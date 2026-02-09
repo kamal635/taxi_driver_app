@@ -1,0 +1,106 @@
+# =========================
+# Misc / OS / temp files
+# =========================
+*.class
+*.log
+*.pyc
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+migrate_working_dir/
+
+# =========================
+# IDEs / Editors
+# =========================
+# IntelliJ / Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code (keep common shared configs)
+.vscode/*
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# =========================
+# Dart / Flutter / Pub
+# =========================
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+.pub-cache/
+build/
+coverage/
+**/doc/api/
+**/ios/Flutter/.last_build_id
+
+# If you use FVM
+.fvm/
+
+# =========================
+# Android
+# =========================
+**/android/**/local.properties
+**/android/**/key.properties
+**/android/**/*.jks
+**/android/**/*.keystore
+**/android/.gradle/
+**/android/**/build/
+**/android/**/captures/
+**/android/**/.cxx/
+
+# Generated app build variants (optional, but safe)
+**/android/**/app/debug/
+**/android/**/app/profile/
+**/android/**/app/release/
+
+# =========================
+# iOS / macOS (Xcode / CocoaPods)
+# =========================
+DerivedData/
+**/*.xcuserdata/
+**/*.xcuserstate
+
+# iOS
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Runner.xcworkspace/xcuserdata/
+**/ios/Runner.xcodeproj/xcuserdata/
+
+# macOS
+**/macos/Pods/
+**/macos/Flutter/ephemeral/
+**/macos/Runner.xcworkspace/xcuserdata/
+**/macos/Runner.xcodeproj/xcuserdata/
+
+# =========================
+# Linux / Windows ephemeral
+# =========================
+**/linux/flutter/ephemeral/
+**/windows/flutter/ephemeral/
+
+# =========================
+# Env / secrets (keep an example file)
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Symbolication / obfuscation
+# =========================
+app.*.symbols
+app.*.map.json
