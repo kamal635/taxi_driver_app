@@ -22,7 +22,7 @@ class TaxiDriverApp extends StatelessWidget {
         onGenerateTitle: (context) => context.l10n.appTitle,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
+        locale: const Locale('ar'),
         theme: AppTheme.light(const Locale('en')),
         routerConfig: AppRouter.router,
       ),
