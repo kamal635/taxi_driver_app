@@ -1,13 +1,13 @@
 {
   "@@locale": "ar",
-  "appTitle": "Taxi Driver App",
-  "brandName": "Syrian Taxi",
-  "brandSubtitle": "Approved drivers platform",
-  "phoneNumberLabel": "Phone number",
+  "appTitle": "تطبيق سائق التكسي",
+  "brandName": "التكسي السوري",
+  "brandSubtitle": "منصة السائقين المعتمدين",
+  "phoneNumberLabel": "رقم الهاتف",
   "phoneHint": "09xx xxx xxx",
-  "passwordLabel": "Password",
+  "passwordLabel": "كلمة المرور",
   "passwordHint": "••••••••",
-  "signIn": "Sign in",
-  "forgotPassword": "Forgot password?",
-  "copyright": "© 2026 Taxi Driver App"
+  "signIn": "تسجيل الدخول",
+  "forgotPassword": "هل نسيت كلمة المرور؟",
+  "copyright": "© 2026 تطبيق سائق التكسي"
 }

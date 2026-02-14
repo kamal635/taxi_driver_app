@@ -9,32 +9,32 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get appTitle => 'Taxi Driver App';
+  String get appTitle => 'تطبيق سائق التكسي';
 
   @override
-  String get brandName => 'Syrian Taxi';
+  String get brandName => 'التكسي السوري';
 
   @override
-  String get brandSubtitle => 'Approved drivers platform';
+  String get brandSubtitle => 'منصة السائقين المعتمدين';
 
   @override
-  String get phoneNumberLabel => 'Phone number';
+  String get phoneNumberLabel => 'رقم الهاتف';
 
   @override
   String get phoneHint => '09xx xxx xxx';
 
   @override
-  String get passwordLabel => 'Password';
+  String get passwordLabel => 'كلمة المرور';
 
   @override
   String get passwordHint => '••••••••';
 
   @override
-  String get signIn => 'Sign in';
+  String get signIn => 'تسجيل الدخول';
 
   @override
-  String get forgotPassword => 'Forgot password?';
+  String get forgotPassword => 'هل نسيت كلمة المرور؟';
 
   @override
-  String get copyright => '© 2026 Taxi Driver App';
+  String get copyright => '© 2026 تطبيق سائق التكسي';
 }
