@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
+import 'package:taxi_driver_app/app/theme/app_typography.dart';
 
 class AppButton extends StatelessWidget {
   const AppButton({
@@ -23,7 +24,7 @@ class AppButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.taxiYellow,
-          foregroundColor: Colors.black,
+          foregroundColor: AppColors.textPrimary,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.r),
@@ -33,14 +34,14 @@ class AppButton extends StatelessWidget {
             ? SizedBox(
                 width: 18.w,
                 height: 18.w,
-                child: const CircularProgressIndicator(strokeWidth: 2),
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.taxiYellow,
+                ),
               )
             : Text(
                 label,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: AppTypography.button,
               ),
       ),
     );

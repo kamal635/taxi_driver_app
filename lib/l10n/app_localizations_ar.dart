@@ -18,10 +18,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get brandSubtitle => 'منصة السائقين المعتمدين';
 
   @override
-  String get phoneNumberLabel => 'رقم الهاتف';
+  String get emailLabel => 'البريد الإلكتروني';
 
   @override
-  String get phoneHint => '09xx xxx xxx';
+  String get emailHint => 'example@example.com';
 
   @override
   String get passwordLabel => 'كلمة المرور';

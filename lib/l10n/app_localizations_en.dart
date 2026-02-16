@@ -18,10 +18,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get brandSubtitle => 'Approved drivers platform';
 
   @override
-  String get phoneNumberLabel => 'Phone number';
+  String get emailLabel => 'Email Address';
 
   @override
-  String get phoneHint => '09xx xxx xxx';
+  String get emailHint => 'example@example.com';
 
   @override
   String get passwordLabel => 'Password';

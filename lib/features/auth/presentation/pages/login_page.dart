@@ -5,24 +5,8 @@ import 'package:taxi_driver_app/features/auth/presentation/widgets/login_footer.
 import 'package:taxi_driver_app/features/auth/presentation/widgets/login_form.dart';
 import 'package:taxi_driver_app/features/auth/presentation/widgets/login_header.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
-
-  @override
-  void dispose() {
-    _phoneController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +17,7 @@ class _LoginPageState extends State<LoginPage> {
         decoration: const BoxDecoration(
           gradient: RadialGradient(
             center: Alignment.topCenter,
-            radius: 1.25,
+            radius: 1.5,
             colors: [AppColors.bgWarm, AppColors.bgBase],
           ),
         ),
@@ -42,15 +26,18 @@ class _LoginPageState extends State<LoginPage> {
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Column(
               children: [
+                /// Header with logo and titles
                 const LoginHeader(),
+
                 LoginForm(
-                  phoneController: _phoneController,
-                  passwordController: _passwordController,
-                  obscurePassword: _obscurePassword,
-                  onTogglePasswordVisibility: () {
-                    setState(() => _obscurePassword = !_obscurePassword);
-                  },
+                  emailController: TextEditingController(),
+                  passwordController: TextEditingController(),
+                  obscurePassword: true,
+                  onTogglePasswordVisibility: () {},
                 ),
+
+                /// Footer widget for the login page,
+                /// showing copyright information
                 const LoginFooter(),
               ],
             ),

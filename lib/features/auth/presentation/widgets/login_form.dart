@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:taxi_driver_app/app/theme/app_colors.dart';
+import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/widgets/app_button.dart';
@@ -7,14 +9,14 @@ import 'package:taxi_driver_app/core/widgets/app_text_field.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({
-    required this.phoneController,
+    required this.emailController,
     required this.passwordController,
     required this.obscurePassword,
     required this.onTogglePasswordVisibility,
     super.key,
   });
 
-  final TextEditingController phoneController;
+  final TextEditingController emailController;
   final TextEditingController passwordController;
 
   final bool obscurePassword;
@@ -24,35 +26,48 @@ class LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        /// Email input field
         AppTextField(
-          controller: phoneController,
-          labelText: context.l10n.phoneNumberLabel,
-          hintText: context.l10n.phoneHint,
-          keyboardType: TextInputType.phone,
+          controller: emailController,
+          labelText: context.l10n.emailLabel,
+          hintText: context.l10n.emailHint,
+          keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
-          suffixIcon: const Icon(AppIcons.phone),
+          prefixIcon: const Icon(AppIcons.email),
         ),
-        const SizedBox(height: 16),
+
+        AppSpacing.h16,
+
+        /// Password input field with visibility toggle
         AppTextField(
           controller: passwordController,
           labelText: context.l10n.passwordLabel,
           hintText: context.l10n.passwordHint,
           obscureText: obscurePassword,
           textInputAction: TextInputAction.done,
-          suffixIcon: const Icon(AppIcons.lock),
-          prefixIcon: IconButton(
+          prefixIcon: const Icon(AppIcons.lock),
+          suffixIcon: IconButton(
+            color: AppColors.iconMuted,
             onPressed: onTogglePasswordVisibility,
-            icon: Icon(obscurePassword ? AppIcons.eye : AppIcons.eyeOff),
+            icon: Icon(
+              obscurePassword ? AppIcons.eye : AppIcons.eyeOff,
+            ),
           ),
         ),
-        const SizedBox(height: 18),
+
+        AppSpacing.h24,
+
+        /// Sign in button
         AppButton(
           label: context.l10n.signIn,
           onPressed: () {
             // UI only for now (no logic yet)
           },
         ),
-        const SizedBox(height: 12),
+
+        AppSpacing.h12,
+
+        /// Forgot password text button
         AppTextButton(
           label: context.l10n.forgotPassword,
           onPressed: () {

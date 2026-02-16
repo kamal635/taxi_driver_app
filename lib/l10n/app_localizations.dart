@@ -116,17 +116,17 @@ abstract class AppLocalizations {
   /// **'Approved drivers platform'**
   String get brandSubtitle;
 
-  /// No description provided for @phoneNumberLabel.
+  /// No description provided for @emailLabel.
   ///
   /// In en, this message translates to:
-  /// **'Phone number'**
-  String get phoneNumberLabel;
+  /// **'Email Address'**
+  String get emailLabel;
 
-  /// No description provided for @phoneHint.
+  /// No description provided for @emailHint.
   ///
   /// In en, this message translates to:
-  /// **'09xx xxx xxx'**
-  String get phoneHint;
+  /// **'example@example.com'**
+  String get emailHint;
 
   /// No description provided for @passwordLabel.
   ///

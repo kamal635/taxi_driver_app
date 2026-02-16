@@ -11,4 +11,6 @@ final class AppColors {
 
   static const border = Color(0xFFE5E7EB);
   static const iconMuted = Color(0xFF9CA3AF);
+
+  static const erorr = Color(0xFFEF4444);
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
+import 'package:taxi_driver_app/app/theme/app_spacing.dart';
+import 'package:taxi_driver_app/app/theme/app_typography.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({
@@ -51,14 +53,10 @@ class AppTextField extends StatelessWidget {
             alignment: AlignmentDirectional.centerStart,
             child: Text(
               labelText!,
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
+              style: AppTypography.labelMd,
             ),
           ),
-          SizedBox(height: 8.h),
+          AppSpacing.h8,
         ],
         TextFormField(
           controller: controller,
@@ -70,32 +68,22 @@ class AppTextField extends StatelessWidget {
           autofillHints: autofillHints,
           onChanged: onChanged,
           onFieldSubmitted: onFieldSubmitted,
-          style: TextStyle(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
+          style: AppTypography.bodyMd,
           validator: validator,
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
-              color: AppColors.iconMuted,
-            ),
+            hintStyle: AppTypography.bodyMuted,
             filled: true,
             fillColor: Colors.white,
             contentPadding: EdgeInsets.symmetric(
               horizontal: 14.w,
               vertical: 14.h,
             ),
-            prefixIcon: prefixIcon,
-            suffixIcon: suffixIcon == null
-                ? null
-                : IconTheme(
-                    data: const IconThemeData(color: AppColors.iconMuted),
-                    child: suffixIcon!,
-                  ),
+            prefixIcon: IconTheme(
+              data: const IconThemeData(color: AppColors.iconMuted),
+              child: prefixIcon!,
+            ),
+            suffixIcon: suffixIcon,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14.r),
               borderSide: const BorderSide(color: AppColors.border),
@@ -113,11 +101,11 @@ class AppTextField extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14.r),
-              borderSide: const BorderSide(color: Colors.redAccent),
+              borderSide: const BorderSide(color: AppColors.erorr),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14.r),
-              borderSide: const BorderSide(color: Colors.redAccent, width: 1.6),
+              borderSide: const BorderSide(color: AppColors.erorr, width: 1.6),
             ),
           ),
         ),
