@@ -1,0 +1,13 @@
+{
+  "@@locale": "en",
+  "appTitle": "Taxi Driver App",
+  "brandName": "Syrian Taxi",
+  "brandSubtitle": "Approved drivers platform",
+  "emailLabel": "Email Address",
+  "emailHint":  "example@example.com",
+  "passwordLabel": "Password",
+  "passwordHint": "••••••••",
+  "signIn": "Sign in",
+  "forgotPassword": "Forgot password?",
+  "copyright": "© 2026 Taxi Driver App"
+}
