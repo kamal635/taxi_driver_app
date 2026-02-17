@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:taxi_driver_app/app/app.dart';
-import 'package:taxi_driver_app/features/auth/presentation/pages/login_page.dart';
+import 'package:taxi_driver_app/app/router/app_shell_page.dart';
 
 void main() {
   testWidgets('App boots without crashing', (tester) async {
@@ -21,7 +21,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Don’t assert localized text. Assert the first screen exists.
-    expect(find.byType(LoginPage), findsOneWidget);
+    expect(find.byType(AppShellPage), findsOneWidget);
 
     // Optional: ensure no uncaught exception happened during build.
     expect(tester.takeException(), isNull);

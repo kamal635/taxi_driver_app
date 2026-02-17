@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taxi_driver_app/app/router/bottom_nav.dart';
+import 'package:taxi_driver_app/app/theme/app_colors.dart';
+import 'package:taxi_driver_app/app/theme/app_spacing.dart';
+import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/widgets/app_background.dart';
 
@@ -12,12 +16,45 @@ class AppShellPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
+    final pageTitle = switch (navigationShell.currentIndex) {
+      0 => l10n.navHome,
+      1 => l10n.navTrips,
+      _ => l10n.navProfile,
+    };
+
     return Scaffold(
       extendBody: true,
       body: Stack(
         children: [
           const AppBackground(),
-          navigationShell,
+
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Column(
+                    children: [
+                      AppSpacing.h8,
+                      AppTopBar(
+                        title: pageTitle,
+                        avatarText: 'A',
+                        onBellPressed: () {},
+                        onAvatarPressed: () {
+                          context.go('/profile');
+                        },
+                      ),
+                      AppSpacing.h12,
+                    ],
+                  ),
+                ),
+
+                /// The main content area where
+                ///  the current page will be displayed
+                Expanded(child: navigationShell),
+              ],
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: BottomNav(
@@ -27,6 +64,60 @@ class AppShellPage extends StatelessWidget {
         tripsLabel: l10n.navTrips,
         profileLabel: l10n.navProfile,
       ),
+    );
+  }
+}
+
+class AppTopBar extends StatelessWidget {
+  const AppTopBar({
+    required this.title,
+    required this.avatarText,
+    required this.onBellPressed,
+    required this.onAvatarPressed,
+    super.key,
+  });
+
+  final String title;
+  final String avatarText;
+  final VoidCallback onBellPressed;
+  final VoidCallback onAvatarPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        IconButton(
+          onPressed: onBellPressed,
+          icon: const Icon(Icons.notifications_none_rounded),
+          color: AppColors.textPrimary,
+        ),
+
+        Expanded(
+          child: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: AppTypography.titleSm,
+          ),
+        ),
+
+        GestureDetector(
+          onTap: onAvatarPressed,
+          child: Container(
+            width: 38.r,
+            height: 38.r,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.taxiYellow, width: 2),
+              color: Colors.white,
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              avatarText,
+              style: AppTypography.labelMd,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
