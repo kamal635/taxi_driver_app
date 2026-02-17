@@ -11,15 +11,10 @@ class AppPlaceholderPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title, style: TextStyle(fontSize: 16.sp)),
-      ),
-      body: Center(
-        child: Text(
-          '$title (Placeholder)',
-          style: TextStyle(fontSize: 18.sp),
-        ),
+    return Center(
+      child: Text(
+        '$title (Placeholder)',
+        style: TextStyle(fontSize: 18.sp),
       ),
     );
   }

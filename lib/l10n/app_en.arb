@@ -4,10 +4,66 @@
   "brandName": "Syrian Taxi",
   "brandSubtitle": "Approved drivers platform",
   "emailLabel": "Email Address",
-  "emailHint":  "example@example.com",
+  "emailHint": "example@example.com",
   "passwordLabel": "Password",
   "passwordHint": "••••••••",
   "signIn": "Sign in",
   "forgotPassword": "Forgot password?",
-  "copyright": "© 2026 Taxi Driver App"
+  "copyright": "© 2026 Taxi Driver App",
+
+  "homeGreeting": "Hello,",
+  "homeNetworkConnected": "Connected",
+  "homeNetworkDisconnected": "Disconnected",
+
+  "homeAvailabilityOnTitle": "You are available now",
+  "homeAvailabilityOnSubtitle": "You will receive nearby ride requests once available",
+
+  "homeAvailabilityOffTitle": "You are offline",
+  "homeAvailabilityOffSubtitle": "Turn availability on to start receiving nearby ride requests",
+
+  "actionConfirm": "Confirm",
+  "actionCancel": "Cancel",
+
+  "availabilityTurnOffTitle": "Turn off availability?",
+  "availabilityTurnOffMessage": "You will stop receiving ride requests until you turn it on again.",
+
+  "homeEmptyTitle": "Waiting for new requests...",
+  "homeEmptySubtitle": "We are looking for new riders near your current area. Please stay close to the app.",
+  "homeUpdateLocation": "Update location",
+
+  "homeTabCurrent": "Current",
+  "homeTabCompleted": "Completed",
+
+  "homeRequestNewTitle": "New request",
+  "homeRequestCurrentTitle": "Current ride",
+  "homeRequestCompletedTitle": "Completed ride",
+
+  "homePickupPrefix": "Pickup:",
+  "homeDropoffPrefix": "Dropoff:",
+  "homeFarePrefix": "Fare:",
+
+  "homeAvailableIn": "Available in:",
+
+  "actionAccept": "Accept",
+  "actionReject": "Reject",
+  "actionDone": "Done",
+
+  "badgeNew": "NEW",
+  "badgeLive": "LIVE",
+  "badgeDone": "DONE",
+
+  "navHome": "Home",
+  "navTrips": "Trips",
+  "navProfile": "Profile",
+
+  "homeLastLocationUpdateNow": "Last location update: now",
+  "homeLastLocationUpdateSecondsAgo": "Last location update: {seconds}s ago",
+  "@homeLastLocationUpdateSecondsAgo": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+
+  "exitAppTitle": "Exit app?",
+  "exitAppMessage": "Are you sure you want to close the app?"
 }
