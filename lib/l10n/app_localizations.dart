@@ -157,6 +157,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'© 2026 Taxi Driver App'**
   String get copyright;
+
+  /// No description provided for @homeGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello,'**
+  String get homeGreeting;
+
+  /// No description provided for @homeNetworkConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get homeNetworkConnected;
+
+  /// No description provided for @homeNetworkDisconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnected'**
+  String get homeNetworkDisconnected;
+
+  /// No description provided for @homeAvailabilityOnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You are available now'**
+  String get homeAvailabilityOnTitle;
+
+  /// No description provided for @homeAvailabilityOnSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You will receive nearby ride requests once available'**
+  String get homeAvailabilityOnSubtitle;
+
+  /// No description provided for @homeAvailabilityOffTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You are offline'**
+  String get homeAvailabilityOffTitle;
+
+  /// No description provided for @homeAvailabilityOffSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn availability on to start receiving nearby ride requests'**
+  String get homeAvailabilityOffSubtitle;
+
+  /// No description provided for @actionConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get actionConfirm;
+
+  /// No description provided for @actionCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get actionCancel;
+
+  /// No description provided for @availabilityTurnOffTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off availability?'**
+  String get availabilityTurnOffTitle;
+
+  /// No description provided for @availabilityTurnOffMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You will stop receiving ride requests until you turn it on again.'**
+  String get availabilityTurnOffMessage;
+
+  /// No description provided for @homeEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for new requests...'**
+  String get homeEmptyTitle;
+
+  /// No description provided for @homeEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We are looking for new riders near your current area. Please stay close to the app.'**
+  String get homeEmptySubtitle;
+
+  /// No description provided for @homeUpdateLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Update location'**
+  String get homeUpdateLocation;
+
+  /// No description provided for @homeTabCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get homeTabCurrent;
+
+  /// No description provided for @homeTabCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get homeTabCompleted;
+
+  /// No description provided for @homeRequestNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New request'**
+  String get homeRequestNewTitle;
+
+  /// No description provided for @homeRequestCurrentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Current ride'**
+  String get homeRequestCurrentTitle;
+
+  /// No description provided for @homeRequestCompletedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed ride'**
+  String get homeRequestCompletedTitle;
+
+  /// No description provided for @homePickupPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup:'**
+  String get homePickupPrefix;
+
+  /// No description provided for @homeDropoffPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Dropoff:'**
+  String get homeDropoffPrefix;
+
+  /// No description provided for @homeFarePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Fare:'**
+  String get homeFarePrefix;
+
+  /// No description provided for @homeAvailableIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Available in:'**
+  String get homeAvailableIn;
+
+  /// No description provided for @actionAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get actionAccept;
+
+  /// No description provided for @actionReject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get actionReject;
+
+  /// No description provided for @actionDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get actionDone;
+
+  /// No description provided for @badgeNew.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW'**
+  String get badgeNew;
+
+  /// No description provided for @badgeLive.
+  ///
+  /// In en, this message translates to:
+  /// **'LIVE'**
+  String get badgeLive;
+
+  /// No description provided for @badgeDone.
+  ///
+  /// In en, this message translates to:
+  /// **'DONE'**
+  String get badgeDone;
+
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips'**
+  String get navTrips;
+
+  /// No description provided for @navProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get navProfile;
+
+  /// No description provided for @homeLastLocationUpdateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Last location update: now'**
+  String get homeLastLocationUpdateNow;
+
+  /// No description provided for @homeLastLocationUpdateSecondsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Last location update: {seconds}s ago'**
+  String homeLastLocationUpdateSecondsAgo(int seconds);
+
+  /// No description provided for @exitAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit app?'**
+  String get exitAppTitle;
+
+  /// No description provided for @exitAppMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to close the app?'**
+  String get exitAppMessage;
 }
 
 class _AppLocalizationsDelegate

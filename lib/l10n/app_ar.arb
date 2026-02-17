@@ -4,10 +4,66 @@
   "brandName": "التكسي السوري",
   "brandSubtitle": "منصة السائقين المعتمدين",
   "emailLabel": "البريد الإلكتروني",
-  "emailHint":  "example@example.com",
+  "emailHint": "example@example.com",
   "passwordLabel": "كلمة المرور",
   "passwordHint": "••••••••",
   "signIn": "تسجيل الدخول",
   "forgotPassword": "هل نسيت كلمة المرور؟",
-  "copyright": "© 2026 تطبيق سائق التكسي"
+  "copyright": "© 2026 تطبيق سائق التكسي",
+
+  "homeGreeting": "مرحباً،",
+  "homeNetworkConnected": "متصل بالشبكة",
+  "homeNetworkDisconnected": "غير متصل بالشبكة",
+
+  "homeAvailabilityOnTitle": "أنت متاح الآن",
+  "homeAvailabilityOnSubtitle": "ستتلقى طلبات الركاب القريبة منك فور توفرها",
+
+  "homeAvailabilityOffTitle": "أنت غير متاح حالياً",
+  "homeAvailabilityOffSubtitle": "فعّل وضع التوفر لتبدأ باستقبال طلبات الركاب القريبة منك",
+
+  "actionConfirm": "تأكيد",
+  "actionCancel": "إلغاء",
+
+  "availabilityTurnOffTitle": "هل تريد إيقاف التوفر؟",
+  "availabilityTurnOffMessage": "لن تستقبل طلبات جديدة حتى تقوم بتفعيل التوفر مرة أخرى.",
+
+  "homeEmptyTitle": "بانتظار الطلبات الجديدة...",
+  "homeEmptySubtitle": "نحن نبحث عن ركاب جدد في منطقتك الحالية. يرجى البقاء بالقرب من تطبيقك.",
+  "homeUpdateLocation": "تحديث الموقع",
+
+  "homeTabCurrent": "الحالية",
+  "homeTabCompleted": "المكتملة",
+
+  "homeRequestNewTitle": "طلب جديد",
+  "homeRequestCurrentTitle": "طلب جاري",
+  "homeRequestCompletedTitle": "طلب مكتمل",
+
+  "homePickupPrefix": "الانطلاق:",
+  "homeDropoffPrefix": "الوجهة:",
+  "homeFarePrefix": "السعر:",
+
+  "homeAvailableIn": "متاح بعد:",
+
+  "actionAccept": "قبول",
+  "actionReject": "رفض",
+  "actionDone": "تم",
+
+  "badgeNew": "جديد",
+  "badgeLive": "جاري",
+  "badgeDone": "تم",
+
+  "navHome": "الرئيسية",
+  "navTrips": "رحلاتي",
+  "navProfile": "ملف شخصي",
+
+  "homeLastLocationUpdateNow": "آخر تحديث للموقع: الآن",
+  "homeLastLocationUpdateSecondsAgo": "آخر تحديث للموقع: قبل {seconds} ثانية",
+  "@homeLastLocationUpdateSecondsAgo": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+
+  "exitAppTitle": "إغلاق التطبيق؟",
+  "exitAppMessage": "هل أنت متأكد أنك تريد إغلاق التطبيق؟"
 }
