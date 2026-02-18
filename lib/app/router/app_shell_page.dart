@@ -26,6 +26,7 @@ class AppShellPage extends StatelessWidget {
 
     return Scaffold(
       extendBody: true,
+
       body: Stack(
         children: [
           const AppBackground(),
@@ -46,7 +47,7 @@ class AppShellPage extends StatelessWidget {
                           context.go('/profile');
                         },
                       ),
-                      AppSpacing.h12,
+                      AppSpacing.h8,
                     ],
                   ),
                 ),
@@ -139,7 +140,7 @@ class _AppTopBarState extends State<AppTopBar> {
             ),
           ],
         ),
-        AppSpacing.h12,
+        AppSpacing.h4,
 
         /// Availability
         AvailabilityCard(

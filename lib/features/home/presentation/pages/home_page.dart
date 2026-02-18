@@ -30,13 +30,9 @@ class _HomePageState extends State<HomePage> {
         children: [
           AppSpacing.h8,
 
-          AppSpacing.h18,
-
           /// Requests
           Expanded(
-            child: SingleChildScrollView(
-              child: _buildRequestArea(l10n),
-            ),
+            child: SingleChildScrollView(child: _buildRequestArea(l10n)),
           ),
         ],
       ),
@@ -64,6 +60,7 @@ class _HomePageState extends State<HomePage> {
                 setState(() => _requestState = HomeRequestUiState.empty);
               },
             ),
+
             AppSpacing.h16,
           ],
         );

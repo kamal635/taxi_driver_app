@@ -55,8 +55,6 @@ class _TripsPageState extends State<TripsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppSpacing.h12,
-
           TripsSummaryCard(
             title: l10n.tripsSummaryTitle,
             subtitle: l10n.tripsSummarySubtitle,
