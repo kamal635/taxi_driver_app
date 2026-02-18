@@ -68,7 +68,7 @@ Future<bool> showAppConfirmDialog({
                     child: AppButton(
                       backgroundColor: Colors.transparent,
                       label: cancelLabel,
-                      onPressed: () => context.pop(true),
+                      onPressed: () => context.pop(false),
                     ),
                   ),
 

@@ -65,5 +65,19 @@
   },
 
   "exitAppTitle": "Exit app?",
-  "exitAppMessage": "Are you sure you want to close the app?"
+  "exitAppMessage": "Are you sure you want to close the app?",
+
+  "tripsSummaryTitle": "Your trips at a glance",
+  "tripsSummarySubtitle": "Track completed rides and earnings",
+  "tripsSummaryTripsLabel": "Trips",
+  "tripsSummaryEarningsLabel": "Earnings",
+  "tripsFilterAll": "All",
+  "tripsFilterToday": "Today",
+  "tripsFilterWeek": "Week",
+  "tripsRecentTitle": "Recent completed trips",
+  "tripsEmptyTitle": "No trips yet",
+  "tripsEmptySubtitle": "Completed trips will appear here once you finish your first ride.",
+  
+  "online": "Online",
+  "offline": "Offline"
 }

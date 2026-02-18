@@ -65,5 +65,19 @@
   },
 
   "exitAppTitle": "إغلاق التطبيق؟",
-  "exitAppMessage": "هل أنت متأكد أنك تريد إغلاق التطبيق؟"
+  "exitAppMessage": "هل أنت متأكد أنك تريد إغلاق التطبيق؟",
+
+  "tripsSummaryTitle": "نظرة سريعة على رحلاتك",
+  "tripsSummarySubtitle": "تابع الرحلات المكتملة والأرباح",
+  "tripsSummaryTripsLabel": "الرحلات",
+  "tripsSummaryEarningsLabel": "الأرباح",
+  "tripsFilterAll": "الكل",
+  "tripsFilterToday": "اليوم",
+  "tripsFilterWeek": "الأسبوع",
+  "tripsRecentTitle": "الرحلات المكتملة مؤخراً",
+  "tripsEmptyTitle": "لا توجد رحلات بعد",
+  "tripsEmptySubtitle": "ستظهر الرحلات المكتملة هنا بعد إنهاء أول رحلة.",
+
+  "online": "متصل",
+  "offline": "غير متصل"
 }

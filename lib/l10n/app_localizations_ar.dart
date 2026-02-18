@@ -151,4 +151,41 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get exitAppMessage => 'هل أنت متأكد أنك تريد إغلاق التطبيق؟';
+
+  @override
+  String get tripsSummaryTitle => 'نظرة سريعة على رحلاتك';
+
+  @override
+  String get tripsSummarySubtitle => 'تابع الرحلات المكتملة والأرباح';
+
+  @override
+  String get tripsSummaryTripsLabel => 'الرحلات';
+
+  @override
+  String get tripsSummaryEarningsLabel => 'الأرباح';
+
+  @override
+  String get tripsFilterAll => 'الكل';
+
+  @override
+  String get tripsFilterToday => 'اليوم';
+
+  @override
+  String get tripsFilterWeek => 'الأسبوع';
+
+  @override
+  String get tripsRecentTitle => 'الرحلات المكتملة مؤخراً';
+
+  @override
+  String get tripsEmptyTitle => 'لا توجد رحلات بعد';
+
+  @override
+  String get tripsEmptySubtitle =>
+      'ستظهر الرحلات المكتملة هنا بعد إنهاء أول رحلة.';
+
+  @override
+  String get online => 'متصل';
+
+  @override
+  String get offline => 'غير متصل';
 }

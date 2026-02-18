@@ -151,4 +151,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exitAppMessage => 'Are you sure you want to close the app?';
+
+  @override
+  String get tripsSummaryTitle => 'Your trips at a glance';
+
+  @override
+  String get tripsSummarySubtitle => 'Track completed rides and earnings';
+
+  @override
+  String get tripsSummaryTripsLabel => 'Trips';
+
+  @override
+  String get tripsSummaryEarningsLabel => 'Earnings';
+
+  @override
+  String get tripsFilterAll => 'All';
+
+  @override
+  String get tripsFilterToday => 'Today';
+
+  @override
+  String get tripsFilterWeek => 'Week';
+
+  @override
+  String get tripsRecentTitle => 'Recent completed trips';
+
+  @override
+  String get tripsEmptyTitle => 'No trips yet';
+
+  @override
+  String get tripsEmptySubtitle =>
+      'Completed trips will appear here once you finish your first ride.';
+
+  @override
+  String get online => 'Online';
+
+  @override
+  String get offline => 'Offline';
 }

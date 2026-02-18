@@ -3,6 +3,7 @@ import 'package:taxi_driver_app/app/router/app_shell_page.dart';
 import 'package:taxi_driver_app/core/widgets/app_placeholder_page.dart';
 import 'package:taxi_driver_app/features/auth/presentation/pages/login_page.dart';
 import 'package:taxi_driver_app/features/home/presentation/pages/home_page.dart';
+import 'package:taxi_driver_app/features/trips/presentation/pages/trips_page.dart';
 
 final class AppRouter {
   static final GoRouter router = GoRouter(
@@ -32,8 +33,7 @@ final class AppRouter {
               GoRoute(
                 path: '/trips',
                 name: 'trips',
-                builder: (context, state) =>
-                    const AppPlaceholderPage(title: 'Trips'),
+                builder: (context, state) => const TripsPage(),
               ),
             ],
           ),

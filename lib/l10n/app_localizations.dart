@@ -373,6 +373,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to close the app?'**
   String get exitAppMessage;
+
+  /// No description provided for @tripsSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your trips at a glance'**
+  String get tripsSummaryTitle;
+
+  /// No description provided for @tripsSummarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track completed rides and earnings'**
+  String get tripsSummarySubtitle;
+
+  /// No description provided for @tripsSummaryTripsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips'**
+  String get tripsSummaryTripsLabel;
+
+  /// No description provided for @tripsSummaryEarningsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Earnings'**
+  String get tripsSummaryEarningsLabel;
+
+  /// No description provided for @tripsFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get tripsFilterAll;
+
+  /// No description provided for @tripsFilterToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get tripsFilterToday;
+
+  /// No description provided for @tripsFilterWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get tripsFilterWeek;
+
+  /// No description provided for @tripsRecentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent completed trips'**
+  String get tripsRecentTitle;
+
+  /// No description provided for @tripsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No trips yet'**
+  String get tripsEmptyTitle;
+
+  /// No description provided for @tripsEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed trips will appear here once you finish your first ride.'**
+  String get tripsEmptySubtitle;
+
+  /// No description provided for @online.
+  ///
+  /// In en, this message translates to:
+  /// **'Online'**
+  String get online;
+
+  /// No description provided for @offline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get offline;
 }
 
 class _AppLocalizationsDelegate

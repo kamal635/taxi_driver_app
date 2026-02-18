@@ -20,7 +20,7 @@ class StatusPill extends StatelessWidget {
     final dot = isOnline ? AppColors.success : AppColors.error;
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(999.r),
@@ -32,8 +32,8 @@ class StatusPill extends StatelessWidget {
         children: [
           /// Colored Dot
           Container(
-            width: 8.r,
-            height: 8.r,
+            width: 6.r,
+            height: 6.r,
             decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
           ),
 
