@@ -3,12 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
+import 'package:taxi_driver_app/core/widgets/status_pill.dart';
 
-class HomeAvailabilityCard extends StatelessWidget {
-  const HomeAvailabilityCard({
+class AvailabilityCard extends StatelessWidget {
+  const AvailabilityCard({
     required this.isOnline,
     required this.title,
     required this.subtitle,
+    required this.textPill,
     required this.onChanged,
     super.key,
   });
@@ -16,6 +18,7 @@ class HomeAvailabilityCard extends StatelessWidget {
   final bool isOnline;
   final String title;
   final String subtitle;
+  final String textPill;
   final ValueChanged<bool> onChanged;
 
   @override
@@ -24,7 +27,7 @@ class HomeAvailabilityCard extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(18.r),
         border: Border.all(color: AppColors.border),
         boxShadow: [
@@ -54,10 +57,16 @@ class HomeAvailabilityCard extends StatelessWidget {
           AppSpacing.w12,
 
           /// Switch
-          Switch(
-            value: isOnline,
-            onChanged: onChanged,
-            activeTrackColor: AppColors.taxiYellow,
+          Column(
+            children: [
+              StatusPill(text: textPill, isOnline: isOnline),
+              AppSpacing.h12,
+              Switch(
+                value: isOnline,
+                onChanged: onChanged,
+                activeTrackColor: AppColors.taxiYellow,
+              ),
+            ],
           ),
         ],
       ),
