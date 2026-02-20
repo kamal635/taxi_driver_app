@@ -153,7 +153,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exitAppMessage => 'Are you sure you want to close the app?';
 
   @override
-  String get tripsSummaryTitle => 'Your trips at a glance';
+  String get tripsSummaryTitle => 'Your earnings at a glance';
 
   @override
   String get tripsSummarySubtitle => 'Track completed rides and earnings';
@@ -295,4 +295,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get vehicleInfoNote =>
       'This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office or your coordinator.';
+
+  @override
+  String tripsTotalTrips(int count) {
+    return 'total trips: ($count)';
+  }
 }

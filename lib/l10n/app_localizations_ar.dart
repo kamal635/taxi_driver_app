@@ -153,7 +153,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get exitAppMessage => 'هل أنت متأكد أنك تريد إغلاق التطبيق؟';
 
   @override
-  String get tripsSummaryTitle => 'نظرة سريعة على رحلاتك';
+  String get tripsSummaryTitle => 'نظرة سريعة على أرباحك';
 
   @override
   String get tripsSummarySubtitle => 'تابع الرحلات المكتملة والأرباح';
@@ -296,4 +296,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get vehicleInfoNote =>
       'معلومات هذه المركبة مسجّلة في النظام. إذا تغيّر أي تفصيل أو ظهر بشكل غير صحيح، يرجى التواصل مع المكتب أو معسّقك.';
+
+  @override
+  String tripsTotalTrips(int count) {
+    return 'إجمالي الرحلات: ($count)';
+  }
 }

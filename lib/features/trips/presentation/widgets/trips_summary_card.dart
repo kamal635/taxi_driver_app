@@ -7,7 +7,6 @@ import 'package:taxi_driver_app/app/theme/app_typography.dart';
 class TripsSummaryCard extends StatelessWidget {
   const TripsSummaryCard({
     required this.title,
-    required this.subtitle,
     required this.tripsLabel,
     required this.earningsLabel,
     required this.tripsCountText,
@@ -16,7 +15,6 @@ class TripsSummaryCard extends StatelessWidget {
   });
 
   final String title;
-  final String subtitle;
   final String tripsLabel;
   final String earningsLabel;
   final String tripsCountText;
@@ -25,6 +23,7 @@ class TripsSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.all(14.r),
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -42,31 +41,14 @@ class TripsSummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: AppTypography.titleSm),
-          AppSpacing.h6,
-          Text(subtitle, style: AppTypography.subtitleMd),
+
           AppSpacing.h12,
 
-          Row(
-            children: [
-              Expanded(
-                child: _SummaryStat(
-                  icon: Icons.check_circle_rounded,
-                  label: tripsLabel,
-                  value: tripsCountText,
-                ),
-              ),
-
-              AppSpacing.w12,
-
-              Expanded(
-                child: _SummaryStat(
-                  icon: Icons.payments_rounded,
-                  label: earningsLabel,
-                  value: earningsText,
-                  valueColor: const Color(0xFF16A34A),
-                ),
-              ),
-            ],
+          _SummaryStat(
+            icon: Icons.payments_rounded,
+            label: earningsLabel,
+            value: earningsText,
+            valueColor: const Color(0xFF16A34A),
           ),
         ],
       ),
@@ -97,6 +79,7 @@ class _SummaryStat extends StatelessWidget {
         border: Border.all(color: AppColors.border),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: 38.r,
@@ -111,7 +94,7 @@ class _SummaryStat extends StatelessWidget {
 
           AppSpacing.w12,
 
-          Expanded(
+          Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

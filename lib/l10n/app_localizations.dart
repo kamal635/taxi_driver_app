@@ -377,7 +377,7 @@ abstract class AppLocalizations {
   /// No description provided for @tripsSummaryTitle.
   ///
   /// In en, this message translates to:
-  /// **'Your trips at a glance'**
+  /// **'Your earnings at a glance'**
   String get tripsSummaryTitle;
 
   /// No description provided for @tripsSummarySubtitle.
@@ -655,6 +655,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office or your coordinator.'**
   String get vehicleInfoNote;
+
+  /// No description provided for @tripsTotalTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'total trips: ({count})'**
+  String tripsTotalTrips(int count);
 }
 
 class _AppLocalizationsDelegate
