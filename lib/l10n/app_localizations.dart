@@ -445,6 +445,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Offline'**
   String get offline;
+
+  /// No description provided for @profileSectionAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account settings'**
+  String get profileSectionAccount;
+
+  /// No description provided for @profileSectionSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get profileSectionSupport;
+
+  /// No description provided for @profileSectionSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get profileSectionSignOut;
+
+  /// No description provided for @profileEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get profileEditTitle;
+
+  /// No description provided for @profileEditSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your personal info'**
+  String get profileEditSubtitle;
+
+  /// No description provided for @profileChangePasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get profileChangePasswordTitle;
+
+  /// No description provided for @profileChangePasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure your account'**
+  String get profileChangePasswordSubtitle;
+
+  /// No description provided for @profileMyVehiclesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My vehicles'**
+  String get profileMyVehiclesTitle;
+
+  /// No description provided for @profileMyVehiclesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your registered cars'**
+  String get profileMyVehiclesSubtitle;
+
+  /// No description provided for @profileHelpCenterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help center'**
+  String get profileHelpCenterTitle;
+
+  /// No description provided for @profileHelpCenterSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FAQs and technical support'**
+  String get profileHelpCenterSubtitle;
+
+  /// No description provided for @profileSignOutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get profileSignOutTitle;
+
+  /// No description provided for @profileSignOutSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out from this account'**
+  String get profileSignOutSubtitle;
+
+  /// No description provided for @signOutConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to sign out from this account?'**
+  String get signOutConfirmMessage;
+
+  /// No description provided for @signOutConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out?'**
+  String get signOutConfirmTitle;
+
+  /// No description provided for @profileChangePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get profileChangePhoto;
+
+  /// No description provided for @profileFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get profileFullName;
+
+  /// No description provided for @profileFullNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'John Doe'**
+  String get profileFullNameHint;
+
+  /// No description provided for @profilePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get profilePhone;
+
+  /// No description provided for @profilePhoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'+963 123 456 789'**
+  String get profilePhoneHint;
+
+  /// No description provided for @profileEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get profileEmail;
+
+  /// No description provided for @actionSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get actionSaveChanges;
+
+  /// No description provided for @profileCurrentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password'**
+  String get profileCurrentPassword;
+
+  /// No description provided for @profileNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get profileNewPassword;
+
+  /// No description provided for @profileConfirmNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get profileConfirmNewPassword;
+
+  /// No description provided for @profilePasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters.'**
+  String get profilePasswordHint;
+
+  /// No description provided for @profileUpdatePasswordAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Update password'**
+  String get profileUpdatePasswordAction;
+
+  /// No description provided for @vehicleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Vehicle'**
+  String get vehicleTitle;
+
+  /// No description provided for @vehiclePlateNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Plate Number'**
+  String get vehiclePlateNumberLabel;
+
+  /// No description provided for @vehicleTaxiLanternNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Taxi Lantern Number'**
+  String get vehicleTaxiLanternNumberLabel;
+
+  /// No description provided for @vehicleModelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get vehicleModelLabel;
+
+  /// No description provided for @vehicleTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get vehicleTypeLabel;
+
+  /// No description provided for @vehicleTypePublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Public'**
+  String get vehicleTypePublic;
+
+  /// No description provided for @vehicleTypePrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get vehicleTypePrivate;
+
+  /// No description provided for @vehicleInfoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office or your coordinator.'**
+  String get vehicleInfoNote;
 }
 
 class _AppLocalizationsDelegate

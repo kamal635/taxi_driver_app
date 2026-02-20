@@ -188,4 +188,112 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get offline => 'غير متصل';
+
+  @override
+  String get profileSectionAccount => 'إعدادات الحساب';
+
+  @override
+  String get profileSectionSupport => 'الدعم والمساعدة';
+
+  @override
+  String get profileSectionSignOut => 'تسجيل الخروج';
+
+  @override
+  String get profileEditTitle => 'تعديل الملف الشخصي';
+
+  @override
+  String get profileEditSubtitle => 'تحديث معلوماتك الشخصية';
+
+  @override
+  String get profileChangePasswordTitle => 'تغيير كلمة المرور';
+
+  @override
+  String get profileChangePasswordSubtitle => 'تأمين حسابك بكلمة مرور جديدة';
+
+  @override
+  String get profileMyVehiclesTitle => 'مركباتي';
+
+  @override
+  String get profileMyVehiclesSubtitle => 'إدارة السيارات المسجلة';
+
+  @override
+  String get profileHelpCenterTitle => 'مركز المساعدة';
+
+  @override
+  String get profileHelpCenterSubtitle => 'الأسئلة الشائعة والدعم الفني';
+
+  @override
+  String get profileSignOutTitle => 'تسجيل الخروج';
+
+  @override
+  String get profileSignOutSubtitle => 'الخروج من هذا الحساب';
+
+  @override
+  String get signOutConfirmMessage =>
+      'هل أنت متأكد أنك تريد تسجيل الخروج من هذا الحساب؟';
+
+  @override
+  String get signOutConfirmTitle => 'تسجيل الخروج؟';
+
+  @override
+  String get profileChangePhoto => 'تغيير الصورة';
+
+  @override
+  String get profileFullName => 'الاسم الكامل';
+
+  @override
+  String get profileFullNameHint => 'الاسم الكامل';
+
+  @override
+  String get profilePhone => 'رقم الهاتف';
+
+  @override
+  String get profilePhoneHint => '+963 123 456 789';
+
+  @override
+  String get profileEmail => 'البريد الإلكتروني';
+
+  @override
+  String get actionSaveChanges => 'حفظ التغييرات';
+
+  @override
+  String get profileCurrentPassword => 'كلمة المرور الحالية';
+
+  @override
+  String get profileNewPassword => 'كلمة المرور الجديدة';
+
+  @override
+  String get profileConfirmNewPassword => 'تأكيد كلمة المرور الجديدة';
+
+  @override
+  String get profilePasswordHint =>
+      'يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل.';
+
+  @override
+  String get profileUpdatePasswordAction => 'تحديث كلمة المرور';
+
+  @override
+  String get vehicleTitle => 'مركبتي';
+
+  @override
+  String get vehiclePlateNumberLabel => 'رقم اللوحة';
+
+  @override
+  String get vehicleTaxiLanternNumberLabel => 'رقم فانوس التاكسي';
+
+  @override
+  String get vehicleModelLabel => 'الموديل';
+
+  @override
+  String get vehicleTypeLabel => 'النوع';
+
+  @override
+  String get vehicleTypePublic => 'عمومي';
+
+  @override
+  String get vehicleTypePrivate => 'خصوصي';
+
+  @override
+  String get vehicleInfoNote =>
+      'معلومات هذه المركبة مسجّلة في النظام. إذا تغيّر أي تفصيل أو ظهر بشكل غير صحيح، يرجى التواصل مع المكتب أو معسّقك.';
 }

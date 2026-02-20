@@ -6,11 +6,11 @@ import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/widgets/app_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CurrentRequestCard extends StatelessWidget {
   const CurrentRequestCard._({
     required this.title,
-    required this.riderName,
     required this.fareText,
     required this.pickup,
     required this.dropoff,
@@ -23,12 +23,12 @@ class CurrentRequestCard extends StatelessWidget {
     this.onPrimaryAction,
     this.countdownPrefix,
     this.doneDelay,
+    this.phoneNumber,
     super.key,
   });
 
   factory CurrentRequestCard.offer({
     required String title,
-    required String riderName,
     required String fareText,
     required String pickup,
     required String dropoff,
@@ -41,7 +41,6 @@ class CurrentRequestCard extends StatelessWidget {
     return CurrentRequestCard._(
       key: key,
       title: title,
-      riderName: riderName,
       fareText: fareText,
       pickup: pickup,
       dropoff: dropoff,
@@ -55,10 +54,10 @@ class CurrentRequestCard extends StatelessWidget {
 
   factory CurrentRequestCard.current({
     required String title,
-    required String riderName,
     required String fareText,
     required String pickup,
     required String dropoff,
+    required String phoneNumber,
     required String primaryActionLabel,
     required VoidCallback onPrimaryAction,
     required String countdownPrefix,
@@ -68,10 +67,10 @@ class CurrentRequestCard extends StatelessWidget {
     return CurrentRequestCard._(
       key: key,
       title: title,
-      riderName: riderName,
       fareText: fareText,
       pickup: pickup,
       dropoff: dropoff,
+      phoneNumber: phoneNumber,
       variant: CardVariant.current,
       primaryActionLabel: primaryActionLabel,
       onPrimaryAction: onPrimaryAction,
@@ -81,26 +80,24 @@ class CurrentRequestCard extends StatelessWidget {
   }
 
   final String title;
-  final String riderName;
   final String fareText;
   final String pickup;
   final String dropoff;
 
   final CardVariant variant;
 
-  // Offer
   final String? acceptLabel;
   final String? rejectLabel;
   final VoidCallback? onAccept;
   final VoidCallback? onReject;
 
-  // Current
   final String? primaryActionLabel;
   final VoidCallback? onPrimaryAction;
 
-  // Countdown (Current)
   final String? countdownPrefix;
   final Duration? doneDelay;
+
+  final String? phoneNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -118,45 +115,23 @@ class CurrentRequestCard extends StatelessWidget {
           ),
         ],
       ),
-
-      /// Content
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// Title, Rider Name, and Avatar
+          /// Header (Title + Status)
           Row(
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: AppTypography.subtitleSm),
-                    AppSpacing.h4,
-                    Text(riderName, style: AppTypography.titleSm),
-                  ],
+                child: Text(
+                  title,
+                  style: AppTypography.subtitleSm,
                 ),
               ),
-
-              /// Rider Avatar (Placeholder)
-              Container(
-                width: 42.r,
-                height: 42.r,
-                decoration: BoxDecoration(
-                  color: AppColors.bgBase,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: AppColors.border),
-                ),
-
-                child: Icon(
-                  Icons.person_rounded,
-                  color: AppColors.iconMuted,
-                  size: 22.r,
-                ),
-              ),
+              _RequestStatus(variant: variant),
             ],
           ),
 
-          AppSpacing.h12,
+          AppSpacing.h16,
 
           /// Fare
           Text(fareText, style: AppTypography.titleSm),
@@ -173,8 +148,52 @@ class CurrentRequestCard extends StatelessWidget {
 
           AppSpacing.h16,
 
+          /// Phone Section (only current)
+          if (variant == CardVariant.current) ...[
+            const Divider(color: AppColors.border),
+            AppSpacing.h12,
+            Row(
+              children: [
+                Icon(
+                  Icons.phone_rounded,
+                  color: AppColors.taxiYellow,
+                  size: 20.r,
+                ),
+                AppSpacing.w8,
+                Expanded(
+                  child: Text(
+                    phoneNumber ?? '',
+                    style: AppTypography.bodyMd,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    final uri = Uri.parse('tel:${phoneNumber ?? ''}');
+                    await launchUrl(
+                      uri,
+                      mode: LaunchMode.externalApplication,
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(8.r),
+                    decoration: const BoxDecoration(
+                      color: AppColors.taxiYellow,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.call_rounded,
+                      color: AppColors.textPrimary,
+                      size: 18.r,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            AppSpacing.h16,
+          ],
+
+          /// Buttons
           if (variant == CardVariant.offer) ...[
-            /// Reject Buttons
             Row(
               children: [
                 Expanded(
@@ -191,10 +210,7 @@ class CurrentRequestCard extends StatelessWidget {
                     child: Text(rejectLabel!, style: AppTypography.labelMd),
                   ),
                 ),
-
                 AppSpacing.w12,
-
-                ///  Accept Button
                 Expanded(
                   child: AppButton(
                     label: acceptLabel!,
@@ -204,8 +220,6 @@ class CurrentRequestCard extends StatelessWidget {
               ],
             ),
           ] else ...[
-            /// Primary Action Button (Done)
-            // ✅ Current: Countdown + disabled Done button until timer ends
             _DoneCountdownAction(
               prefix: countdownPrefix ?? 'Available in:',
               label: primaryActionLabel ?? 'Done',
@@ -219,10 +233,8 @@ class CurrentRequestCard extends StatelessWidget {
   }
 }
 
-/// The type of the card, which determines which buttons are shown.
 enum CardVariant { offer, current }
 
-/// A simple line with an icon and text, used for pickup and dropoff info.
 class _Line extends StatelessWidget {
   const _Line({required this.icon, required this.text});
   final IconData icon;
@@ -240,7 +252,36 @@ class _Line extends StatelessWidget {
   }
 }
 
-/// Countdown action: Done button stays disabled (faded) until time is over.
+class _RequestStatus extends StatelessWidget {
+  const _RequestStatus({required this.variant});
+  final CardVariant variant;
+
+  @override
+  Widget build(BuildContext context) {
+    final isOffer = variant == CardVariant.offer;
+
+    final text = isOffer ? 'Pending' : 'Accepted';
+
+    final bgColor = isOffer
+        ? AppColors.taxiYellow.withValues(alpha: 0.15)
+        : Colors.green.withValues(alpha: 0.15);
+
+    final textColor = isOffer ? AppColors.textPrimary : Colors.green.shade700;
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Text(
+        text,
+        style: AppTypography.labelMd.copyWith(color: textColor),
+      ),
+    );
+  }
+}
+
 class _DoneCountdownAction extends StatefulWidget {
   const _DoneCountdownAction({
     required this.prefix,
@@ -253,6 +294,7 @@ class _DoneCountdownAction extends StatefulWidget {
   final String label;
   final Duration duration;
   final VoidCallback onDone;
+
   @override
   State<_DoneCountdownAction> createState() => _DoneCountdownActionState();
 }
@@ -262,6 +304,7 @@ class _DoneCountdownActionState extends State<_DoneCountdownAction> {
   Timer? _timer;
 
   bool get _canDone => _left <= Duration.zero;
+
   @override
   void initState() {
     super.initState();

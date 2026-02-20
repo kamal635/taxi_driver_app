@@ -4,6 +4,7 @@ import 'package:taxi_driver_app/app/router/app_router.dart';
 import 'package:taxi_driver_app/app/theme/app_theme.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/utils/screen_util_design_size.dart';
+import 'package:taxi_driver_app/core/widgets/app_background.dart';
 import 'package:taxi_driver_app/l10n/app_localizations.dart';
 
 class TaxiDriverApp extends StatelessWidget {
@@ -25,6 +26,17 @@ class TaxiDriverApp extends StatelessWidget {
         locale: const Locale('en'),
         theme: AppTheme.light(const Locale('en')),
         routerConfig: AppRouter.router,
+
+        builder: (context, child) {
+          return Stack(
+            children: [
+              const AppBackground(),
+              Positioned.fill(
+                child: child ?? const SizedBox.shrink(),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

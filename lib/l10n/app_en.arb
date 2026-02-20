@@ -79,5 +79,52 @@
   "tripsEmptySubtitle": "Completed trips will appear here once you finish your first ride.",
   
   "online": "Online",
-  "offline": "Offline"
+  "offline": "Offline",
+  
+  "profileSectionAccount": "Account settings",
+  "profileSectionSupport": "Support",
+  "profileSectionSignOut": "Sign out",
+
+  "profileEditTitle": "Edit profile",
+  "profileEditSubtitle": "Update your personal info",
+  "profileChangePasswordTitle": "Change password",
+  "profileChangePasswordSubtitle": "Secure your account",
+  "profileMyVehiclesTitle": "My vehicles",
+  "profileMyVehiclesSubtitle": "Manage your registered cars",
+  "profileHelpCenterTitle": "Help center",
+  "profileHelpCenterSubtitle": "FAQs and technical support",
+
+  "profileSignOutTitle": "Sign out",
+  "profileSignOutSubtitle": "Sign out from this account",
+  "signOutConfirmMessage": "Are you sure you want to sign out from this account?",
+  "signOutConfirmTitle": "Sign out?",
+
+  "profileChangePhoto": "Change photo",
+  "profileFullName": "Full name",
+  "profileFullNameHint": "John Doe",
+  "profilePhone": "Phone number",
+  "profilePhoneHint": "+963 123 456 789",
+  "profileEmail": "Email",
+
+  "actionSaveChanges": "Save changes",
+
+  "profileCurrentPassword": "Current password",
+  "profileNewPassword": "New password",
+  "profileConfirmNewPassword": "Confirm new password",
+  "profilePasswordHint": "Password must be at least 8 characters.",
+  "profileUpdatePasswordAction": "Update password",
+
+  "vehicleTitle": "My Vehicle",
+
+  "vehiclePlateNumberLabel": "Plate Number",
+  "vehicleTaxiLanternNumberLabel": "Taxi Lantern Number",
+  "vehicleModelLabel": "Model",
+  "vehicleTypeLabel": "Type",
+
+  "vehicleTypePublic": "Public",
+  "vehicleTypePrivate": "Private",
+
+  "vehicleInfoNote": "This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office or your coordinator."
+
+
 }
