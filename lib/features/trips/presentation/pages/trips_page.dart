@@ -57,7 +57,6 @@ class _TripsPageState extends State<TripsPage> {
         children: [
           TripsSummaryCard(
             title: l10n.tripsSummaryTitle,
-            subtitle: l10n.tripsSummarySubtitle,
             tripsLabel: l10n.tripsSummaryTripsLabel,
             earningsLabel: l10n.tripsSummaryEarningsLabel,
             tripsCountText: '3', // UI-only
@@ -76,9 +75,21 @@ class _TripsPageState extends State<TripsPage> {
 
           AppSpacing.h18,
 
-          Text(
-            l10n.tripsRecentTitle,
-            style: AppTypography.titleSm,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                l10n.tripsRecentTitle,
+                style: AppTypography.titleSm,
+              ),
+              AppSpacing.w8,
+              Expanded(
+                child: Text(
+                  l10n.tripsTotalTrips(10),
+                  style: AppTypography.subtitleSm,
+                ),
+              ),
+            ],
           ),
 
           AppSpacing.h12,

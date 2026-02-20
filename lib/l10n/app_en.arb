@@ -67,7 +67,7 @@
   "exitAppTitle": "Exit app?",
   "exitAppMessage": "Are you sure you want to close the app?",
 
-  "tripsSummaryTitle": "Your trips at a glance",
+  "tripsSummaryTitle": "Your earnings at a glance",
   "tripsSummarySubtitle": "Track completed rides and earnings",
   "tripsSummaryTripsLabel": "Trips",
   "tripsSummaryEarningsLabel": "Earnings",
@@ -124,7 +124,8 @@
   "vehicleTypePublic": "Public",
   "vehicleTypePrivate": "Private",
 
-  "vehicleInfoNote": "This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office or your coordinator."
+  "vehicleInfoNote": "This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office or your coordinator.",
 
-
+  "tripsTotalTrips": "total trips: ({count})",
+  "@tripsTotalTrips": { "placeholders": { "count": { "type": "int" } } }
 }

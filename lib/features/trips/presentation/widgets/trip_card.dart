@@ -20,11 +20,6 @@ class TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
-    final chevron = isRtl
-        ? Icons.chevron_left_rounded
-        : Icons.chevron_right_rounded;
-
     return InkWell(
       borderRadius: BorderRadius.circular(18.r),
       onTap: onTap,
@@ -80,8 +75,6 @@ class TripCard extends StatelessWidget {
                     color: const Color(0xFF16A34A),
                   ),
                 ),
-                AppSpacing.h8,
-                Icon(chevron, color: AppColors.iconMuted, size: 22.r),
               ],
             ),
           ],

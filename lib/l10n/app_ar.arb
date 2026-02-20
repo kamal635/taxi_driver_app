@@ -67,7 +67,7 @@
   "exitAppTitle": "إغلاق التطبيق؟",
   "exitAppMessage": "هل أنت متأكد أنك تريد إغلاق التطبيق؟",
 
-  "tripsSummaryTitle": "نظرة سريعة على رحلاتك",
+  "tripsSummaryTitle": "نظرة سريعة على أرباحك",
   "tripsSummarySubtitle": "تابع الرحلات المكتملة والأرباح",
   "tripsSummaryTripsLabel": "الرحلات",
   "tripsSummaryEarningsLabel": "الأرباح",
@@ -126,7 +126,10 @@
   "vehicleTypePublic": "عمومي",
   "vehicleTypePrivate": "خصوصي",
 
-  "vehicleInfoNote": "معلومات هذه المركبة مسجّلة في النظام. إذا تغيّر أي تفصيل أو ظهر بشكل غير صحيح، يرجى التواصل مع المكتب أو معسّقك."
+  "vehicleInfoNote": "معلومات هذه المركبة مسجّلة في النظام. إذا تغيّر أي تفصيل أو ظهر بشكل غير صحيح، يرجى التواصل مع المكتب أو معسّقك.",
+
+  "tripsTotalTrips": "إجمالي الرحلات: ({count})",
+  "@tripsTotalTrips": { "placeholders": { "count": { "type": "int" } } }
 
 
 
