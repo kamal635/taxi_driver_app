@@ -6,8 +6,8 @@ import 'package:taxi_driver_app/app/theme/app_typography.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({
-    required this.controller,
     required this.hintText,
+    this.controller,
     super.key,
     this.labelText,
     this.keyboardType,
@@ -23,7 +23,7 @@ class AppTextField extends StatelessWidget {
     this.focusNode,
   });
 
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final String hintText;
   final String? labelText;
 
@@ -81,7 +81,7 @@ class AppTextField extends StatelessWidget {
             ),
             prefixIcon: IconTheme(
               data: const IconThemeData(color: AppColors.iconMuted),
-              child: prefixIcon!,
+              child: prefixIcon ?? const SizedBox.shrink(),
             ),
             suffixIcon: suffixIcon,
             border: OutlineInputBorder(

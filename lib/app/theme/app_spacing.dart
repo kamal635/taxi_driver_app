@@ -17,7 +17,9 @@ final class AppSpacing {
   static SizedBox get h32 => h(32);
 
   static SizedBox get w4 => w(4);
+  static SizedBox get w6 => w(6);
   static SizedBox get w8 => w(8);
+  static SizedBox get w10 => w(10);
   static SizedBox get w12 => w(12);
   static SizedBox get w16 => w(16);
 }

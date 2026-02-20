@@ -188,4 +188,111 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get offline => 'Offline';
+
+  @override
+  String get profileSectionAccount => 'Account settings';
+
+  @override
+  String get profileSectionSupport => 'Support';
+
+  @override
+  String get profileSectionSignOut => 'Sign out';
+
+  @override
+  String get profileEditTitle => 'Edit profile';
+
+  @override
+  String get profileEditSubtitle => 'Update your personal info';
+
+  @override
+  String get profileChangePasswordTitle => 'Change password';
+
+  @override
+  String get profileChangePasswordSubtitle => 'Secure your account';
+
+  @override
+  String get profileMyVehiclesTitle => 'My vehicles';
+
+  @override
+  String get profileMyVehiclesSubtitle => 'Manage your registered cars';
+
+  @override
+  String get profileHelpCenterTitle => 'Help center';
+
+  @override
+  String get profileHelpCenterSubtitle => 'FAQs and technical support';
+
+  @override
+  String get profileSignOutTitle => 'Sign out';
+
+  @override
+  String get profileSignOutSubtitle => 'Sign out from this account';
+
+  @override
+  String get signOutConfirmMessage =>
+      'Are you sure you want to sign out from this account?';
+
+  @override
+  String get signOutConfirmTitle => 'Sign out?';
+
+  @override
+  String get profileChangePhoto => 'Change photo';
+
+  @override
+  String get profileFullName => 'Full name';
+
+  @override
+  String get profileFullNameHint => 'John Doe';
+
+  @override
+  String get profilePhone => 'Phone number';
+
+  @override
+  String get profilePhoneHint => '+963 123 456 789';
+
+  @override
+  String get profileEmail => 'Email';
+
+  @override
+  String get actionSaveChanges => 'Save changes';
+
+  @override
+  String get profileCurrentPassword => 'Current password';
+
+  @override
+  String get profileNewPassword => 'New password';
+
+  @override
+  String get profileConfirmNewPassword => 'Confirm new password';
+
+  @override
+  String get profilePasswordHint => 'Password must be at least 8 characters.';
+
+  @override
+  String get profileUpdatePasswordAction => 'Update password';
+
+  @override
+  String get vehicleTitle => 'My Vehicle';
+
+  @override
+  String get vehiclePlateNumberLabel => 'Plate Number';
+
+  @override
+  String get vehicleTaxiLanternNumberLabel => 'Taxi Lantern Number';
+
+  @override
+  String get vehicleModelLabel => 'Model';
+
+  @override
+  String get vehicleTypeLabel => 'Type';
+
+  @override
+  String get vehicleTypePublic => 'Public';
+
+  @override
+  String get vehicleTypePrivate => 'Private';
+
+  @override
+  String get vehicleInfoNote =>
+      'This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office or your coordinator.';
 }

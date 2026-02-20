@@ -8,8 +8,8 @@ final class FontChoice {
 }
 
 final class AppFonts {
-  static const english = 'Inter';
-  static const arabic = 'Cairo';
+  static const english = 'Archivo';
+  static const arabic = 'NotoKufiArabic';
 
   static FontChoice resolve(Locale locale) {
     // Only special-case scripts where you want a specific primary font.

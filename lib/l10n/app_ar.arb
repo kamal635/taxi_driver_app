@@ -79,5 +79,55 @@
   "tripsEmptySubtitle": "ستظهر الرحلات المكتملة هنا بعد إنهاء أول رحلة.",
 
   "online": "متصل",
-  "offline": "غير متصل"
+  "offline": "غير متصل",
+
+  
+  "profileSectionAccount": "إعدادات الحساب",
+  "profileSectionSupport": "الدعم والمساعدة",
+  "profileSectionSignOut": "تسجيل الخروج",
+
+  "profileEditTitle": "تعديل الملف الشخصي",
+  "profileEditSubtitle": "تحديث معلوماتك الشخصية",
+  "profileChangePasswordTitle": "تغيير كلمة المرور",
+  "profileChangePasswordSubtitle": "تأمين حسابك بكلمة مرور جديدة",
+  "profileMyVehiclesTitle": "مركباتي",
+  "profileMyVehiclesSubtitle": "إدارة السيارات المسجلة",
+  "profileHelpCenterTitle": "مركز المساعدة",
+  "profileHelpCenterSubtitle": "الأسئلة الشائعة والدعم الفني",
+
+  "profileSignOutTitle": "تسجيل الخروج",
+  "profileSignOutSubtitle": "الخروج من هذا الحساب",
+  "signOutConfirmTitle": "تسجيل الخروج؟",
+  "signOutConfirmMessage": "هل أنت متأكد أنك تريد تسجيل الخروج من هذا الحساب؟",
+
+  "profileChangePhoto": "تغيير الصورة",
+  "profileFullName": "الاسم الكامل",
+  "profileFullNameHint": "الاسم الكامل",
+  "profilePhoneHint": "+963 123 456 789",
+  "profilePhone": "رقم الهاتف",
+  "profileEmail": "البريد الإلكتروني",
+
+  "actionSaveChanges": "حفظ التغييرات",
+
+  "profileCurrentPassword": "كلمة المرور الحالية",
+  "profileNewPassword": "كلمة المرور الجديدة",
+  "profileConfirmNewPassword": "تأكيد كلمة المرور الجديدة",
+  "profilePasswordHint": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل.",
+  "profileUpdatePasswordAction": "تحديث كلمة المرور",
+
+
+  "vehicleTitle": "مركبتي",
+
+  "vehiclePlateNumberLabel": "رقم اللوحة",
+  "vehicleTaxiLanternNumberLabel": "رقم فانوس التاكسي",
+  "vehicleModelLabel": "الموديل",
+  "vehicleTypeLabel": "النوع",
+
+  "vehicleTypePublic": "عمومي",
+  "vehicleTypePrivate": "خصوصي",
+
+  "vehicleInfoNote": "معلومات هذه المركبة مسجّلة في النظام. إذا تغيّر أي تفصيل أو ظهر بشكل غير صحيح، يرجى التواصل مع المكتب أو معسّقك."
+
+
+
 }
