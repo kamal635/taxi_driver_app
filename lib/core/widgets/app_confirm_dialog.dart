@@ -15,7 +15,7 @@ Future<bool> showAppConfirmDialog({
   IconData icon = Icons.help_outline_rounded,
   bool barrierDismissible = false,
   Color? iconColor,
-  Color? backgroundIconColor,
+  Color? backgroundColorIcon,
 }) async {
   final result = await showDialog<bool>(
     context: context,
@@ -39,7 +39,7 @@ Future<bool> showAppConfirmDialog({
                     width: 40.r,
                     height: 40.r,
                     decoration: BoxDecoration(
-                      color: backgroundIconColor,
+                      color: backgroundColorIcon,
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(color: AppColors.border),
                     ),

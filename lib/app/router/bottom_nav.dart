@@ -28,65 +28,83 @@ class BottomNav extends StatelessWidget {
       _NavItemData(icon: Icons.person_rounded, label: profileLabel),
     ];
 
-    return Container(
-      padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: const Border(top: BorderSide(color: AppColors.border)),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 22,
-            offset: const Offset(0, -10),
-            color: Colors.black.withValues(alpha: 0.06),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(items.length, (i) {
-          final data = items[i];
-          final selected = i == index;
+    // ✅ ألوان مثل Sofascore-style (بس مع لمسة الـ brand عندك)
+    const inactiveColor = AppColors.iconMuted;
+    const activeColor = AppColors.taxiYellow; // بدك إياها أزرق؟ بقلك تحت
+    const indicatorColor = AppColors.taxiYellow;
 
-          return InkWell(
-            borderRadius: BorderRadius.circular(18.r),
-            onTap: () => onChanged(i),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 46.r,
-                    height: 46.r,
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? AppColors.taxiYellow
-                          : Colors.transparent,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      data.icon,
-                      size: 22.r,
-                      color: selected
-                          ? AppColors.textPrimary
-                          : AppColors.iconMuted,
-                    ),
-                  ),
-                  SizedBox(height: 6.h),
-                  Text(
-                    data.label,
-                    style: AppTypography.labelSm.copyWith(
-                      fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
-                      color: selected
-                          ? AppColors.textPrimary
-                          : AppColors.iconMuted,
-                    ),
-                  ),
-                ],
-              ),
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: EdgeInsets.only(top: 4.h),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          border: const Border(top: BorderSide(color: AppColors.border)),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 18,
+              offset: const Offset(0, -8),
+              color: Colors.black.withValues(alpha: 0.06),
             ),
-          );
-        }),
+          ],
+        ),
+        child: Row(
+          children: List.generate(items.length, (i) {
+            final data = items[i];
+            final selected = i == index;
+
+            return Expanded(
+              child: InkWell(
+                onTap: () => onChanged(i),
+                child: SizedBox(
+                  height: 54.h,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Content (Icon + Text)
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            data.icon,
+                            size: 24.r,
+                            color: selected ? activeColor : inactiveColor,
+                          ),
+                          SizedBox(height: 6.h),
+                          Text(
+                            data.label,
+                            style: AppTypography.labelSm.copyWith(
+                              color: selected ? activeColor : inactiveColor,
+                              fontWeight: selected
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // ✅ Indicator line under selected tab
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          curve: Curves.easeOutCubic,
+                          height: 2.h,
+                          width: selected ? 36.w : 0,
+                          margin: EdgeInsets.only(bottom: 0.h),
+                          decoration: BoxDecoration(
+                            color: indicatorColor,
+                            borderRadius: BorderRadius.circular(999.r),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
       ),
     );
   }

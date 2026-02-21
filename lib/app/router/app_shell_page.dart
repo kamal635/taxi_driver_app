@@ -7,7 +7,7 @@ import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/widgets/status_pill.dart';
+import 'package:taxi_driver_app/core/widgets/pill_switch.dart';
 import 'package:taxi_driver_app/features/home/presentation/pages/home_page.dart';
 
 class AppShellPage extends StatelessWidget {
@@ -82,7 +82,6 @@ class AppTopBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final isOnline = ref.watch(isOnlineProvider);
 
     return Column(
       children: [
@@ -101,12 +100,19 @@ class AppTopBar extends ConsumerWidget {
               ),
             ),
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                StatusPill(
-                  text: isOnline ? l10n.online : l10n.offline,
-                  isOnline: isOnline,
+                PillSwitch(
+                  value: ref.watch(isOnlineProvider),
+                  onChanged: (v) =>
+                      ref.read(isOnlineProvider.notifier).state = v,
+                  offLabel: l10n.offline,
+                  onLabel: l10n.online,
+                  uppercase: false,
+                  // Optional if you ever need a cap:
+                  // maxWidth: 140.w,
                 ),
-                AppSpacing.w8,
+                AppSpacing.w12,
                 GestureDetector(
                   onTap: onAvatarPressed,
                   child: Container(
@@ -125,7 +131,6 @@ class AppTopBar extends ConsumerWidget {
             ),
           ],
         ),
-        AppSpacing.h4,
       ],
     );
   }
