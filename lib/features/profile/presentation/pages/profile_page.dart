@@ -100,9 +100,10 @@ class ProfilePage extends ConsumerWidget {
                     message: l10n.signOutConfirmMessage,
                     confirmLabel: l10n.profileSignOutTitle,
                     cancelLabel: l10n.actionCancel,
+                    barrierDismissible: true,
                     icon: Icons.logout_rounded,
                     iconColor: Colors.red,
-                    backgroundIconColor: Colors.red.withValues(alpha: 0.10),
+                    backgroundColorIcon: Colors.red.withValues(alpha: 0.10),
                   );
 
                   if (!context.mounted) return;

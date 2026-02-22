@@ -29,7 +29,6 @@ final class AppRouter {
     initialLocation: AppRoutes.home,
     debugLogDiagnostics: kDebugMode,
 
-    // صفحة احتياطية لو صار خطأ بالتوجيه
     errorBuilder: (context, state) => Scaffold(
       body: Center(
         child: Text(state.error?.toString() ?? 'Unknown routing error'),

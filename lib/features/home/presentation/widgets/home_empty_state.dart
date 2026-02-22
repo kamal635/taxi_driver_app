@@ -18,54 +18,49 @@ class HomeEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        padding: EdgeInsets.only(bottom: 90.h),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            /// Icon
-            Container(
-              width: 160.r,
-              height: 160.r,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.taxiYellow.withValues(alpha: 0.12),
-                border: Border.all(
-                  color: AppColors.taxiYellow.withValues(alpha: 0.35),
-                  width: 1.2,
-                ),
-              ),
-              child: Icon(
-                icon,
-                size: 40.r,
-                color: AppColors.textPrimary.withValues(alpha: 0.85),
-              ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        /// Icon
+        Container(
+          width: 160.r,
+          height: 160.r,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.taxiYellow.withValues(alpha: 0.12),
+            border: Border.all(
+              color: AppColors.taxiYellow.withValues(alpha: 0.35),
+              width: 1.2,
             ),
-
-            AppSpacing.h18,
-
-            /// Title
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: AppTypography.titleSm,
-            ),
-
-            AppSpacing.h10,
-
-            /// Subtitle
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 22.w),
-              child: Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: AppTypography.bodyMuted,
-              ),
-            ),
-          ],
+          ),
+          child: Icon(
+            icon,
+            size: 40.r,
+            color: AppColors.textPrimary.withValues(alpha: 0.85),
+          ),
         ),
-      ),
+
+        AppSpacing.h18,
+
+        /// Title
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: AppTypography.titleSm,
+        ),
+
+        AppSpacing.h10,
+
+        /// Subtitle
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 22.w),
+          child: Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: AppTypography.bodyMuted,
+          ),
+        ),
+      ],
     );
   }
 }
