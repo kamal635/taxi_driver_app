@@ -109,9 +109,8 @@ class AppTopBar extends ConsumerWidget {
                   offLabel: l10n.offline,
                   onLabel: l10n.online,
                   uppercase: false,
-                  // Optional if you ever need a cap:
-                  // maxWidth: 140.w,
                 ),
+
                 AppSpacing.w12,
                 GestureDetector(
                   onTap: onAvatarPressed,

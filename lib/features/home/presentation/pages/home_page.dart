@@ -34,8 +34,17 @@ class _HomePageState extends ConsumerState<HomePage> {
 
           /// Requests
           Expanded(
-            child: SingleChildScrollView(
-              child: _buildRequestArea(l10n),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: _buildRequestArea(l10n),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -85,16 +94,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         );
 
       case HomeRequestUiState.empty:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            HomeEmptyState(
-              icon: Icons.search_rounded,
-              title: l10n.homeEmptyTitle,
-              subtitle: l10n.homeEmptySubtitle,
-            ),
-            AppSpacing.h16,
-          ],
+        return Center(
+          child: HomeEmptyState(
+            icon: Icons.search_rounded,
+            title: l10n.homeEmptyTitle,
+            subtitle: l10n.homeEmptySubtitle,
+          ),
         );
     }
   }

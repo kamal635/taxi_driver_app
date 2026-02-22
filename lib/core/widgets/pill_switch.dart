@@ -43,7 +43,7 @@ class _PillSwitchState extends State<PillSwitch> {
   bool _animating = false;
   int _animSeed = 0;
 
-  // ---- Cached text metrics (to avoid TextPainter layout on every rebuild)
+  // Cached text metrics to avoid running TextPainter on every rebuild.
   double _maxLabelW = 0;
 
   String? _cacheOnText;
@@ -69,17 +69,17 @@ class _PillSwitchState extends State<PillSwitch> {
   void didUpdateWidget(covariant PillSwitch oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // If labels/uppercase changed => update cached metrics.
+    // If labels or uppercase flag changed, recalculate cached metrics.
     if (oldWidget.onLabel != widget.onLabel ||
         oldWidget.offLabel != widget.offLabel ||
         oldWidget.uppercase != widget.uppercase) {
       _updateLabelMetricsIfNeeded(force: true);
     } else {
-      // Still might change due to inherited updates; keep it safe & cheap.
+      // Dependencies (text scale / direction) can still change, keep it safe & cheap.
       _updateLabelMetricsIfNeeded();
     }
 
-    // Value change => start animation (same logic as your code).
+    // When the external value changes, start the wipe animation.
     if (oldWidget.value != widget.value) {
       setState(() {
         _fromValue = oldWidget.value;
@@ -100,14 +100,9 @@ class _PillSwitchState extends State<PillSwitch> {
     final ringSize = 18.r;
     final safety = 6.w;
 
-    final baseTextStyle = AppTypography.subtitleSm.copyWith(
-      fontWeight: FontWeight.w900,
-      letterSpacing: 0.8,
-    );
-
     final contentPadding = EdgeInsets.symmetric(horizontal: paddingX);
 
-    // Use cached max label width (computed in didChangeDependencies / didUpdateWidget)
+    // Use cached max label width (precomputed in lifecycle hooks).
     final desiredWidth = _maxLabelW + (paddingX * 2) + gap + ringSize + safety;
 
     Color bgFor({required bool v}) =>
@@ -118,16 +113,41 @@ class _PillSwitchState extends State<PillSwitch> {
     Widget contentRow({required bool v}) {
       final accent = accentFor(v: v);
       const ringBorderWidth = 2.2;
+      final label = _shownLabelFor(v);
+
+      final isRtl = Directionality.of(context) == TextDirection.rtl;
+
+      TextStyle labelStyle({required bool v}) {
+        final base = AppTypography.subtitleSm.copyWith(
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0.8,
+          color: accent,
+        );
+
+        // Arabic (RTL): shrink only when OFF
+        if (isRtl && !v) {
+          return base.copyWith(fontSize: 10.sp);
+        }
+
+        // English (LTR) OR ON state: keep default size
+        return base;
+      }
 
       return Row(
         children: [
-          Flexible(
-            child: Text(
-              _shownLabelFor(v),
-              maxLines: 1,
-              softWrap: false,
-              overflow: TextOverflow.ellipsis,
-              style: baseTextStyle.copyWith(color: accent),
+          // Expanded keeps the ring pinned to the far end,
+          // regardless of how short the label is.
+          Expanded(
+            child: Tooltip(
+              // Shows the full label without changing the pill size.
+              message: label,
+              child: Text(
+                label,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis, // Prevents overflow.
+                style: labelStyle(v: v),
+              ),
             ),
           ),
           SizedBox(width: gap),
@@ -183,18 +203,19 @@ class _PillSwitchState extends State<PillSwitch> {
                 height: h,
                 child: Stack(
                   children: [
-                    // Base (old) content
+                    // Base (old) content layer.
                     Padding(
                       padding: contentPadding,
                       child: Align(
-                        alignment: Alignment.centerLeft,
+                        // Direction-aware alignment (LTR/RTL).
+                        alignment: AlignmentDirectional.centerStart,
                         child: contentRow(
                           v: _animating ? _fromValue : widget.value,
                         ),
                       ),
                     ),
 
-                    // Animated fill + revealed next content (LEFT -> RIGHT)
+                    // Animated fill + partially revealed new content.
                     if (_animating)
                       Positioned.fill(
                         child: TweenAnimationBuilder<double>(
@@ -210,22 +231,31 @@ class _PillSwitchState extends State<PillSwitch> {
                             });
                           },
                           builder: (context, t, _) {
-                            final clipper = _FillClipperLTR(t);
+                            final dir = Directionality.of(context);
+                            final clipper = _FillClipperDirectional(
+                              t,
+                              textDirection: dir,
+                            );
 
                             return Stack(
                               children: [
+                                // Fill background (reveals from START to END).
                                 ClipRect(
                                   clipper: clipper,
                                   child: SizedBox.expand(
                                     child: ColoredBox(color: overlayBg),
                                   ),
                                 ),
+
+                                // New content revealed using the same clip.
                                 ClipRect(
                                   clipper: clipper,
                                   child: Padding(
                                     padding: contentPadding,
                                     child: Align(
-                                      alignment: Alignment.centerLeft,
+                                      // Direction-aware alignment (LTR/RTL).
+                                      alignment:
+                                          AlignmentDirectional.centerStart,
                                       child: contentRow(v: _toValue),
                                     ),
                                   ),
@@ -242,7 +272,7 @@ class _PillSwitchState extends State<PillSwitch> {
           ),
         );
 
-        // Lock width => no title shifting
+        // Lock width to avoid top bar title shifting.
         return SizedBox(width: fixedWidth, child: pillBody);
       },
     );
@@ -265,7 +295,7 @@ class _PillSwitchState extends State<PillSwitch> {
     final onText = _shownLabelFor(true);
     final offText = _shownLabelFor(false);
 
-    // Stable key for text scaling (works well with TextScaler)
+    // Stable key for TextScaler changes.
     final textScaleKey = textScaler.scale(1);
     final styleHash = textStyle.hashCode;
 
@@ -306,18 +336,29 @@ class _PillSwitchState extends State<PillSwitch> {
   }
 }
 
-/// Clips a rectangle from LEFT to RIGHT based on [t] (0..1).
-class _FillClipperLTR extends CustomClipper<Rect> {
-  _FillClipperLTR(this.t);
+/// Clips a rectangle from START to END based on [t] (0..1).
+/// LTR: left -> right
+/// RTL: right -> left
+class _FillClipperDirectional extends CustomClipper<Rect> {
+  _FillClipperDirectional(this.t, {required this.textDirection});
 
   final double t;
+  final TextDirection textDirection;
 
   @override
   Rect getClip(Size size) {
     final w = size.width * t.clamp(0.0, 1.0);
+
+    if (textDirection == TextDirection.rtl) {
+      // Reveal from right to left.
+      return Rect.fromLTWH(size.width - w, 0, w, size.height);
+    }
+
+    // Reveal from left to right.
     return Rect.fromLTWH(0, 0, w, size.height);
   }
 
   @override
-  bool shouldReclip(covariant _FillClipperLTR oldClipper) => oldClipper.t != t;
+  bool shouldReclip(covariant _FillClipperDirectional oldClipper) =>
+      oldClipper.t != t || oldClipper.textDirection != textDirection;
 }
