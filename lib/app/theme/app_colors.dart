@@ -17,6 +17,10 @@ final class AppColors {
   static const successBg = Color(0xFFD1FAE5);
   static const error = Color(0xFFEF4444);
   static const errorBg = Color(0xFFFEE2E2);
+  static const warning = Color(0xFF2C1E0A);
+  static const warningBg = Color(0xFFFFD166);
+  static const info = Color(0xFF1D4ED8);
+  static const infoBg = Color(0xFFEFF6FF);
 
   static const white = Color(0xFFFFFFFF);
 }

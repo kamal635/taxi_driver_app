@@ -12,7 +12,7 @@ class PillSwitch extends StatefulWidget {
     required this.onLabel,
     required this.offLabel,
     super.key,
-    this.duration = const Duration(milliseconds: 900),
+    this.duration = const Duration(milliseconds: 700),
     this.height,
     this.uppercase = true,
     this.maxWidth,
@@ -36,7 +36,8 @@ class PillSwitch extends StatefulWidget {
   State<PillSwitch> createState() => _PillSwitchState();
 }
 
-class _PillSwitchState extends State<PillSwitch> {
+class _PillSwitchState extends State<PillSwitch>
+    with SingleTickerProviderStateMixin {
   late bool _fromValue;
   late bool _toValue;
 
@@ -52,11 +53,54 @@ class _PillSwitchState extends State<PillSwitch> {
   double? _cacheTextScaleKey;
   TextDirection? _cacheDirection;
 
+  // -----------------------------
+  // Ring pulse animation
+  // -----------------------------
+  late final AnimationController _ringCtrl;
+  late final Animation<double> _ringScale;
+  int? _ringBumpedForSeed; // ensures "once per toggle"
+
   @override
   void initState() {
     super.initState();
     _fromValue = widget.value;
     _toValue = widget.value;
+
+    _ringCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+    );
+
+    // Pulse: 1.0 -> 1.18 -> 0.95 -> 1.0
+    _ringScale = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 1,
+          end: 1.18,
+        ).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 45,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 1.18,
+          end: 0.95,
+        ).chain(CurveTween(curve: Curves.easeIn)),
+        weight: 30,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 0.95,
+          end: 1,
+        ).chain(CurveTween(curve: Curves.easeOutBack)),
+        weight: 25,
+      ),
+    ]).animate(_ringCtrl);
+  }
+
+  @override
+  void dispose() {
+    _ringCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -69,25 +113,39 @@ class _PillSwitchState extends State<PillSwitch> {
   void didUpdateWidget(covariant PillSwitch oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // If labels or uppercase flag changed, recalculate cached metrics.
     if (oldWidget.onLabel != widget.onLabel ||
         oldWidget.offLabel != widget.offLabel ||
         oldWidget.uppercase != widget.uppercase) {
       _updateLabelMetricsIfNeeded(force: true);
     } else {
-      // Dependencies (text scale / direction) can still change, keep it safe & cheap.
       _updateLabelMetricsIfNeeded();
     }
 
-    // When the external value changes, start the wipe animation.
     if (oldWidget.value != widget.value) {
       setState(() {
         _fromValue = oldWidget.value;
         _toValue = widget.value;
         _animating = true;
         _animSeed++;
+        _ringBumpedForSeed = null; // reset bump for the new animation
       });
     }
+  }
+
+  void _maybeBumpRing({
+    required double t,
+    required double threshold,
+  }) {
+    if (_ringBumpedForSeed == _animSeed) return;
+    if (t < threshold) return;
+
+    _ringBumpedForSeed = _animSeed;
+
+    // Avoid doing work inside the build of TweenAnimationBuilder.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await _ringCtrl.forward(from: 0);
+    });
   }
 
   @override
@@ -102,7 +160,6 @@ class _PillSwitchState extends State<PillSwitch> {
 
     final contentPadding = EdgeInsets.symmetric(horizontal: paddingX);
 
-    // Use cached max label width (precomputed in lifecycle hooks).
     final desiredWidth = _maxLabelW + (paddingX * 2) + gap + ringSize + safety;
 
     Color bgFor({required bool v}) =>
@@ -110,11 +167,29 @@ class _PillSwitchState extends State<PillSwitch> {
     Color accentFor({required bool v}) =>
         v ? AppColors.success : AppColors.error;
 
-    Widget contentRow({required bool v}) {
-      final accent = accentFor(v: v);
+    Widget ringWidget({required Color accent, required bool bumpable}) {
       const ringBorderWidth = 2.2;
-      final label = _shownLabelFor(v);
 
+      final ring = Container(
+        width: ringSize,
+        height: ringSize,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: accent,
+            width: ringBorderWidth,
+          ),
+        ),
+      );
+
+      if (!bumpable) return ring;
+      return ScaleTransition(scale: _ringScale, child: ring);
+    }
+
+    Widget contentRow({required bool v, required bool bumpableRing}) {
+      final accent = accentFor(v: v);
+      final label = _shownLabelFor(v);
       final isRtl = Directionality.of(context) == TextDirection.rtl;
 
       TextStyle labelStyle({required bool v}) {
@@ -128,41 +203,25 @@ class _PillSwitchState extends State<PillSwitch> {
         if (isRtl && !v) {
           return base.copyWith(fontSize: 10.sp);
         }
-
-        // English (LTR) OR ON state: keep default size
         return base;
       }
 
       return Row(
         children: [
-          // Expanded keeps the ring pinned to the far end,
-          // regardless of how short the label is.
           Expanded(
             child: Tooltip(
-              // Shows the full label without changing the pill size.
               message: label,
               child: Text(
                 label,
                 maxLines: 1,
                 softWrap: false,
-                overflow: TextOverflow.ellipsis, // Prevents overflow.
+                overflow: TextOverflow.ellipsis,
                 style: labelStyle(v: v),
               ),
             ),
           ),
           SizedBox(width: gap),
-          Container(
-            width: ringSize,
-            height: ringSize,
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: accent,
-                width: ringBorderWidth,
-              ),
-            ),
-          ),
+          ringWidget(accent: accent, bumpable: bumpableRing),
         ],
       );
     }
@@ -180,6 +239,12 @@ class _PillSwitchState extends State<PillSwitch> {
         if (constraints.hasBoundedWidth) {
           fixedWidth = math.min(fixedWidth, constraints.maxWidth);
         }
+
+        // When the wipe reaches the ring area (near the end padding),
+        // bump the ring.
+        // Works for both LTR & RTL because reveal "reaches the far end" at the
+        //same t.
+        final bumpThreshold = (1.0 - (paddingX / fixedWidth)).clamp(0.0, 1.0);
 
         final pillBody = InkWell(
           borderRadius: radius,
@@ -207,10 +272,10 @@ class _PillSwitchState extends State<PillSwitch> {
                     Padding(
                       padding: contentPadding,
                       child: Align(
-                        // Direction-aware alignment (LTR/RTL).
                         alignment: AlignmentDirectional.centerStart,
                         child: contentRow(
                           v: _animating ? _fromValue : widget.value,
+                          bumpableRing: false,
                         ),
                       ),
                     ),
@@ -231,6 +296,8 @@ class _PillSwitchState extends State<PillSwitch> {
                             });
                           },
                           builder: (context, t, _) {
+                            _maybeBumpRing(t: t, threshold: bumpThreshold);
+
                             final dir = Directionality.of(context);
                             final clipper = _FillClipperDirectional(
                               t,
@@ -239,24 +306,23 @@ class _PillSwitchState extends State<PillSwitch> {
 
                             return Stack(
                               children: [
-                                // Fill background (reveals from START to END).
                                 ClipRect(
                                   clipper: clipper,
                                   child: SizedBox.expand(
                                     child: ColoredBox(color: overlayBg),
                                   ),
                                 ),
-
-                                // New content revealed using the same clip.
                                 ClipRect(
                                   clipper: clipper,
                                   child: Padding(
                                     padding: contentPadding,
                                     child: Align(
-                                      // Direction-aware alignment (LTR/RTL).
                                       alignment:
                                           AlignmentDirectional.centerStart,
-                                      child: contentRow(v: _toValue),
+                                      child: contentRow(
+                                        v: _toValue,
+                                        bumpableRing: true,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -272,7 +338,6 @@ class _PillSwitchState extends State<PillSwitch> {
           ),
         );
 
-        // Lock width to avoid top bar title shifting.
         return SizedBox(width: fixedWidth, child: pillBody);
       },
     );
@@ -295,7 +360,6 @@ class _PillSwitchState extends State<PillSwitch> {
     final onText = _shownLabelFor(true);
     final offText = _shownLabelFor(false);
 
-    // Stable key for TextScaler changes.
     final textScaleKey = textScaler.scale(1);
     final styleHash = textStyle.hashCode;
 
@@ -350,11 +414,8 @@ class _FillClipperDirectional extends CustomClipper<Rect> {
     final w = size.width * t.clamp(0.0, 1.0);
 
     if (textDirection == TextDirection.rtl) {
-      // Reveal from right to left.
       return Rect.fromLTWH(size.width - w, 0, w, size.height);
     }
-
-    // Reveal from left to right.
     return Rect.fromLTWH(0, 0, w, size.height);
   }
 

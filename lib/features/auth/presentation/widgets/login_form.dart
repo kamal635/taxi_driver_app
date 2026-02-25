@@ -9,36 +9,40 @@ import 'package:taxi_driver_app/core/widgets/app_text_field.dart';
 
 class LoginForm extends StatelessWidget {
   const LoginForm({
-    required this.emailController,
+    required this.phoneController,
     required this.passwordController,
     required this.obscurePassword,
     required this.onTogglePasswordVisibility,
+    required this.isLoading,
+    required this.onSubmit,
     super.key,
   });
 
-  final TextEditingController emailController;
+  final TextEditingController phoneController; // (phone)
   final TextEditingController passwordController;
 
   final bool obscurePassword;
   final VoidCallback onTogglePasswordVisibility;
 
+  /// When true, disable submit and (optionally) show loading in the button.
+  final bool isLoading;
+
+  /// Trigger sign-in from the parent (LoginPage).
+  final VoidCallback? onSubmit;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        /// Email input field
         AppTextField(
-          controller: emailController,
-          labelText: context.l10n.emailLabel,
-          hintText: context.l10n.emailHint,
-          keyboardType: TextInputType.emailAddress,
+          controller: phoneController,
+          labelText: context.l10n.phoneLabel,
+          hintText: context.l10n.phoneHint,
+          keyboardType: TextInputType.phone,
           textInputAction: TextInputAction.next,
-          prefixIcon: const Icon(AppIcons.email),
+          prefixIcon: const Icon(AppIcons.phone),
         ),
-
         AppSpacing.h16,
-
-        /// Password input field with visibility toggle
         AppTextField(
           controller: passwordController,
           labelText: context.l10n.passwordLabel,
@@ -49,25 +53,19 @@ class LoginForm extends StatelessWidget {
           suffixIcon: IconButton(
             color: AppColors.iconMuted,
             onPressed: onTogglePasswordVisibility,
-            icon: Icon(
-              obscurePassword ? AppIcons.eye : AppIcons.eyeOff,
-            ),
+            icon: Icon(obscurePassword ? AppIcons.eye : AppIcons.eyeOff),
           ),
         ),
-
         AppSpacing.h24,
 
-        /// Sign in button
         AppButton(
           label: context.l10n.signIn,
-          onPressed: () {
-            // UI only for now (no logic yet)
-          },
+          onPressed: isLoading ? null : onSubmit,
+          isLoading: isLoading,
         ),
 
         AppSpacing.h12,
 
-        /// Forgot password text button
         AppTextButton(
           label: context.l10n.forgotPassword,
           onPressed: () {

@@ -128,6 +128,18 @@ abstract class AppLocalizations {
   /// **'example@example.com'**
   String get emailHint;
 
+  /// No description provided for @phoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneLabel;
+
+  /// No description provided for @phoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'09xxxxxxxx'**
+  String get phoneHint;
+
   /// No description provided for @passwordLabel.
   ///
   /// In en, this message translates to:
@@ -653,7 +665,7 @@ abstract class AppLocalizations {
   /// No description provided for @vehicleInfoNote.
   ///
   /// In en, this message translates to:
-  /// **'This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office or your coordinator.'**
+  /// **'This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office.'**
   String get vehicleInfoNote;
 
   /// No description provided for @tripsTotalTrips.
@@ -661,6 +673,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'total trips: ({count})'**
   String tripsTotalTrips(int count);
+
+  /// No description provided for @errorUnexpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get errorUnexpected;
+
+  /// No description provided for @errorNoInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Check your network and try again.'**
+  String get errorNoInternet;
+
+  /// No description provided for @errorTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The request took too long. Please try again.'**
+  String get errorTimeout;
+
+  /// No description provided for @errorCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Request cancelled.'**
+  String get errorCancelled;
+
+  /// No description provided for @errorAccountLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is locked. Please contact support.'**
+  String get errorAccountLocked;
+
+  /// No description provided for @errorConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'A conflict occurred. Please try again.'**
+  String get errorConflict;
+
+  /// No description provided for @errorValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your input and try again.'**
+  String get errorValidation;
+
+  /// No description provided for @errorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Resource not found.'**
+  String get errorNotFound;
+
+  /// No description provided for @errorForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to perform this action.'**
+  String get errorForbidden;
+
+  /// No description provided for @errorInvalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number or password is incorrect.'**
+  String get errorInvalidCredentials;
+
+  /// No description provided for @errorSessionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired. Please sign in again.'**
+  String get errorSessionExpired;
+
+  /// No description provided for @errorServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Server error. Please try again later.'**
+  String get errorServer;
+
+  /// No description provided for @errorBadResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected server response. Please try again.'**
+  String get errorBadResponse;
+
+  /// No description provided for @authSetupPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create password'**
+  String get authSetupPasswordTitle;
+
+  /// No description provided for @authSetupPasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'To finish setting up your account, create a new password.'**
+  String get authSetupPasswordSubtitle;
+
+  /// No description provided for @authNewPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get authNewPasswordLabel;
+
+  /// No description provided for @authConfirmNewPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm new password'**
+  String get authConfirmNewPasswordLabel;
+
+  /// No description provided for @authCreatePasswordAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create password'**
+  String get authCreatePasswordAction;
+
+  /// No description provided for @authPasswordRulesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters.'**
+  String get authPasswordRulesHint;
 }
 
 class _AppLocalizationsDelegate

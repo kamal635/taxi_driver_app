@@ -104,3 +104,22 @@ DerivedData/
 # =========================
 app.*.symbols
 app.*.map.json
+
+# =========================
+# Certificates / private keys (highly sensitive)
+# =========================
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+*.mobileprovision
+
+# =========================
+# Local secrets files (if you ever create them)
+# =========================
+secrets.json
+secrets.*.json
+**/android/**/secrets.properties
+**/ios/**/Secrets.plist

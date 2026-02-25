@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:taxi_driver_app/app/router/app_routes.dart';
 import 'package:taxi_driver_app/app/router/app_shell_page.dart';
 import 'package:taxi_driver_app/app/router/route_names.dart';
+import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_result.dart';
 import 'package:taxi_driver_app/features/auth/presentation/pages/login_page.dart';
+import 'package:taxi_driver_app/features/auth/presentation/widgets/setup_password_page.dart';
 import 'package:taxi_driver_app/features/home/presentation/pages/home_page.dart';
 import 'package:taxi_driver_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:taxi_driver_app/features/profile/presentation/widgets/change_password_page.dart';
@@ -26,7 +28,7 @@ final class AppRouter {
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutes.home,
+    initialLocation: AppRoutes.login,
     debugLogDiagnostics: kDebugMode,
 
     errorBuilder: (context, state) => Scaffold(
@@ -40,6 +42,7 @@ final class AppRouter {
 
   static final List<RouteBase> _routes = <RouteBase>[
     _loginRoute(),
+    _setupPasswordRoute(),
     _shellRoute(),
   ];
 
@@ -48,6 +51,31 @@ final class AppRouter {
       path: AppRoutes.login,
       name: RouteNames.login,
       builder: (context, state) => const LoginPage(),
+    );
+  }
+
+  /// ✅ Setup Password route (opens on root navigator, not inside the shell)
+  /// Expects tokens in `state.extra`.
+  static GoRoute _setupPasswordRoute() {
+    return GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: AppRoutes.setupPassword,
+      name: RouteNames.setupPassword,
+      pageBuilder: (context, state) {
+        final tokens = state.extra as AuthTokens?;
+
+        // Safety: if opened without tokens, send user back to login.
+        if (tokens == null) {
+          return _fadeSlidePage(
+            state: state,
+            child: const LoginPage(),
+          );
+        }
+        return _fadeSlidePage(
+          state: state,
+          child: SetupPasswordPage(tokens: tokens),
+        );
+      },
     );
   }
 

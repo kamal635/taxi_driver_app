@@ -24,6 +24,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get emailHint => 'example@example.com';
 
   @override
+  String get phoneLabel => 'رقم الهاتف';
+
+  @override
+  String get phoneHint => '09xxxxxxxx';
+
+  @override
   String get passwordLabel => 'كلمة المرور';
 
   @override
@@ -295,10 +301,71 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get vehicleInfoNote =>
-      'معلومات هذه المركبة مسجّلة في النظام. إذا تغيّر أي تفصيل أو ظهر بشكل غير صحيح، يرجى التواصل مع المكتب أو معسّقك.';
+      'معلومات هذه المركبة مسجّلة في النظام. إذا تغيّر أي تفصيل أو ظهر بشكل غير صحيح، يرجى التواصل مع المكتب.';
 
   @override
   String tripsTotalTrips(int count) {
     return 'إجمالي الرحلات: ($count)';
   }
+
+  @override
+  String get errorUnexpected => 'حدث خطأ غير متوقع. حاول مرة أخرى.';
+
+  @override
+  String get errorNoInternet =>
+      'لا يوجد اتصال بالإنترنت. تأكد من الشبكة وحاول مجددًا.';
+
+  @override
+  String get errorTimeout => 'استغرق الطلب وقتًا طويلًا. حاول مرة أخرى.';
+
+  @override
+  String get errorCancelled => 'تم إلغاء الطلب.';
+
+  @override
+  String get errorAccountLocked => 'حسابك مقفل. الرجاء التواصل مع الإدارة.';
+
+  @override
+  String get errorConflict => 'حدث تعارض أثناء العملية. حاول مرة أخرى.';
+
+  @override
+  String get errorValidation => 'تأكد من البيانات المدخلة وحاول مجددًا.';
+
+  @override
+  String get errorNotFound => 'المورد غير موجود.';
+
+  @override
+  String get errorForbidden => 'ليس لديك صلاحية لتنفيذ هذه العملية.';
+
+  @override
+  String get errorInvalidCredentials => 'رقم الهاتف أو كلمة المرور غير صحيحة.';
+
+  @override
+  String get errorSessionExpired =>
+      'انتهت الجلسة. الرجاء تسجيل الدخول من جديد.';
+
+  @override
+  String get errorServer => 'مشكلة في السيرفر. حاول لاحقًا.';
+
+  @override
+  String get errorBadResponse => 'رد السيرفر غير متوقع. حاول مرة أخرى.';
+
+  @override
+  String get authSetupPasswordTitle => 'إنشاء كلمة المرور';
+
+  @override
+  String get authSetupPasswordSubtitle =>
+      'لإكمال إعداد حسابك، أنشئ كلمة مرور جديدة.';
+
+  @override
+  String get authNewPasswordLabel => 'كلمة المرور الجديدة';
+
+  @override
+  String get authConfirmNewPasswordLabel => 'تأكيد كلمة المرور';
+
+  @override
+  String get authCreatePasswordAction => 'إنشاء كلمة المرور';
+
+  @override
+  String get authPasswordRulesHint =>
+      'يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل.';
 }

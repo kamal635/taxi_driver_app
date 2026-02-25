@@ -5,6 +5,8 @@
   "brandSubtitle": "منصة السائقين المعتمدين",
   "emailLabel": "البريد الإلكتروني",
   "emailHint": "example@example.com",
+  "phoneLabel": "رقم الهاتف",
+  "phoneHint": "09xxxxxxxx",
   "passwordLabel": "كلمة المرور",
   "passwordHint": "••••••••",
   "signIn": "تسجيل الدخول",
@@ -126,11 +128,31 @@
   "vehicleTypePublic": "عمومي",
   "vehicleTypePrivate": "خصوصي",
 
-  "vehicleInfoNote": "معلومات هذه المركبة مسجّلة في النظام. إذا تغيّر أي تفصيل أو ظهر بشكل غير صحيح، يرجى التواصل مع المكتب أو معسّقك.",
+  "vehicleInfoNote": "معلومات هذه المركبة مسجّلة في النظام. إذا تغيّر أي تفصيل أو ظهر بشكل غير صحيح، يرجى التواصل مع المكتب.",
 
   "tripsTotalTrips": "إجمالي الرحلات: ({count})",
-  "@tripsTotalTrips": { "placeholders": { "count": { "type": "int" } } }
+  "@tripsTotalTrips": { "placeholders": { "count": { "type": "int" } } },
+ 
+  "errorUnexpected": "حدث خطأ غير متوقع. حاول مرة أخرى.",
+  "errorNoInternet": "لا يوجد اتصال بالإنترنت. تأكد من الشبكة وحاول مجددًا.",
+  "errorTimeout": "استغرق الطلب وقتًا طويلًا. حاول مرة أخرى.",
+  "errorCancelled": "تم إلغاء الطلب.",
+  "errorAccountLocked": "حسابك مقفل. الرجاء التواصل مع الإدارة.",
+  "errorConflict": "حدث تعارض أثناء العملية. حاول مرة أخرى.",
+  "errorValidation": "تأكد من البيانات المدخلة وحاول مجددًا.",
+  "errorNotFound": "المورد غير موجود.",
+  "errorForbidden": "ليس لديك صلاحية لتنفيذ هذه العملية.",
+  "errorInvalidCredentials": "رقم الهاتف أو كلمة المرور غير صحيحة.",
+  "errorSessionExpired": "انتهت الجلسة. الرجاء تسجيل الدخول من جديد.",
+  "errorServer": "مشكلة في السيرفر. حاول لاحقًا.",
+  "errorBadResponse": "رد السيرفر غير متوقع. حاول مرة أخرى.",
 
 
+  "authSetupPasswordTitle": "إنشاء كلمة المرور",
+  "authSetupPasswordSubtitle": "لإكمال إعداد حسابك، أنشئ كلمة مرور جديدة.",
+  "authNewPasswordLabel": "كلمة المرور الجديدة",
+  "authConfirmNewPasswordLabel": "تأكيد كلمة المرور",
+  "authCreatePasswordAction": "إنشاء كلمة المرور",
+  "authPasswordRulesHint": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل."
 
 }

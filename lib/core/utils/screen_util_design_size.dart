@@ -1,34 +1,28 @@
-import 'dart:ui';
+import 'dart:math' as math;
 
-Size pickDesignSize() {
-  final dispatcher = PlatformDispatcher.instance;
+import 'package:flutter/widgets.dart';
 
-  // Prefer implicitView when available (more stable in tests),
-  // otherwise fall back to the first view if any.
-  final view =
-      dispatcher.implicitView ??
-      (dispatcher.views.isNotEmpty ? dispatcher.views.first : null);
+Size pickDesignSizeFromConstraints(BoxConstraints c) {
+  final w = c.maxWidth.isFinite ? c.maxWidth : 0.0;
+  final h = c.maxHeight.isFinite ? c.maxHeight : 0.0;
 
-  // In some test environments there may be no views yet.
-  if (view == null) {
-    return const Size(360, 800); // Safe default (phone)
-  }
+  final shortest = math.min(w, h);
 
-  final dpr = view.devicePixelRatio;
-  if (dpr == 0) {
+  // Safe default (tests/edge cases)
+  if (shortest <= 0 || shortest.isNaN) {
     return const Size(360, 800);
   }
 
-  final logicalSize = view.physicalSize / dpr;
-  final shortestSide = logicalSize.shortestSide;
-
-  // If the test view has no size, use a safe default.
-  if (shortestSide <= 0 || shortestSide.isNaN) {
-    return const Size(360, 800);
+  // Desktop / Large screens
+  if (w >= 1024) {
+    return const Size(1440, 900);
   }
 
-  if (shortestSide >= 600) {
-    return const Size(768, 1024); // Tablet design
+  // Tablet
+  if (shortest >= 600) {
+    return const Size(768, 1024);
   }
-  return const Size(360, 800); // Phone design
+
+  // Phone
+  return const Size(360, 800);
 }

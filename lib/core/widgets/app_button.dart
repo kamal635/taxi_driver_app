@@ -37,13 +37,14 @@ class AppButton extends StatelessWidget {
                 width: 18.w,
                 height: 18.w,
                 child: const CircularProgressIndicator(
-                  strokeWidth: 2,
+                  strokeWidth: 3,
                   color: AppColors.taxiYellow,
                 ),
               )
             : Text(
                 label,
                 style: AppTypography.button,
+                overflow: TextOverflow.ellipsis,
               ),
       ),
     );
