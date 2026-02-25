@@ -13,4 +13,10 @@ final class AppIcons {
   static const IconData car = Icons.directions_car_rounded;
   static const IconData helpCenter = Icons.help_outline_rounded;
   static const IconData signOut = Icons.logout_rounded;
+
+  // Snackbars / Status
+  static const IconData success = Icons.check_circle_rounded;
+  static const IconData error = Icons.error_rounded;
+  static const IconData warning = Icons.warning_rounded;
+  static const IconData info = Icons.info_rounded;
 }

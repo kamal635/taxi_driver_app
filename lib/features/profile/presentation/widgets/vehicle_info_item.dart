@@ -22,8 +22,8 @@ class VehicleInfoItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 40.w,
-          height: 40.w,
+          width: 40.r,
+          height: 40.r,
           decoration: BoxDecoration(
             color: AppColors.bgWarm,
             borderRadius: BorderRadius.circular(12.r),

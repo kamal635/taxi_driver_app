@@ -98,7 +98,7 @@ class ProfilePage extends ConsumerWidget {
                     context: context,
                     title: l10n.signOutConfirmTitle,
                     message: l10n.signOutConfirmMessage,
-                    confirmLabel: l10n.profileSignOutTitle,
+                    confirmLabel: l10n.actionConfirm,
                     cancelLabel: l10n.actionCancel,
                     barrierDismissible: true,
                     icon: Icons.logout_rounded,

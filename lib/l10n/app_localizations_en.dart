@@ -24,6 +24,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailHint => 'example@example.com';
 
   @override
+  String get phoneLabel => 'Phone Number';
+
+  @override
+  String get phoneHint => '09xxxxxxxx';
+
+  @override
   String get passwordLabel => 'Password';
 
   @override
@@ -294,10 +300,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get vehicleInfoNote =>
-      'This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office or your coordinator.';
+      'This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office.';
 
   @override
   String tripsTotalTrips(int count) {
     return 'total trips: ($count)';
   }
+
+  @override
+  String get errorUnexpected => 'Something went wrong. Please try again.';
+
+  @override
+  String get errorNoInternet =>
+      'No internet connection. Check your network and try again.';
+
+  @override
+  String get errorTimeout => 'The request took too long. Please try again.';
+
+  @override
+  String get errorCancelled => 'Request cancelled.';
+
+  @override
+  String get errorAccountLocked =>
+      'Your account is locked. Please contact support.';
+
+  @override
+  String get errorConflict => 'A conflict occurred. Please try again.';
+
+  @override
+  String get errorValidation => 'Please check your input and try again.';
+
+  @override
+  String get errorNotFound => 'Resource not found.';
+
+  @override
+  String get errorForbidden =>
+      'You don\'t have permission to perform this action.';
+
+  @override
+  String get errorInvalidCredentials =>
+      'Phone number or password is incorrect.';
+
+  @override
+  String get errorSessionExpired => 'Session expired. Please sign in again.';
+
+  @override
+  String get errorServer => 'Server error. Please try again later.';
+
+  @override
+  String get errorBadResponse =>
+      'Unexpected server response. Please try again.';
+
+  @override
+  String get authSetupPasswordTitle => 'Create password';
+
+  @override
+  String get authSetupPasswordSubtitle =>
+      'To finish setting up your account, create a new password.';
+
+  @override
+  String get authNewPasswordLabel => 'New password';
+
+  @override
+  String get authConfirmNewPasswordLabel => 'Confirm new password';
+
+  @override
+  String get authCreatePasswordAction => 'Create password';
+
+  @override
+  String get authPasswordRulesHint => 'Password must be at least 8 characters.';
 }

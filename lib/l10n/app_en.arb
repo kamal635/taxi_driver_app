@@ -5,6 +5,8 @@
   "brandSubtitle": "Approved drivers platform",
   "emailLabel": "Email Address",
   "emailHint": "example@example.com",
+  "phoneLabel": "Phone Number",
+  "phoneHint": "09xxxxxxxx",
   "passwordLabel": "Password",
   "passwordHint": "••••••••",
   "signIn": "Sign in",
@@ -124,8 +126,30 @@
   "vehicleTypePublic": "Public",
   "vehicleTypePrivate": "Private",
 
-  "vehicleInfoNote": "This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office or your coordinator.",
+  "vehicleInfoNote": "This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office.",
 
   "tripsTotalTrips": "total trips: ({count})",
-  "@tripsTotalTrips": { "placeholders": { "count": { "type": "int" } } }
+  "@tripsTotalTrips": { "placeholders": { "count": { "type": "int" } } },
+ 
+  "errorUnexpected": "Something went wrong. Please try again.",
+  "errorNoInternet": "No internet connection. Check your network and try again.",
+  "errorTimeout": "The request took too long. Please try again.",
+  "errorCancelled": "Request cancelled.",
+  "errorAccountLocked": "Your account is locked. Please contact support.",
+  "errorConflict": "A conflict occurred. Please try again.",
+  "errorValidation": "Please check your input and try again.",
+  "errorNotFound": "Resource not found.",
+  "errorForbidden": "You don't have permission to perform this action.",
+  "errorInvalidCredentials": "Phone number or password is incorrect.",
+  "errorSessionExpired": "Session expired. Please sign in again.",
+  "errorServer": "Server error. Please try again later.",
+  "errorBadResponse": "Unexpected server response. Please try again.",
+
+  "authSetupPasswordTitle": "Create password",
+  "authSetupPasswordSubtitle": "To finish setting up your account, create a new password.",
+  "authNewPasswordLabel": "New password",
+  "authConfirmNewPasswordLabel": "Confirm new password",
+  "authCreatePasswordAction": "Create password",
+  "authPasswordRulesHint": "Password must be at least 8 characters."
+
 }
