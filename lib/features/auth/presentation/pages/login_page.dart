@@ -7,6 +7,7 @@ import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
+import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_result.dart';
 import 'package:taxi_driver_app/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:taxi_driver_app/features/auth/presentation/widgets/login_footer.dart';
@@ -46,35 +47,44 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Listen for side-effects (errors, navigation, toasts)
+    final authSession = ref.read(authSessionProvider);
+
     ref.listen(authControllerProvider, (prev, next) async {
       await next.whenOrNull(
-        // Handle failures (show error message)
         error: (err, _) {
           final msg = failureToUserMessage(
             err,
             l10n: context.l10n,
             context: FailureContext.authLogin,
           );
-
-          context.showAppSnack(
-            msg,
-            type: AppSnackType.error,
-          );
+          context.showAppSnack(msg, type: AppSnackType.error);
         },
-
-        // Handle successful result states
         data: (result) async {
           if (result == null) return;
 
           switch (result) {
-            // Signed in successfully -> go to home
-            case AuthSignedIn():
-              context.go(AppRoutes.home);
+            case AuthSignedIn(:final tokens):
+              await authSession.saveAfterLogin(
+                token: tokens.accessToken,
+                refreshToken: tokens.refreshToken,
+                mustChangePassword: false,
+              );
+              if (context.mounted) context.go(AppRoutes.home);
+              return;
 
-            // User must finish setup (e.g., set password)
-            case AuthSetupRequired():
-              await context.push(AppRoutes.setupPassword, extra: result.tokens);
+            case AuthSetupRequired(:final tokens):
+              await authSession.saveAfterLogin(
+                token: tokens.accessToken,
+                refreshToken: tokens.refreshToken,
+                mustChangePassword: true,
+              );
+              if (context.mounted) {
+                context.go(
+                  AppRoutes.setupPassword,
+                  extra: tokens,
+                );
+              }
+              return;
           }
         },
       );

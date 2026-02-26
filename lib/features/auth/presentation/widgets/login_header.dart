@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 
 class LoginHeader extends StatelessWidget {
@@ -14,21 +12,7 @@ class LoginHeader extends StatelessWidget {
     return Column(
       children: [
         AppSpacing.h18,
-
-        /// Logo in a circular container
-        Container(
-          width: 72.w,
-          height: 72.w,
-          decoration: const BoxDecoration(
-            color: AppColors.taxiYellow,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            AppIcons.taxi,
-            size: 34.w,
-            color: AppColors.textPrimary,
-          ),
-        ),
+        Image.asset('assets/images/logo.png', height: 112.r, width: 112.r),
 
         AppSpacing.h14,
 

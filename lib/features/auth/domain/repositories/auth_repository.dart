@@ -8,7 +8,6 @@ abstract interface class AuthRepository {
   });
 
   Future<String> setPassword({
-    required String token,
     required String newPassword,
   });
 }

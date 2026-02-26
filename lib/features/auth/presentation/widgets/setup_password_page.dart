@@ -10,15 +10,14 @@ import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
+import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/core/widgets/app_button.dart';
 import 'package:taxi_driver_app/core/widgets/app_overlay_scaffold.dart';
 import 'package:taxi_driver_app/core/widgets/app_text_field.dart';
-import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_result.dart';
 import 'package:taxi_driver_app/features/auth/presentation/controllers/setup_password_controller.dart';
 
 class SetupPasswordPage extends ConsumerStatefulWidget {
-  const SetupPasswordPage({required this.tokens, super.key});
-  final AuthTokens tokens;
+  const SetupPasswordPage({super.key});
 
   @override
   ConsumerState<SetupPasswordPage> createState() => _SetupPasswordPageState();
@@ -47,17 +46,27 @@ class _SetupPasswordPageState extends ConsumerState<SetupPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authSession = ref.read(authSessionProvider);
     final l10n = context.l10n;
 
-    ref.listen(setupPasswordControllerProvider, (prev, next) {
-      next.whenOrNull(
-        data: (msg) {
+    ref.listen(setupPasswordControllerProvider, (prev, next) async {
+      await next.whenOrNull(
+        data: (msg) async {
           if (msg == null || msg.isEmpty) return;
-          context.showAppSnack(msg, type: AppSnackType.success);
-          ref.read(setupPasswordControllerProvider.notifier).reset();
-          context.go(AppRoutes.home);
+
+          await Future(() async {
+            await authSession.markPasswordCreated();
+
+            if (context.mounted) {
+              context.showAppSnack(msg, type: AppSnackType.success);
+            }
+            ref.read(setupPasswordControllerProvider.notifier).reset();
+            if (context.mounted) {
+              context.go(AppRoutes.home);
+            }
+          });
         },
-        error: (err, _) {
+        error: (err, _) async {
           final msg = failureToUserMessage(
             err,
             l10n: l10n,
@@ -100,7 +109,6 @@ class _SetupPasswordPageState extends ConsumerState<SetupPasswordPage> {
                 await ref
                     .read(setupPasswordControllerProvider.notifier)
                     .submit(
-                      token: widget.tokens.accessToken,
                       newPassword: newPass,
                     );
               },

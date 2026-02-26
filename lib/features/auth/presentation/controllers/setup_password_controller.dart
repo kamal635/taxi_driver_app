@@ -18,12 +18,11 @@ class SetupPasswordController extends AsyncNotifier<String?> {
   }
 
   Future<void> submit({
-    required String token,
     required String newPassword,
   }) async {
     state = const AsyncLoading();
     try {
-      final msg = await _setPassword(token: token, newPassword: newPassword);
+      final msg = await _setPassword(newPassword: newPassword);
       state = AsyncData(msg);
     } on Failure catch (f, st) {
       state = AsyncError(f, st);

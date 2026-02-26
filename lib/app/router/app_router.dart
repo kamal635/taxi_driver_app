@@ -1,10 +1,12 @@
+// lib/app/router/app_router.dart
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taxi_driver_app/app/router/app_routes.dart';
 import 'package:taxi_driver_app/app/router/app_shell_page.dart';
 import 'package:taxi_driver_app/app/router/route_names.dart';
-import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_result.dart';
+import 'package:taxi_driver_app/core/session/auth_session.dart';
 import 'package:taxi_driver_app/features/auth/presentation/pages/login_page.dart';
 import 'package:taxi_driver_app/features/auth/presentation/widgets/setup_password_page.dart';
 import 'package:taxi_driver_app/features/home/presentation/pages/home_page.dart';
@@ -26,19 +28,54 @@ final class AppRouter {
   static final GlobalKey<NavigatorState> _profileBranchKey =
       GlobalKey<NavigatorState>(debugLabel: 'profileBranch');
 
-  static final GoRouter router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutes.login,
-    debugLogDiagnostics: kDebugMode,
+  static GoRouter create(AuthSession session) {
+    return GoRouter(
+      navigatorKey: _rootNavigatorKey,
+      initialLocation: AppRoutes.login,
+      debugLogDiagnostics: kDebugMode,
 
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(
-        child: Text(state.error?.toString() ?? 'Unknown routing error'),
+      // Tell GoRouter to re-evaluate redirect when session changes
+      refreshListenable: session,
+
+      // The 3-cases redirect logic
+      redirect: (context, state) {
+        if (!session.isReady) return null;
+
+        final loc = state.matchedLocation;
+
+        final inAuthFlow =
+            loc == AppRoutes.login || loc == AppRoutes.setupPassword;
+
+        final loggedIn = session.isLoggedIn;
+        final mustChange = session.mustChangePassword;
+
+        // 1) No token -> must be in auth flow
+        if (!loggedIn) {
+          return inAuthFlow ? null : AppRoutes.login;
+        }
+
+        // 2) Token + mustChangePassword=true -> force setup password
+        if (mustChange) {
+          return (loc == AppRoutes.setupPassword)
+              ? null
+              : AppRoutes.setupPassword;
+        }
+
+        // 3) Token + mustChangePassword=false -> prevent auth flow
+        if (inAuthFlow) return AppRoutes.home;
+
+        return null;
+      },
+
+      errorBuilder: (context, state) => Scaffold(
+        body: Center(
+          child: Text(state.error?.toString() ?? 'Unknown routing error'),
+        ),
       ),
-    ),
 
-    routes: _routes,
-  );
+      routes: _routes,
+    );
+  }
 
   static final List<RouteBase> _routes = <RouteBase>[
     _loginRoute(),
@@ -54,28 +91,15 @@ final class AppRouter {
     );
   }
 
-  /// ✅ Setup Password route (opens on root navigator, not inside the shell)
-  /// Expects tokens in `state.extra`.
   static GoRoute _setupPasswordRoute() {
     return GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
       path: AppRoutes.setupPassword,
       name: RouteNames.setupPassword,
-      pageBuilder: (context, state) {
-        final tokens = state.extra as AuthTokens?;
-
-        // Safety: if opened without tokens, send user back to login.
-        if (tokens == null) {
-          return _fadeSlidePage(
-            state: state,
-            child: const LoginPage(),
-          );
-        }
-        return _fadeSlidePage(
-          state: state,
-          child: SetupPasswordPage(tokens: tokens),
-        );
-      },
+      pageBuilder: (context, state) => _fadeSlidePage(
+        state: state,
+        child: const SetupPasswordPage(),
+      ),
     );
   }
 
