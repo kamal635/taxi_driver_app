@@ -29,16 +29,13 @@ class AuthRemoteDataSource {
   }
 
   Future<String> setPassword({
-    required String token,
     required String newPassword,
   }) async {
     final data = await _api.postJson(
-      '/api/driver/credentials/set',
+      '/api/admin/drivers/credentials/set',
       body: {'newPassword': newPassword},
-      headers: {'Authorization': 'Bearer $token'},
     );
 
-    // expected: { "message": "Password updated successfully" }
     return (data['message'] as String?) ?? '';
   }
 }

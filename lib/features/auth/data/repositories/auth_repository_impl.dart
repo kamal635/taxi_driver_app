@@ -31,11 +31,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<String> setPassword({
-    required String token,
     required String newPassword,
   }) {
     return _remote.setPassword(
-      token: token,
       newPassword: newPassword,
     );
   }

@@ -4,7 +4,6 @@ import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/widgets/app_button.dart';
-import 'package:taxi_driver_app/core/widgets/app_text_button.dart';
 import 'package:taxi_driver_app/core/widgets/app_text_field.dart';
 
 class LoginForm extends StatelessWidget {
@@ -66,12 +65,12 @@ class LoginForm extends StatelessWidget {
 
         AppSpacing.h12,
 
-        AppTextButton(
-          label: context.l10n.forgotPassword,
-          onPressed: () {
-            // later
-          },
-        ),
+        // AppTextButton(
+        //   label: context.l10n.forgotPassword,
+        //   onPressed: () {
+        //     // later
+        //   },
+        // ),
       ],
     );
   }

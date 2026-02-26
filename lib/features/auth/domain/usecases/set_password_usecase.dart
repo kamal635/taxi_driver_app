@@ -6,7 +6,6 @@ class SetPasswordUseCase {
   final AuthRepository _repo;
 
   Future<String> call({
-    required String token,
     required String newPassword,
-  }) => _repo.setPassword(token: token, newPassword: newPassword);
+  }) => _repo.setPassword(newPassword: newPassword);
 }

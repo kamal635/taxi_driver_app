@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
@@ -23,21 +24,25 @@ extension SnackBarX on BuildContext {
     messenger.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
+        margin: EdgeInsets.all(16.r),
         elevation: 0,
         duration: duration,
         backgroundColor: style.bg,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
         ),
         content: Row(
           children: [
-            Icon(style.icon, color: style.fg),
+            Icon(
+              style.icon,
+              color: style.fg,
+              size: 20.r,
+            ),
             AppSpacing.w12,
             Expanded(
               child: Text(
                 message,
-                style: AppTypography.labelMd.copyWith(color: AppColors.white),
+                style: AppTypography.labelSm.copyWith(color: AppColors.white),
               ),
             ),
           ],
