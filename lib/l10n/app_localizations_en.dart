@@ -369,4 +369,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authPasswordRulesHint => 'Password must be at least 8 characters.';
+
+  @override
+  String get locationServiceDisabled => 'Please enable Location Services.';
+
+  @override
+  String get locationPermissionRequired =>
+      'Location permission is required to go online.';
+
+  @override
+  String get locationPermissionDeniedForever =>
+      'Location permission is permanently denied. Please enable it from Settings.';
+
+  @override
+  String get locationPermissionUnableToDetermine =>
+      'Unable to determine location permission. Please try again.';
+
+  @override
+  String get actionSettings => 'Settings';
 }

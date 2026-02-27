@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/home_empty_state.dart';
 import 'package:taxi_driver_app/l10n/app_localizations.dart';
-
-final isOnlineProvider = StateProvider<bool>((ref) => false);
 
 enum HomeRequestUiState { empty, offer, current }
 

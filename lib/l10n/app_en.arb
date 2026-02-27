@@ -150,6 +150,12 @@
   "authNewPasswordLabel": "New password",
   "authConfirmNewPasswordLabel": "Confirm new password",
   "authCreatePasswordAction": "Create password",
-  "authPasswordRulesHint": "Password must be at least 8 characters."
+  "authPasswordRulesHint": "Password must be at least 8 characters.",
 
+  "locationServiceDisabled": "Please enable Location Services.",
+  "locationPermissionRequired": "Location permission is required to go online.",
+  "locationPermissionDeniedForever": "Location permission is permanently denied. Please enable it from Settings.",
+  "locationPermissionUnableToDetermine": "Unable to determine location permission. Please try again.",
+
+  "actionSettings": "Settings"
 }

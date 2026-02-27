@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,8 +9,11 @@ import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
+import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
+import 'package:taxi_driver_app/core/location/location_providers.dart';
+import 'package:taxi_driver_app/core/location/location_result.dart';
 import 'package:taxi_driver_app/core/widgets/pill_switch.dart';
-import 'package:taxi_driver_app/features/home/presentation/pages/home_page.dart';
+import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
 
 class AppShellPage extends StatelessWidget {
   const AppShellPage({required this.navigationShell, super.key});
@@ -83,6 +88,57 @@ class AppTopBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
 
+    // Listen once per change, show snackbar (+ Settings action when needed),
+    // then clear
+    ref.listen<LocationFailureReason?>(
+      availabilityProvider.select((s) => s.errorReason),
+      (previous, next) {
+        if (next == null || next == previous) return;
+
+        final message = switch (next) {
+          LocationFailureReason.serviceDisabled => l10n.locationServiceDisabled,
+          LocationFailureReason.permissionDenied =>
+            l10n.locationPermissionRequired,
+          LocationFailureReason.permissionDeniedForever =>
+            l10n.locationPermissionDeniedForever,
+          LocationFailureReason.unableToDetermine =>
+            l10n.locationPermissionUnableToDetermine,
+        };
+
+        final actionLabel = switch (next) {
+          LocationFailureReason.serviceDisabled ||
+          LocationFailureReason.permissionDeniedForever => l10n.actionSettings,
+          _ => null,
+        };
+
+        final locationService = ref.read(locationServiceProvider);
+
+        final onAction = switch (next) {
+          LocationFailureReason.serviceDisabled => () => unawaited(
+            locationService.openLocationSettings(),
+          ),
+          LocationFailureReason.permissionDeniedForever => () => unawaited(
+            locationService.openAppSettings(),
+          ),
+          _ => null,
+        };
+
+        context.showAppSnack(
+          message,
+          type: AppSnackType.error,
+          actionLabel: actionLabel,
+          onAction: onAction,
+        );
+
+        ref.read(availabilityProvider.notifier).clearError();
+      },
+    );
+
+    // Read both values in one watch (rebuild only when either changes)
+    final (isOnline, isBusy) = ref.watch(
+      availabilityProvider.select((s) => (s.isOnline, s.isBusy)),
+    );
+
     return Column(
       children: [
         Row(
@@ -103,14 +159,20 @@ class AppTopBar extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 PillSwitch(
-                  value: ref.watch(isOnlineProvider),
-                  onChanged: (v) =>
-                      ref.read(isOnlineProvider.notifier).state = v,
+                  value: isOnline,
+                  onChanged: isBusy
+                      ? null
+                      : (v) {
+                          unawaited(
+                            ref
+                                .read(availabilityProvider.notifier)
+                                .requestSetOnline(value: v),
+                          );
+                        },
                   offLabel: l10n.offline,
                   onLabel: l10n.online,
                   uppercase: false,
                 ),
-
                 AppSpacing.w12,
                 GestureDetector(
                   onTap: onAvatarPressed,
