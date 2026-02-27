@@ -368,4 +368,22 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get authPasswordRulesHint =>
       'يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل.';
+
+  @override
+  String get locationServiceDisabled => 'يرجى تفعيل خدمات الموقع (GPS).';
+
+  @override
+  String get locationPermissionRequired =>
+      'صلاحية الموقع مطلوبة لتفعيل وضع التوفر.';
+
+  @override
+  String get locationPermissionDeniedForever =>
+      'تم رفض صلاحية الموقع نهائياً. يرجى تفعيلها من الإعدادات.';
+
+  @override
+  String get locationPermissionUnableToDetermine =>
+      'تعذّر تحديد صلاحية الموقع. حاول مرة أخرى.';
+
+  @override
+  String get actionSettings => 'الإعدادات';
 }

@@ -83,8 +83,7 @@ final dioProvider = Provider<Dio>((ref) {
             final data = res.data;
 
             // Parse tokens from response
-            final access = (data is Map ? data['accessToken'] : null)
-                ?.toString();
+            final access = (data is Map ? data['token'] : null)?.toString();
 
             // If server rotates refresh tokens, use the new one.
             // Otherwise, keep the old one.

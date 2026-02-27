@@ -153,6 +153,13 @@
   "authNewPasswordLabel": "كلمة المرور الجديدة",
   "authConfirmNewPasswordLabel": "تأكيد كلمة المرور",
   "authCreatePasswordAction": "إنشاء كلمة المرور",
-  "authPasswordRulesHint": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل."
+  "authPasswordRulesHint": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل.",
+
+  "locationServiceDisabled": "يرجى تفعيل خدمات الموقع (GPS).",
+  "locationPermissionRequired": "صلاحية الموقع مطلوبة لتفعيل وضع التوفر.",
+  "locationPermissionDeniedForever": "تم رفض صلاحية الموقع نهائياً. يرجى تفعيلها من الإعدادات.",
+  "locationPermissionUnableToDetermine": "تعذّر تحديد صلاحية الموقع. حاول مرة أخرى.",
+
+  "actionSettings": "الإعدادات"
 
 }

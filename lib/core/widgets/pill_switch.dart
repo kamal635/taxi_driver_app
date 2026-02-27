@@ -19,7 +19,7 @@ class PillSwitch extends StatefulWidget {
   });
 
   final bool value;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
 
   final String onLabel;
   final String offLabel;
@@ -248,7 +248,7 @@ class _PillSwitchState extends State<PillSwitch>
 
         final pillBody = InkWell(
           borderRadius: radius,
-          onTap: _animating ? null : () => widget.onChanged(!widget.value),
+          onTap: _animating ? null : () => widget.onChanged!(!widget.value),
           child: Container(
             decoration: BoxDecoration(
               color: baseBg,

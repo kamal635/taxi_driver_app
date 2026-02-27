@@ -787,6 +787,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password must be at least 8 characters.'**
   String get authPasswordRulesHint;
+
+  /// No description provided for @locationServiceDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enable Location Services.'**
+  String get locationServiceDisabled;
+
+  /// No description provided for @locationPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is required to go online.'**
+  String get locationPermissionRequired;
+
+  /// No description provided for @locationPermissionDeniedForever.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is permanently denied. Please enable it from Settings.'**
+  String get locationPermissionDeniedForever;
+
+  /// No description provided for @locationPermissionUnableToDetermine.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to determine location permission. Please try again.'**
+  String get locationPermissionUnableToDetermine;
+
+  /// No description provided for @actionSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get actionSettings;
 }
 
 class _AppLocalizationsDelegate
