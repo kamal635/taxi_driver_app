@@ -812,6 +812,12 @@ abstract class AppLocalizations {
   /// **'Unable to determine location permission. Please try again.'**
   String get locationPermissionUnableToDetermine;
 
+  /// No description provided for @locationNetworkError.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. We can\'t update your location.'**
+  String get locationNetworkError;
+
   /// No description provided for @actionSettings.
   ///
   /// In en, this message translates to:

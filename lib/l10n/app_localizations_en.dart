@@ -386,5 +386,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Unable to determine location permission. Please try again.';
 
   @override
+  String get locationNetworkError =>
+      'No internet connection. We can\'t update your location.';
+
+  @override
   String get actionSettings => 'Settings';
 }

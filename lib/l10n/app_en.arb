@@ -156,6 +156,8 @@
   "locationPermissionRequired": "Location permission is required to go online.",
   "locationPermissionDeniedForever": "Location permission is permanently denied. Please enable it from Settings.",
   "locationPermissionUnableToDetermine": "Unable to determine location permission. Please try again.",
+   
+  "locationNetworkError": "No internet connection. We can't update your location.",
 
   "actionSettings": "Settings"
 }
