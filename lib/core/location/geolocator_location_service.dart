@@ -3,6 +3,7 @@ import 'package:taxi_driver_app/core/location/location_result.dart';
 import 'package:taxi_driver_app/core/location/location_service.dart';
 
 final class GeolocatorLocationService implements LocationService {
+  ///------------- 1
   @override
   Future<LocationReadyResult> ensureReady() async {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -20,16 +21,19 @@ final class GeolocatorLocationService implements LocationService {
     return _resultFromPermission(effectivePermission);
   }
 
+  ///------------- 2
   @override
   Future<bool> openLocationSettings() {
     return Geolocator.openLocationSettings();
   }
 
+  ///------------- 3
   @override
   Future<bool> openAppSettings() {
     return Geolocator.openAppSettings();
   }
 
+  ///------------- Helper
   LocationReadyResult _resultFromPermission(LocationPermission permission) {
     return switch (permission) {
       LocationPermission.whileInUse ||
@@ -50,9 +54,8 @@ final class GeolocatorLocationService implements LocationService {
   }
 
   LocationReadyResult _failure(
-    LocationFailureReason reason, {
-    String? message,
-  }) {
-    return LocationReadyResult.failure(reason: reason, message: message);
+    LocationFailureReason reason,
+  ) {
+    return LocationReadyResult.failure(reason: reason);
   }
 }

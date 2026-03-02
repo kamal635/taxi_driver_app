@@ -103,6 +103,7 @@ class AppTopBar extends ConsumerWidget {
             l10n.locationPermissionDeniedForever,
           LocationFailureReason.unableToDetermine =>
             l10n.locationPermissionUnableToDetermine,
+          LocationFailureReason.networkError => l10n.locationNetworkError,
         };
 
         final actionLabel = switch (next) {
@@ -135,8 +136,10 @@ class AppTopBar extends ConsumerWidget {
     );
 
     // Read both values in one watch (rebuild only when either changes)
-    final (isOnline, isBusy) = ref.watch(
-      availabilityProvider.select((s) => (s.isOnline, s.isBusy)),
+    final (:isOnline, :isBusy) = ref.watch(
+      availabilityProvider.select(
+        (s) => (isOnline: s.isOnline, isBusy: s.isBusy),
+      ),
     );
 
     return Column(

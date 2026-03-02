@@ -55,4 +55,48 @@ class ApiClient {
       throw mapDioException(e);
     }
   }
+
+  Future<Map<String, dynamic>> putJson(
+    String path, {
+    Map<String, dynamic>? body,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? query,
+  }) async {
+    try {
+      final res = await _dio.put<Map<String, dynamic>>(
+        path,
+        data: body,
+        queryParameters: query,
+        options: Options(headers: headers),
+      );
+
+      final data = res.data;
+      if (data == null) {
+        throw const ParsingFailure(message: 'Empty response body');
+      }
+      return data;
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    } on FormatException catch (e) {
+      throw ParsingFailure(details: e);
+    }
+  }
+
+  Future<void> putVoid(
+    String path, {
+    Map<String, dynamic>? body,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? query,
+  }) async {
+    try {
+      await _dio.put<void>(
+        path,
+        data: body,
+        queryParameters: query,
+        options: Options(headers: headers),
+      );
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
+  }
 }

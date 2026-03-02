@@ -385,5 +385,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'تعذّر تحديد صلاحية الموقع. حاول مرة أخرى.';
 
   @override
+  String get locationNetworkError =>
+      'لا يوجد اتصال بالإنترنت. لا يمكن تحديث موقعك.';
+
+  @override
   String get actionSettings => 'الإعدادات';
 }

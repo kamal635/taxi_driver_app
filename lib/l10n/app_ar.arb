@@ -159,7 +159,9 @@
   "locationPermissionRequired": "صلاحية الموقع مطلوبة لتفعيل وضع التوفر.",
   "locationPermissionDeniedForever": "تم رفض صلاحية الموقع نهائياً. يرجى تفعيلها من الإعدادات.",
   "locationPermissionUnableToDetermine": "تعذّر تحديد صلاحية الموقع. حاول مرة أخرى.",
-
+  
+  "locationNetworkError": "لا يوجد اتصال بالإنترنت. لا يمكن تحديث موقعك.",
+  
   "actionSettings": "الإعدادات"
 
 }

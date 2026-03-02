@@ -245,10 +245,11 @@ class _PillSwitchState extends State<PillSwitch>
         // Works for both LTR & RTL because reveal "reaches the far end" at the
         //same t.
         final bumpThreshold = (1.0 - (paddingX / fixedWidth)).clamp(0.0, 1.0);
-
+        final isEnabled = !_animating && widget.onChanged != null;
         final pillBody = InkWell(
           borderRadius: radius,
-          onTap: _animating ? null : () => widget.onChanged!(!widget.value),
+
+          onTap: isEnabled ? () => widget.onChanged!.call(!widget.value) : null,
           child: Container(
             decoration: BoxDecoration(
               color: baseBg,

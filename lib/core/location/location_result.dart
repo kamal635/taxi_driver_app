@@ -10,13 +10,14 @@ enum LocationFailureReason {
 
   /// Permission state can't be determined (e.g., unsupported platform/browser).
   unableToDetermine,
+
+  networkError,
 }
 
 final class LocationReadyResult {
   LocationReadyResult({
     required this.isSuccess,
     this.reason,
-    this.message,
   });
 
   factory LocationReadyResult.success() {
@@ -25,16 +26,13 @@ final class LocationReadyResult {
 
   factory LocationReadyResult.failure({
     required LocationFailureReason reason,
-    String? message,
   }) {
     return LocationReadyResult(
       isSuccess: false,
       reason: reason,
-      message: message,
     );
   }
 
   final bool isSuccess;
   final LocationFailureReason? reason;
-  final String? message;
 }
