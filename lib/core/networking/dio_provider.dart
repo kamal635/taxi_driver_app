@@ -81,7 +81,7 @@ final dioProvider = Provider<Dio>((ref) {
             );
 
             final data = res.data;
-
+            final driverId = authSession.driverId;
             // Parse tokens from response
             final access = (data is Map ? data['token'] : null)?.toString();
 
@@ -97,8 +97,13 @@ final dioProvider = Provider<Dio>((ref) {
               throw Exception('Refresh did not return accessToken');
             }
 
+            if (driverId == null) {
+              throw Exception('driverId is null ');
+            }
+
             // Persist updated tokens in session + storage
             await authSession.updateTokens(
+              driverId: driverId,
               token: access,
               refreshToken: newRefresh,
             );

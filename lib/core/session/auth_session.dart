@@ -8,19 +8,26 @@ final class AuthSession extends ChangeNotifier {
 
   String? _token;
   String? _refreshToken;
+  String? _driverId;
   bool _mustChangePassword = false;
   bool _isReady = false;
 
   String? get token => _token;
   String? get refreshToken => _refreshToken;
+  String? get driverId => _driverId;
   bool get mustChangePassword => _mustChangePassword;
   bool get isReady => _isReady;
 
-  bool get isLoggedIn => _token != null && _token!.isNotEmpty;
+  bool get isLoggedIn =>
+      _token != null &&
+      _driverId != null &&
+      _token!.isNotEmpty &&
+      _driverId!.isNotEmpty;
 
   Future<void> load() async {
     _token = await _storage.readToken();
     _refreshToken = await _storage.readRefreshToken();
+    _driverId = await _storage.readDriverId();
     _mustChangePassword = await _storage.readMustChangePassword();
 
     _isReady = true;
@@ -31,14 +38,17 @@ final class AuthSession extends ChangeNotifier {
     required String token,
     required String refreshToken,
     required bool mustChangePassword,
+    required String driverId,
   }) async {
     _token = token;
     _refreshToken = refreshToken;
+    _driverId = driverId;
     _mustChangePassword = mustChangePassword;
 
     await _storage.save(
       token: token,
       refreshToken: refreshToken,
+      driverId: driverId,
       mustChangePassword: mustChangePassword,
     );
 
@@ -54,13 +64,16 @@ final class AuthSession extends ChangeNotifier {
   Future<void> updateTokens({
     required String token,
     required String refreshToken,
+    required String driverId,
   }) async {
     _token = token;
     _refreshToken = refreshToken;
+    _driverId = driverId;
 
     await _storage.save(
       token: token,
       refreshToken: refreshToken,
+      driverId: driverId,
       mustChangePassword: _mustChangePassword,
     );
 
@@ -70,6 +83,7 @@ final class AuthSession extends ChangeNotifier {
   Future<void> clear() async {
     _token = null;
     _refreshToken = null;
+    _driverId = null;
     _mustChangePassword = false;
 
     await _storage.clear();

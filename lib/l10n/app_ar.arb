@@ -13,6 +13,8 @@
   "forgotPassword": "هل نسيت كلمة المرور؟",
   "copyright": "© 2026 تطبيق سائق التكسي",
 
+  "unknown":"غير معروف",
+
   "homeGreeting": "مرحباً،",
   "homeNetworkConnected": "متصل بالشبكة",
   "homeNetworkDisconnected": "غير متصل بالشبكة",

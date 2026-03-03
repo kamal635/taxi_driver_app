@@ -45,6 +45,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copyright => '© 2026 Taxi Driver App';
 
   @override
+  String get unknown => 'unknown';
+
+  @override
   String get homeGreeting => 'Hello,';
 
   @override

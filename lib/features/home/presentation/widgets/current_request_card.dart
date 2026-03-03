@@ -29,7 +29,7 @@ class CurrentRequestCard extends StatelessWidget {
 
   factory CurrentRequestCard.offer({
     required String title,
-    required String fareText,
+    required String priceText,
     required String pickup,
     required String dropoff,
     required String acceptLabel,
@@ -41,7 +41,7 @@ class CurrentRequestCard extends StatelessWidget {
     return CurrentRequestCard._(
       key: key,
       title: title,
-      fareText: fareText,
+      fareText: priceText,
       pickup: pickup,
       dropoff: dropoff,
       variant: CardVariant.offer,

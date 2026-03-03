@@ -1,11 +1,13 @@
-class AuthTokens {
-  const AuthTokens({
+class AuthSessionEntity {
+  const AuthSessionEntity({
     required this.accessToken,
     required this.refreshToken,
+    required this.driverId,
   });
 
   final String accessToken;
   final String refreshToken;
+  final String driverId;
 }
 
 sealed class AuthSignInResult {
@@ -13,11 +15,12 @@ sealed class AuthSignInResult {
 }
 
 final class AuthSignedIn extends AuthSignInResult {
-  const AuthSignedIn(this.tokens);
-  final AuthTokens tokens;
+  const AuthSignedIn(this.authSessionEntity);
+
+  final AuthSessionEntity authSessionEntity;
 }
 
 final class AuthSetupRequired extends AuthSignInResult {
-  const AuthSetupRequired(this.tokens);
-  final AuthTokens tokens;
+  const AuthSetupRequired(this.authSessionEntity);
+  final AuthSessionEntity authSessionEntity;
 }

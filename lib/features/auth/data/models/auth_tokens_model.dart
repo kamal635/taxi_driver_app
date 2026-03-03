@@ -1,14 +1,16 @@
 import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_result.dart';
 
-class AuthTokensModel {
-  const AuthTokensModel({
+class AuthSessionModel {
+  const AuthSessionModel({
+    required this.driverId,
     required this.accessToken,
     required this.refreshToken,
   });
 
-  factory AuthTokensModel.fromJson(Map<String, dynamic> json) {
+  factory AuthSessionModel.fromJson(Map<String, dynamic> json) {
     final access = json['token']?.toString();
     final refreshToken = json['refreshToken']?.toString();
+    final driverId = json['userId']?.toString();
 
     if (access == null || access.isEmpty) {
       throw const FormatException('Missing token');
@@ -17,18 +19,24 @@ class AuthTokensModel {
     if (refreshToken == null || refreshToken.isEmpty) {
       throw const FormatException('Missing refreshToken');
     }
+    if (driverId == null || driverId.isEmpty) {
+      throw const FormatException('Missing driverId');
+    }
 
-    return AuthTokensModel(
+    return AuthSessionModel(
       accessToken: access,
       refreshToken: refreshToken,
+      driverId: driverId,
     );
   }
 
   final String accessToken;
   final String refreshToken;
+  final String driverId;
 
-  AuthTokens toEntity() => AuthTokens(
+  AuthSessionEntity toEntity() => AuthSessionEntity(
     accessToken: accessToken,
     refreshToken: refreshToken,
+    driverId: driverId,
   );
 }
