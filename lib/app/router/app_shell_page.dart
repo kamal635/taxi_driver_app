@@ -14,6 +14,7 @@ import 'package:taxi_driver_app/core/location/location_providers.dart';
 import 'package:taxi_driver_app/core/location/location_result.dart';
 import 'package:taxi_driver_app/core/widgets/pill_switch.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/new_orders_controller.dart';
 
 class AppShellPage extends StatelessWidget {
   const AppShellPage({required this.navigationShell, super.key});
@@ -87,53 +88,67 @@ class AppTopBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    ref
+      ..listen<bool>(
+        availabilityProvider.select((s) => s.isOnline),
+        (prev, next) {
+          if (next) {
+            // Driver became online -> start listening
+            unawaited(ref.read(newOrdersControllerProvider.notifier).start());
+          } else {
+            // Driver became offline -> stop listening
+            unawaited(ref.read(newOrdersControllerProvider.notifier).stop());
+          }
+        },
+      )
+      // Listen once per change, show snackbar (+ Settings action when needed),
+      // then clear
+      ..listen<LocationFailureReason?>(
+        availabilityProvider.select((s) => s.errorReason),
+        (previous, next) {
+          if (next == null || next == previous) return;
 
-    // Listen once per change, show snackbar (+ Settings action when needed),
-    // then clear
-    ref.listen<LocationFailureReason?>(
-      availabilityProvider.select((s) => s.errorReason),
-      (previous, next) {
-        if (next == null || next == previous) return;
+          final message = switch (next) {
+            LocationFailureReason.serviceDisabled =>
+              l10n.locationServiceDisabled,
+            LocationFailureReason.permissionDenied =>
+              l10n.locationPermissionRequired,
+            LocationFailureReason.permissionDeniedForever =>
+              l10n.locationPermissionDeniedForever,
+            LocationFailureReason.unableToDetermine =>
+              l10n.locationPermissionUnableToDetermine,
+            LocationFailureReason.networkError => l10n.locationNetworkError,
+          };
 
-        final message = switch (next) {
-          LocationFailureReason.serviceDisabled => l10n.locationServiceDisabled,
-          LocationFailureReason.permissionDenied =>
-            l10n.locationPermissionRequired,
-          LocationFailureReason.permissionDeniedForever =>
-            l10n.locationPermissionDeniedForever,
-          LocationFailureReason.unableToDetermine =>
-            l10n.locationPermissionUnableToDetermine,
-          LocationFailureReason.networkError => l10n.locationNetworkError,
-        };
+          final actionLabel = switch (next) {
+            LocationFailureReason.serviceDisabled ||
+            LocationFailureReason.permissionDeniedForever =>
+              l10n.actionSettings,
+            _ => null,
+          };
 
-        final actionLabel = switch (next) {
-          LocationFailureReason.serviceDisabled ||
-          LocationFailureReason.permissionDeniedForever => l10n.actionSettings,
-          _ => null,
-        };
+          final locationService = ref.read(locationServiceProvider);
 
-        final locationService = ref.read(locationServiceProvider);
+          final onAction = switch (next) {
+            LocationFailureReason.serviceDisabled => () => unawaited(
+              locationService.openLocationSettings(),
+            ),
+            LocationFailureReason.permissionDeniedForever => () => unawaited(
+              locationService.openAppSettings(),
+            ),
+            _ => null,
+          };
 
-        final onAction = switch (next) {
-          LocationFailureReason.serviceDisabled => () => unawaited(
-            locationService.openLocationSettings(),
-          ),
-          LocationFailureReason.permissionDeniedForever => () => unawaited(
-            locationService.openAppSettings(),
-          ),
-          _ => null,
-        };
+          context.showAppSnack(
+            message,
+            type: AppSnackType.error,
+            actionLabel: actionLabel,
+            onAction: onAction,
+          );
 
-        context.showAppSnack(
-          message,
-          type: AppSnackType.error,
-          actionLabel: actionLabel,
-          onAction: onAction,
-        );
-
-        ref.read(availabilityProvider.notifier).clearError();
-      },
-    );
+          ref.read(availabilityProvider.notifier).clearError();
+        },
+      );
 
     // Read both values in one watch (rebuild only when either changes)
     final (:isOnline, :isBusy) = ref.watch(

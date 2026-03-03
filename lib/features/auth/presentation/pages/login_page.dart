@@ -63,25 +63,27 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           if (result == null) return;
 
           switch (result) {
-            case AuthSignedIn(:final tokens):
+            case AuthSignedIn(:final authSessionEntity):
               await authSession.saveAfterLogin(
-                token: tokens.accessToken,
-                refreshToken: tokens.refreshToken,
+                driverId: authSessionEntity.driverId,
+                token: authSessionEntity.accessToken,
+                refreshToken: authSessionEntity.refreshToken,
                 mustChangePassword: false,
               );
               if (context.mounted) context.go(AppRoutes.home);
               return;
 
-            case AuthSetupRequired(:final tokens):
+            case AuthSetupRequired(:final authSessionEntity):
               await authSession.saveAfterLogin(
-                token: tokens.accessToken,
-                refreshToken: tokens.refreshToken,
+                driverId: authSessionEntity.driverId,
+                token: authSessionEntity.accessToken,
+                refreshToken: authSessionEntity.refreshToken,
                 mustChangePassword: true,
               );
               if (context.mounted) {
                 context.go(
                   AppRoutes.setupPassword,
-                  extra: tokens,
+                  extra: authSessionEntity,
                 );
               }
               return;

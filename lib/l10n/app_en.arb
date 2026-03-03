@@ -13,6 +13,10 @@
   "forgotPassword": "Forgot password?",
   "copyright": "© 2026 Taxi Driver App",
 
+
+  "unknown":"unknown",
+
+
   "homeGreeting": "Hello,",
   "homeNetworkConnected": "Connected",
   "homeNetworkDisconnected": "Disconnected",

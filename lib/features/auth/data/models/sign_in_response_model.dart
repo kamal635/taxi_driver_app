@@ -4,28 +4,28 @@ import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_resul
 class SignInResponseModel {
   const SignInResponseModel({
     required this.mustChangePassword,
-    required this.tokens,
+    required this.authSession,
   });
 
   factory SignInResponseModel.fromJson(Map<String, dynamic> json) {
     final mustChangePassword = json['mustChangePassword'] == true;
 
-    final tokens = AuthTokensModel.fromJson(json);
+    final authSession = AuthSessionModel.fromJson(json);
 
     return SignInResponseModel(
       mustChangePassword: mustChangePassword,
-      tokens: tokens,
+      authSession: authSession,
     );
   }
   final bool mustChangePassword;
-  final AuthTokensModel tokens;
+  final AuthSessionModel authSession;
 
   AuthSignInResult toEntity() {
-    final entityTokens = tokens.toEntity();
+    final authSessionEntity = authSession.toEntity();
 
     if (mustChangePassword) {
-      return AuthSetupRequired(entityTokens);
+      return AuthSetupRequired(authSessionEntity);
     }
-    return AuthSignedIn(entityTokens);
+    return AuthSignedIn(authSessionEntity);
   }
 }
