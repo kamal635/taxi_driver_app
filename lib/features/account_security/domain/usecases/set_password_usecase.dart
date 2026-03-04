@@ -1,9 +1,9 @@
-import 'package:taxi_driver_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:taxi_driver_app/features/account_security/domain/repositories/account_security_repository.dart';
 
 class SetPasswordUseCase {
   const SetPasswordUseCase(this._repo);
 
-  final AuthRepository _repo;
+  final AccountSecurityRepository _repo;
 
   Future<String> call({
     required String newPassword,

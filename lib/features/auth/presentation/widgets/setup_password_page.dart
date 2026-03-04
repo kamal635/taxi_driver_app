@@ -14,7 +14,7 @@ import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/core/widgets/app_button.dart';
 import 'package:taxi_driver_app/core/widgets/app_overlay_scaffold.dart';
 import 'package:taxi_driver_app/core/widgets/app_text_field.dart';
-import 'package:taxi_driver_app/features/auth/presentation/controllers/setup_password_controller.dart';
+import 'package:taxi_driver_app/features/account_security/presentation/controllers/setup_password_controller.dart';
 
 class SetupPasswordPage extends ConsumerStatefulWidget {
   const SetupPasswordPage({super.key});
@@ -51,9 +51,18 @@ class _SetupPasswordPageState extends ConsumerState<SetupPasswordPage> {
 
     ref.listen(setupPasswordControllerProvider, (prev, next) async {
       await next.whenOrNull(
+        error: (err, _) {
+          final msg = failureToUserMessage(
+            err,
+            l10n: context.l10n,
+          );
+          context.showAppSnack(msg, type: AppSnackType.error);
+        },
         data: (msg) async {
-          if (msg == null || msg.isEmpty) return;
+          if (msg == null) return;
 
+          // avoid duplicate snack on rebuild
+          if (msg == prev?.value) return;
           await Future(() async {
             await authSession.markPasswordCreated();
 
@@ -65,14 +74,6 @@ class _SetupPasswordPageState extends ConsumerState<SetupPasswordPage> {
               context.go(AppRoutes.home);
             }
           });
-        },
-        error: (err, _) async {
-          final msg = failureToUserMessage(
-            err,
-            l10n: l10n,
-            context: FailureContext.authLogin,
-          );
-          context.showAppSnack(msg, type: AppSnackType.error);
         },
       );
     });
@@ -91,7 +92,7 @@ class _SetupPasswordPageState extends ConsumerState<SetupPasswordPage> {
                 final newPass = _newPassword.text.trim();
                 final confirm = _confirmNewPassword.text.trim();
 
-                if (newPass.length < 8) {
+                if (newPass.length < 6) {
                   context.showAppSnack(
                     l10n.authPasswordRulesHint,
                     type: AppSnackType.warning,

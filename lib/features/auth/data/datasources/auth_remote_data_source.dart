@@ -27,15 +27,4 @@ class AuthRemoteDataSource {
 
     return SignInResponseModel.fromJson(data);
   }
-
-  Future<String> setPassword({
-    required String newPassword,
-  }) async {
-    final data = await _api.postJson(
-      '/api/admin/drivers/credentials/set',
-      body: {'newPassword': newPassword},
-    );
-
-    return (data['message'] as String?) ?? '';
-  }
 }
