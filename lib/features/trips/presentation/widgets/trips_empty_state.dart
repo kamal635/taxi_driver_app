@@ -33,9 +33,9 @@ class TripsEmptyState extends StatelessWidget {
             height: 96.r,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.taxiYellow.withValues(alpha: 0.14),
+              color: AppColors.primary.withValues(alpha: 0.14),
               border: Border.all(
-                color: AppColors.taxiYellow.withValues(alpha: 0.30),
+                color: AppColors.primary.withValues(alpha: 0.30),
               ),
             ),
             child: Icon(icon, size: 34.r, color: AppColors.textPrimary),

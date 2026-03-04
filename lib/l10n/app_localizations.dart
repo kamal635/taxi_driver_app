@@ -170,6 +170,12 @@ abstract class AppLocalizations {
   /// **'© 2026 Taxi Driver App'**
   String get copyright;
 
+  /// No description provided for @notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notes;
+
   /// No description provided for @unknown.
   ///
   /// In en, this message translates to:

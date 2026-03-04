@@ -45,6 +45,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get copyright => '© 2026 تطبيق سائق التكسي';
 
   @override
+  String get notes => 'ملاحظات';
+
+  @override
   String get unknown => 'غير معروف';
 
   @override

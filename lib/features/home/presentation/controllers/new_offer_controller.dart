@@ -3,49 +3,47 @@ import 'dart:async' show StreamSubscription, unawaited;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/socket/socket_client_provider.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/order_entity.dart';
+import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
 import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
 
-final newOrdersControllerProvider =
-    NotifierProvider<NewOrdersController, NewOrderState>(
-      NewOrdersController.new,
+final newOfferControllerProvider =
+    NotifierProvider<NewOfferController, NewOfferState>(
+      NewOfferController.new,
     );
 
-final class NewOrdersController extends Notifier<NewOrderState> {
-  StreamSubscription<NewOrderEntity>? _streamSubscription;
+final class NewOfferController extends Notifier<NewOfferState> {
+  StreamSubscription<NewOfferEntity>? _streamSubscription;
 
   @override
-  NewOrderState build() {
+  NewOfferState build() {
     ref.onDispose(
       () {
         unawaited(_streamSubscription?.cancel());
         _streamSubscription = null;
       },
     );
-    return NewOrderState(isLoading: false);
+    return NewOfferState(isLoading: false);
   }
 
   Future<void> start() async {
-    if (state.isLoading) return;
-
+    if (_streamSubscription != null) return;
     state = state.copyWith(isLoading: true, error: null);
 
     try {
       await ref.read(socketConnectionManagerProvider);
+      debugPrint('Socket Connection Manager success ');
     } on Exception catch (e) {
       state = state.copyWith(error: e.toString(), isLoading: false);
       debugPrint('Socket Connection Manager Erorr: $e');
       return;
     }
 
-    final watchOrder = ref.read(watchNewOrderUsecaseProvider);
+    final watchOffer = ref.read(watchNewOfferUsecaseProvider);
 
-    if (_streamSubscription != null) return;
-
-    _streamSubscription = watchOrder().listen(
-      (newOrderEntity) {
+    _streamSubscription = watchOffer().listen(
+      (newOfferEntity) {
         state = state.copyWith(
-          currentOrder: newOrderEntity,
+          currentOffer: newOfferEntity,
           isLoading: false,
           error: null,
         );
@@ -72,35 +70,38 @@ final class NewOrdersController extends Notifier<NewOrderState> {
     await ref.read(socketClientProvider).disconnect();
 
     // Reset UI state
-    state = state.copyWith(
-      isLoading: false,
-      error: null,
-    );
+    state = state.copyWith(isLoading: false, error: null, currentOffer: null);
 
     debugPrint('Socket stop streaming');
   }
+
+  void clearCurrent() {
+    state = state.copyWith(currentOffer: null);
+  }
 }
 
-final class NewOrderState {
-  NewOrderState({
+final class NewOfferState {
+  NewOfferState({
     required this.isLoading,
-    this.currentOrder,
+    this.currentOffer,
     this.error,
   });
 
-  final NewOrderEntity? currentOrder;
+  final NewOfferEntity? currentOffer;
   final bool isLoading;
   final String? error;
 
   static const Object _unset = Object();
 
-  NewOrderState copyWith({
-    NewOrderEntity? currentOrder,
+  NewOfferState copyWith({
+    Object? currentOffer = _unset,
     bool? isLoading,
     Object? error = _unset,
   }) {
-    return NewOrderState(
-      currentOrder: currentOrder ?? this.currentOrder,
+    return NewOfferState(
+      currentOffer: identical(currentOffer, _unset)
+          ? this.currentOffer
+          : currentOffer as NewOfferEntity?,
       isLoading: isLoading ?? this.isLoading,
       error: identical(error, _unset) ? this.error : error as String?,
     );

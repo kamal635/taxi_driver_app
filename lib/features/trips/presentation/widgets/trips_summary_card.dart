@@ -85,7 +85,7 @@ class _SummaryStat extends StatelessWidget {
             width: 38.r,
             height: 38.r,
             decoration: BoxDecoration(
-              color: AppColors.taxiYellow.withValues(alpha: 0.18),
+              color: AppColors.primary.withValues(alpha: 0.18),
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: AppColors.border),
             ),

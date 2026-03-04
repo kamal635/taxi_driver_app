@@ -17,7 +17,7 @@ class AvatarImageEditor extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: AppColors.taxiYellow.withValues(alpha: 0.55),
+              color: AppColors.primary.withValues(alpha: 0.55),
               width: 3,
             ),
             color: AppColors.bgBase,
@@ -43,7 +43,7 @@ class AvatarImageEditor extends StatelessWidget {
               height: 34.r,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.taxiYellow,
+                color: AppColors.primary,
                 border: Border.all(color: AppColors.border),
               ),
               child: Icon(
