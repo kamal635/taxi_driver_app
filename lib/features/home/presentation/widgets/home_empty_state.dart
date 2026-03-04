@@ -27,9 +27,9 @@ class HomeEmptyState extends StatelessWidget {
           height: 160.r,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.taxiYellow.withValues(alpha: 0.12),
+            color: AppColors.primary.withValues(alpha: 0.12),
             border: Border.all(
-              color: AppColors.taxiYellow.withValues(alpha: 0.35),
+              color: AppColors.primary.withValues(alpha: 0.35),
               width: 1.2,
             ),
           ),

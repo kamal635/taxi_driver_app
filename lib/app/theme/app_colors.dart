@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 final class AppColors {
-  static const taxiYellow = Color(0xFFFFD400);
+  static const primary = Color(0xFFFFD400);
 
   static const bgWarm = Color(0xFFFFF8E1);
   static const bgBase = Color(0xFFF7F7F7);

@@ -30,8 +30,8 @@ class BottomNav extends StatelessWidget {
 
     // ✅ ألوان مثل Sofascore-style (بس مع لمسة الـ brand عندك)
     const inactiveColor = AppColors.iconMuted;
-    const activeColor = AppColors.taxiYellow; // بدك إياها أزرق؟ بقلك تحت
-    const indicatorColor = AppColors.taxiYellow;
+    const activeColor = AppColors.primary; // بدك إياها أزرق؟ بقلك تحت
+    const indicatorColor = AppColors.primary;
 
     return SafeArea(
       top: false,

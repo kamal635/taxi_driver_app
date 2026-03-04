@@ -25,7 +25,7 @@ class AppButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? AppColors.taxiYellow,
+          backgroundColor: backgroundColor ?? AppColors.primary,
           foregroundColor: AppColors.textPrimary,
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -38,7 +38,7 @@ class AppButton extends StatelessWidget {
                 height: 18.w,
                 child: const CircularProgressIndicator(
                   strokeWidth: 3,
-                  color: AppColors.taxiYellow,
+                  color: AppColors.primary,
                 ),
               )
             : Text(

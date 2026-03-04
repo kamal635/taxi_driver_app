@@ -70,7 +70,7 @@ class _FilterChipButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = selected ? AppColors.taxiYellow : Colors.white;
+    final bg = selected ? AppColors.primary : Colors.white;
     final borderColor = selected ? Colors.transparent : AppColors.border;
 
     return InkWell(
@@ -87,7 +87,7 @@ class _FilterChipButton extends StatelessWidget {
                   BoxShadow(
                     blurRadius: 16,
                     offset: const Offset(0, 10),
-                    color: AppColors.taxiYellow.withValues(alpha: 0.22),
+                    color: AppColors.primary.withValues(alpha: 0.22),
                   ),
                 ]
               : null,

@@ -4,7 +4,7 @@ import 'package:taxi_driver_app/app/theme/app_fonts.dart';
 
 final class AppTheme {
   static ThemeData light(Locale locale) {
-    final scheme = ColorScheme.fromSeed(seedColor: AppColors.taxiYellow);
+    final scheme = ColorScheme.fromSeed(seedColor: AppColors.primary);
 
     final fonts = AppFonts.resolve(locale);
 

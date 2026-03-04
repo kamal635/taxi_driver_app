@@ -14,7 +14,7 @@ import 'package:taxi_driver_app/core/location/location_providers.dart';
 import 'package:taxi_driver_app/core/location/location_result.dart';
 import 'package:taxi_driver_app/core/widgets/pill_switch.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_orders_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 
 class AppShellPage extends StatelessWidget {
   const AppShellPage({required this.navigationShell, super.key});
@@ -53,9 +53,6 @@ class AppShellPage extends StatelessWidget {
                 ],
               ),
             ),
-
-            /// The main content area where
-            ///  the current page will be displayed
             Expanded(child: navigationShell),
           ],
         ),
@@ -71,7 +68,7 @@ class AppShellPage extends StatelessWidget {
   }
 }
 
-class AppTopBar extends ConsumerWidget {
+class AppTopBar extends ConsumerStatefulWidget {
   const AppTopBar({
     required this.title,
     required this.avatarText,
@@ -86,71 +83,90 @@ class AppTopBar extends ConsumerWidget {
   final VoidCallback onAvatarPressed;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AppTopBar> createState() => _AppTopBarState();
+}
+
+class _AppTopBarState extends ConsumerState<AppTopBar> {
+  ProviderSubscription<bool>? _onlineSub;
+  ProviderSubscription<LocationFailureReason?>? _errorSub;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _onlineSub = ref.listenManual<bool>(
+      availabilityProvider.select((s) => s.isOnline),
+      (prev, next) {
+        if (prev == next) return;
+
+        if (next) {
+          unawaited(ref.read(newOfferControllerProvider.notifier).start());
+        } else {
+          unawaited(ref.read(newOfferControllerProvider.notifier).stop());
+        }
+      },
+    );
+
+    _errorSub = ref.listenManual<LocationFailureReason?>(
+      availabilityProvider.select((s) => s.errorReason),
+      (previous, next) {
+        if (next == null || next == previous) return;
+
+        final l10n = context.l10n;
+
+        final message = switch (next) {
+          LocationFailureReason.serviceDisabled => l10n.locationServiceDisabled,
+          LocationFailureReason.permissionDenied =>
+            l10n.locationPermissionRequired,
+          LocationFailureReason.permissionDeniedForever =>
+            l10n.locationPermissionDeniedForever,
+          LocationFailureReason.unableToDetermine =>
+            l10n.locationPermissionUnableToDetermine,
+          LocationFailureReason.networkError => l10n.locationNetworkError,
+        };
+
+        final actionLabel = switch (next) {
+          LocationFailureReason.serviceDisabled ||
+          LocationFailureReason.permissionDeniedForever => l10n.actionSettings,
+          _ => null,
+        };
+
+        final locationService = ref.read(locationServiceProvider);
+
+        final onAction = switch (next) {
+          LocationFailureReason.serviceDisabled => () => unawaited(
+            locationService.openLocationSettings(),
+          ),
+          LocationFailureReason.permissionDeniedForever => () => unawaited(
+            locationService.openAppSettings(),
+          ),
+          _ => null,
+        };
+
+        context.showAppSnack(
+          message,
+          type: AppSnackType.error,
+          actionLabel: actionLabel,
+          onAction: onAction,
+        );
+
+        ref.read(availabilityProvider.notifier).clearError();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _onlineSub?.close();
+    _errorSub?.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = context.l10n;
-    ref
-      ..listen<bool>(
-        availabilityProvider.select((s) => s.isOnline),
-        (prev, next) {
-          if (next) {
-            // Driver became online -> start listening
-            unawaited(ref.read(newOrdersControllerProvider.notifier).start());
-          } else {
-            // Driver became offline -> stop listening
-            unawaited(ref.read(newOrdersControllerProvider.notifier).stop());
-          }
-        },
-      )
-      // Listen once per change, show snackbar (+ Settings action when needed),
-      // then clear
-      ..listen<LocationFailureReason?>(
-        availabilityProvider.select((s) => s.errorReason),
-        (previous, next) {
-          if (next == null || next == previous) return;
 
-          final message = switch (next) {
-            LocationFailureReason.serviceDisabled =>
-              l10n.locationServiceDisabled,
-            LocationFailureReason.permissionDenied =>
-              l10n.locationPermissionRequired,
-            LocationFailureReason.permissionDeniedForever =>
-              l10n.locationPermissionDeniedForever,
-            LocationFailureReason.unableToDetermine =>
-              l10n.locationPermissionUnableToDetermine,
-            LocationFailureReason.networkError => l10n.locationNetworkError,
-          };
-
-          final actionLabel = switch (next) {
-            LocationFailureReason.serviceDisabled ||
-            LocationFailureReason.permissionDeniedForever =>
-              l10n.actionSettings,
-            _ => null,
-          };
-
-          final locationService = ref.read(locationServiceProvider);
-
-          final onAction = switch (next) {
-            LocationFailureReason.serviceDisabled => () => unawaited(
-              locationService.openLocationSettings(),
-            ),
-            LocationFailureReason.permissionDeniedForever => () => unawaited(
-              locationService.openAppSettings(),
-            ),
-            _ => null,
-          };
-
-          context.showAppSnack(
-            message,
-            type: AppSnackType.error,
-            actionLabel: actionLabel,
-            onAction: onAction,
-          );
-
-          ref.read(availabilityProvider.notifier).clearError();
-        },
-      );
-
-    // Read both values in one watch (rebuild only when either changes)
+    // Read both values in one watch (rebuild only when either changes).
     final (:isOnline, :isBusy) = ref.watch(
       availabilityProvider.select(
         (s) => (isOnline: s.isOnline, isBusy: s.isBusy),
@@ -162,13 +178,13 @@ class AppTopBar extends ConsumerWidget {
         Row(
           children: [
             IconButton(
-              onPressed: onBellPressed,
+              onPressed: widget.onBellPressed,
               icon: const Icon(Icons.notifications_none_rounded),
               color: AppColors.textPrimary,
             ),
             Expanded(
               child: Text(
-                title,
+                widget.title,
                 textAlign: TextAlign.center,
                 style: AppTypography.titleSm,
               ),
@@ -193,17 +209,20 @@ class AppTopBar extends ConsumerWidget {
                 ),
                 AppSpacing.w12,
                 GestureDetector(
-                  onTap: onAvatarPressed,
+                  onTap: widget.onAvatarPressed,
                   child: Container(
                     width: 38.r,
                     height: 38.r,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.taxiYellow, width: 2),
+                      border: Border.all(color: AppColors.primary, width: 2),
                       color: Colors.white,
                     ),
                     alignment: Alignment.center,
-                    child: Text(avatarText, style: AppTypography.labelMd),
+                    child: Text(
+                      widget.avatarText,
+                      style: AppTypography.labelMd,
+                    ),
                   ),
                 ),
               ],

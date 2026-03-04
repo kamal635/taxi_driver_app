@@ -3,13 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
+import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_orders_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card.dart';
+import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/accepte_offer_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/current_request_card.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/home_empty_state.dart';
 import 'package:taxi_driver_app/l10n/app_localizations.dart';
-
-enum HomeRequestUiState { empty, newOffer, accepted }
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -19,7 +20,31 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  HomeRequestUiState _requestState = HomeRequestUiState.newOffer;
+  ProviderSubscription<Object?>? _error;
+  @override
+  void initState() {
+    super.initState();
+
+    _error = ref.listenManual(
+      accepteOfferControllerProvider.select((s) => s.error),
+      (previous, next) {
+        if (next == null) return;
+        if (identical(previous, next)) return;
+
+        final msg = failureToUserMessage(
+          next.toString(),
+          l10n: context.l10n,
+        );
+        context.showAppSnack(msg, type: AppSnackType.error);
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _error?.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,11 +75,43 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _buildRequestArea(AppLocalizations l10n) {
-    final state = ref.watch(newOrdersControllerProvider);
-    final currentOrder = state.currentOrder;
+    final newOfferState = ref.watch(newOfferControllerProvider);
+    final accepteOfferAsync = ref.watch(accepteOfferControllerProvider);
 
-    // If we're "waiting for a new offer" but none exists, show the empty state.
-    if (_requestState == HomeRequestUiState.newOffer && currentOrder == null) {
+    final newOffer = newOfferState.currentOffer;
+    final accepted = accepteOfferAsync.value?.offerAcceptedEntity;
+
+    final endsAt = accepteOfferAsync.value?.doneEndsAt;
+
+    // 1) accepted
+    if (accepted != null) {
+      final phoneNumber = '\u200E+963 ${accepted.customerPhone}\u200E';
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CurrentRequestCard.accepted(
+            isNotes: accepted.notes?.isNotEmpty ?? false,
+            badgeTitle: accepted.type,
+            phoneNumber: phoneNumber,
+            priceText: '${accepted.price} SYP',
+            pickup: accepted.pickup,
+            endsAt: endsAt,
+            dropoff: accepted.dropoff ?? l10n.unknown,
+            primaryActionLabel: l10n.actionDone,
+            countdownPrefix: l10n.homeAvailableIn,
+            onPrimaryAction: () async {
+              await ref.read(accepteOfferControllerProvider.notifier).clear();
+              ref.read(newOfferControllerProvider.notifier).clearCurrent();
+            },
+          ),
+          AppSpacing.h16,
+        ],
+      );
+    }
+
+    // 2) offer → empty
+    if (newOffer == null) {
       return Center(
         child: HomeEmptyState(
           icon: Icons.search_rounded,
@@ -64,64 +121,51 @@ class _HomePageState extends ConsumerState<HomePage> {
       );
     }
 
-    switch (_requestState) {
-      case HomeRequestUiState.newOffer:
-        // currentOrder is not null here due to the guard above.
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (state.isLoading)
-              const CircularProgressIndicator(
-                strokeWidth: 3,
-                color: AppColors.taxiYellow,
-              ),
-            if (!state.isLoading)
-              CurrentRequestCard.offer(
-                title: currentOrder!.type,
-                priceText: currentOrder.price,
-                pickup: currentOrder.pickup,
-                // Avoid `!` crash. Use a safe fallback.
-                dropoff: currentOrder.dropoff ?? l10n.unknown,
-                acceptLabel: l10n.actionAccept,
-                rejectLabel: l10n.actionReject,
-                onAccept: () => setState(
-                  () => _requestState = HomeRequestUiState.accepted,
-                ),
-                onReject: () => setState(
-                  () => _requestState = HomeRequestUiState.empty,
-                ),
-              ),
-            AppSpacing.h16,
-          ],
-        );
-
-      case HomeRequestUiState.accepted:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CurrentRequestCard.current(
-              title: l10n.homeRequestCurrentTitle,
-              phoneNumber: '+963 996 500 748',
-              fareText: '${l10n.homeFarePrefix} 15,000 SYP',
-              pickup: '${l10n.homePickupPrefix} Mazzeh',
-              dropoff: '${l10n.homeDropoffPrefix} Umayyad Square',
-              primaryActionLabel: l10n.actionDone,
-              countdownPrefix: l10n.homeAvailableIn,
-              onPrimaryAction: () =>
-                  setState(() => _requestState = HomeRequestUiState.empty),
-            ),
-            AppSpacing.h16,
-          ],
-        );
-
-      case HomeRequestUiState.empty:
-        return Center(
-          child: HomeEmptyState(
-            icon: Icons.search_rounded,
-            title: l10n.homeEmptyTitle,
-            subtitle: l10n.homeEmptySubtitle,
+    // 3) otherwise → show offer card
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (newOfferState.isLoading)
+          const CircularProgressIndicator(
+            strokeWidth: 3,
+            color: AppColors.primary,
           ),
-        );
-    }
+        if (!newOfferState.isLoading)
+          CurrentRequestCard.offer(
+            isLoading: accepteOfferAsync.isLoading,
+            badgeTitle: newOffer.type,
+            priceText: '${newOffer.price} SYP',
+            pickup: newOffer.pickup,
+            dropoff: newOffer.dropoff ?? l10n.unknown,
+            acceptLabel: l10n.actionAccept,
+            rejectLabel: l10n.actionReject,
+            onAccept: accepteOfferAsync.isLoading
+                ? null
+                : () async {
+                    // Accept the offer (HTTP).
+                    await ref
+                        .read(accepteOfferControllerProvider.notifier)
+                        .accepte(offeroId: newOffer.offerId);
+
+                    // Read accepted result (null if failed).
+                    final accepted = ref
+                        .read(accepteOfferControllerProvider)
+                        .value
+                        ?.offerAcceptedEntity;
+
+                    // Clear incoming offer only if accept succeeded.
+                    if (accepted != null) {
+                      ref
+                          .read(newOfferControllerProvider.notifier)
+                          .clearCurrent();
+                    }
+                  },
+            onReject: () {
+              ref.read(newOfferControllerProvider.notifier).clearCurrent();
+            },
+          ),
+        AppSpacing.h16,
+      ],
+    );
   }
 }

@@ -38,7 +38,7 @@ class AppBackground extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppColors.taxiYellow.withValues(alpha: opacity),
+          color: AppColors.primary.withValues(alpha: opacity),
         ),
       ),
     );

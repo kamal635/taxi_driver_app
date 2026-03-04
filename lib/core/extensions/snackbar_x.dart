@@ -77,7 +77,7 @@ extension SnackBarX on BuildContext {
       icon: AppIcons.warning,
     ),
     AppSnackType.info => (
-      bg: AppColors.taxiYellow,
+      bg: AppColors.primary,
       fg: AppColors.infoBg,
       icon: AppIcons.info,
     ),

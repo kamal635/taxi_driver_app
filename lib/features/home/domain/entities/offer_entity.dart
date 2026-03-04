@@ -1,40 +1,40 @@
-sealed class OrderEntity {
-  OrderEntity({
+sealed class OfferEntity {
+  OfferEntity({
     required this.type,
-    required this.orderId,
+    required this.offerId,
     required this.pickup,
     required this.price,
     this.dropoff,
   });
 
   final String type;
-  final String orderId;
+  final String offerId;
   final String pickup;
   final String? dropoff;
   final String price;
 }
 
-final class NewOrderEntity extends OrderEntity {
-  NewOrderEntity({
+final class NewOfferEntity extends OfferEntity {
+  NewOfferEntity({
     required super.type,
-    required super.orderId,
+    required super.offerId,
     required super.pickup,
     required super.price,
     super.dropoff,
   });
 }
 
-final class OrderAcceptedEntity extends OrderEntity {
-  OrderAcceptedEntity({
+final class OfferAcceptedEntity extends OfferEntity {
+  OfferAcceptedEntity({
     required super.type,
-    required super.orderId,
+    required super.offerId,
     required super.pickup,
     required super.price,
     required this.customerPhone,
     super.dropoff,
-    this.info,
+    this.notes,
   });
 
   final String customerPhone;
-  final String? info;
+  final String? notes;
 }
