@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/features/auth/domain/usecases/set_password_usecase.dart';
-import 'package:taxi_driver_app/features/auth/presentation/controllers/auth_usecases_providers.dart';
+import 'package:taxi_driver_app/features/account_security/domain/usecases/set_password_usecase.dart';
+import 'package:taxi_driver_app/features/account_security/presentation/providers/account_security_providers.dart';
 
 final setupPasswordControllerProvider =
     AsyncNotifierProvider<SetupPasswordController, String?>(

@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:taxi_driver_app/app/router/app_routes.dart';
 import 'package:taxi_driver_app/app/router/route_names.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
+import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
+import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
 import 'package:taxi_driver_app/core/widgets/app_confirm_dialog.dart';
+import 'package:taxi_driver_app/features/profile/presentation/controllers/sign_out_controller.dart';
 import 'package:taxi_driver_app/features/profile/presentation/widgets/profile_header_card.dart';
 import 'package:taxi_driver_app/features/profile/presentation/widgets/profile_section.dart';
 import 'package:taxi_driver_app/features/profile/presentation/widgets/profile_section_item.dart';
@@ -22,6 +26,25 @@ class ProfilePage extends ConsumerWidget {
     const name = 'Ahmad Mohammad';
     const phone = '0987654321';
 
+    ref.listen(signOutControllerProvider, (prev, next) async {
+      await next.whenOrNull(
+        error: (err, _) {
+          final msg = failureToUserMessage(
+            err,
+            l10n: context.l10n,
+          );
+          context.showAppSnack(msg, type: AppSnackType.error);
+        },
+        data: (done) async {
+          if (!done) return;
+          if (prev?.value ?? false) return;
+
+          if (context.mounted) {
+            context.go(AppRoutes.login);
+          }
+        },
+      );
+    });
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 90.h),
       child: Column(
@@ -109,7 +132,9 @@ class ProfilePage extends ConsumerWidget {
                   if (!context.mounted) return;
 
                   if (confirmed) {
-                    /// later: sign out logic (Supabase / repo) + navigate to login
+                    await ref
+                        .read(signOutControllerProvider.notifier)
+                        .signOut();
                   }
                 },
               ),

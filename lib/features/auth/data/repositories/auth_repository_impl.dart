@@ -28,13 +28,4 @@ class AuthRepositoryImpl implements AuthRepository {
     // model -> domain result (AuthSignedIn أو AuthSetupRequired)
     return model.toEntity();
   }
-
-  @override
-  Future<String> setPassword({
-    required String newPassword,
-  }) {
-    return _remote.setPassword(
-      newPassword: newPassword,
-    );
-  }
 }

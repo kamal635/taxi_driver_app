@@ -6,8 +6,4 @@ abstract interface class AuthRepository {
     required String password,
     String? fcmToken,
   });
-
-  Future<String> setPassword({
-    required String newPassword,
-  });
 }
