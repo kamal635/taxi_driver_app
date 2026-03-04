@@ -7,6 +7,7 @@ import 'package:taxi_driver_app/features/home/data/datasources/remote/offer_remo
 import 'package:taxi_driver_app/features/home/data/repositories/offer_repository_impl.dart';
 import 'package:taxi_driver_app/features/home/domain/repositories/offer_repo.dart';
 import 'package:taxi_driver_app/features/home/domain/usecases/accepte_offer.dart';
+import 'package:taxi_driver_app/features/home/domain/usecases/decline_offer_use_case.dart';
 import 'package:taxi_driver_app/features/home/domain/usecases/watch_new_offer_usecase.dart';
 
 final offerRemoteDatasourceImplProvider = Provider<OfferRemoteDatasource>(
@@ -22,7 +23,7 @@ final offerRemoteDatasourceImplProvider = Provider<OfferRemoteDatasource>(
 
 final offerRepositoryProvider = Provider<OfferRepository>((ref) {
   final ds = ref.read(offerRemoteDatasourceImplProvider);
-  return OfferRepositoryImpl(offerSocketDatasource: ds);
+  return OfferRepositoryImpl(remote: ds);
 });
 
 final watchNewOfferUsecaseProvider = Provider<WatchNewOfferUseCase>((ref) {
@@ -41,4 +42,8 @@ final doneCountdownStorageProvider = Provider<DoneCountdownStorage>((ref) {
 
 final acceptedOfferStorageProvider = Provider<AcceptedOfferStorage>((ref) {
   return AcceptedOfferStorage();
+});
+
+final declineOfferUsecaseProvider = Provider<DeclineOfferUseCase>((ref) {
+  return DeclineOfferUseCase(ref.read(offerRepositoryProvider));
 });

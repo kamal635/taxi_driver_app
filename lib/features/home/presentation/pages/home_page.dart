@@ -7,6 +7,7 @@ import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/accepte_offer_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/decline_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/current_request_card.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/home_empty_state.dart';
@@ -21,6 +22,8 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   ProviderSubscription<Object?>? _error;
+  ProviderSubscription<Object?>? _declineError;
+
   @override
   void initState() {
     super.initState();
@@ -38,11 +41,26 @@ class _HomePageState extends ConsumerState<HomePage> {
         context.showAppSnack(msg, type: AppSnackType.error);
       },
     );
+
+    _declineError = ref.listenManual(
+      declineOfferControllerProvider.select((s) => s.error),
+      (previous, next) {
+        if (next == null) return;
+        if (identical(previous, next)) return;
+
+        final msg = failureToUserMessage(
+          next.toString(),
+          l10n: context.l10n,
+        );
+        context.showAppSnack(msg, type: AppSnackType.error);
+      },
+    );
   }
 
   @override
   void dispose() {
     _error?.close();
+    _declineError?.close();
     super.dispose();
   }
 
@@ -77,6 +95,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget _buildRequestArea(AppLocalizations l10n) {
     final newOfferState = ref.watch(newOfferControllerProvider);
     final accepteOfferAsync = ref.watch(accepteOfferControllerProvider);
+    final declineAsync = ref.watch(declineOfferControllerProvider);
 
     final newOffer = newOfferState.currentOffer;
     final accepted = accepteOfferAsync.value?.offerAcceptedEntity;
@@ -132,7 +151,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         if (!newOfferState.isLoading)
           CurrentRequestCard.offer(
-            isLoading: accepteOfferAsync.isLoading,
+            isLoading: accepteOfferAsync.isLoading || declineAsync.isLoading,
             badgeTitle: newOffer.type,
             priceText: '${newOffer.price} SYP',
             pickup: newOffer.pickup,
@@ -160,9 +179,24 @@ class _HomePageState extends ConsumerState<HomePage> {
                           .clearCurrent();
                     }
                   },
-            onReject: () {
-              ref.read(newOfferControllerProvider.notifier).clearCurrent();
-            },
+            onReject: (accepteOfferAsync.isLoading || declineAsync.isLoading)
+                ? null
+                : () async {
+                    await ref
+                        .read(declineOfferControllerProvider.notifier)
+                        .decline(offeroId: newOffer.offerId);
+
+                    final declineState = ref.read(
+                      declineOfferControllerProvider,
+                    );
+
+                    // Clear incoming offer only if decline succeeded.
+                    if (!declineState.hasError) {
+                      ref
+                          .read(newOfferControllerProvider.notifier)
+                          .clearCurrent();
+                    }
+                  },
           ),
         AppSpacing.h16,
       ],

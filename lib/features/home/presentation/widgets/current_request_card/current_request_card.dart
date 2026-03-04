@@ -43,7 +43,7 @@ class CurrentRequestCard extends StatelessWidget {
     required String acceptLabel,
     required String rejectLabel,
     required VoidCallback? onAccept,
-    required VoidCallback onReject,
+    required VoidCallback? onReject,
     Key? key,
   }) {
     return CurrentRequestCard._(
@@ -229,17 +229,11 @@ class _OfferActions extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: OutlinedButton(
+          child: AppButton(
+            backgroundColor: AppColors.bgBase,
+            isLoading: isLoading,
             onPressed: onReject,
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppColors.border),
-              foregroundColor: AppColors.textPrimary,
-              padding: EdgeInsets.symmetric(vertical: 12.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14.r),
-              ),
-            ),
-            child: Text(rejectLabel, style: AppTypography.labelMd),
+            label: rejectLabel,
           ),
         ),
         AppSpacing.w12,
