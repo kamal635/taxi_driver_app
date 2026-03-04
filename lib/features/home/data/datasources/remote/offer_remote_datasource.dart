@@ -5,6 +5,7 @@ import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
 abstract interface class OfferRemoteDatasource {
   Stream<NewOfferModel> watchOffer();
   Future<OfferAcceptedModel> accepteOffer({required String offeroId});
+  Future<void> declineOffer({required String offeroId});
 }
 
 final class OfferRemoteDatasourceImpl implements OfferRemoteDatasource {
@@ -41,5 +42,14 @@ final class OfferRemoteDatasourceImpl implements OfferRemoteDatasource {
     );
 
     return OfferAcceptedModel.fromJson(data);
+  }
+
+  /// ========= 2- accepte offer
+  @override
+  Future<void> declineOffer({required String offeroId}) async {
+    await apiClient.postJson(
+      '/api/admin/orders/decline',
+      body: {'orderId': offeroId},
+    );
   }
 }

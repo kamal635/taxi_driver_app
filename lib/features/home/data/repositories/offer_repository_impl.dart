@@ -3,18 +3,23 @@ import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart'
 import 'package:taxi_driver_app/features/home/domain/repositories/offer_repo.dart';
 
 final class OfferRepositoryImpl implements OfferRepository {
-  OfferRepositoryImpl({required this.offerSocketDatasource});
+  OfferRepositoryImpl({required this.remote});
 
-  final OfferRemoteDatasource offerSocketDatasource;
+  final OfferRemoteDatasource remote;
   @override
   Stream<NewOfferEntity> watchOffer() {
-    return offerSocketDatasource.watchOffer().map((m) => m.toEntity());
+    return remote.watchOffer().map((m) => m.toEntity());
   }
 
   @override
   Future<OfferAcceptedEntity> accepteOfer({required String offeroId}) async {
-    final data = await offerSocketDatasource.accepteOffer(offeroId: offeroId);
+    final data = await remote.accepteOffer(offeroId: offeroId);
 
     return data.toEntity();
+  }
+
+  @override
+  Future<void> declineOffer({required String offeroId}) async {
+    await remote.declineOffer(offeroId: offeroId);
   }
 }
