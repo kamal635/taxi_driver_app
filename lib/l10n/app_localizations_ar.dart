@@ -396,4 +396,43 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get actionSettings => 'الإعدادات';
+
+  @override
+  String get todayLabel => 'اليوم';
+
+  @override
+  String get yesterdayLabel => 'أمس';
+
+  @override
+  String get weekdayMonday => 'الاثنين';
+
+  @override
+  String get weekdayTuesday => 'الثلاثاء';
+
+  @override
+  String get weekdayWednesday => 'الأربعاء';
+
+  @override
+  String get weekdayThursday => 'الخميس';
+
+  @override
+  String get weekdayFriday => 'الجمعة';
+
+  @override
+  String get weekdaySaturday => 'السبت';
+
+  @override
+  String get weekdaySunday => 'الأحد';
+
+  @override
+  String get all => 'الكل';
+
+  @override
+  String get month => 'الشهر';
+
+  @override
+  String get week => 'الاسبوع';
+
+  @override
+  String get day => 'اليوم';
 }

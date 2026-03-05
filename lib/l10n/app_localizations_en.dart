@@ -397,4 +397,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actionSettings => 'Settings';
+
+  @override
+  String get todayLabel => 'Today';
+
+  @override
+  String get yesterdayLabel => 'Yesterday';
+
+  @override
+  String get weekdayMonday => 'Monday';
+
+  @override
+  String get weekdayTuesday => 'Tuesday';
+
+  @override
+  String get weekdayWednesday => 'Wednesday';
+
+  @override
+  String get weekdayThursday => 'Thursday';
+
+  @override
+  String get weekdayFriday => 'Friday';
+
+  @override
+  String get weekdaySaturday => 'Saturday';
+
+  @override
+  String get weekdaySunday => 'Sunday';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get month => 'Month';
+
+  @override
+  String get week => 'Week';
+
+  @override
+  String get day => 'Day';
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'
+    show HapticFeedback, SystemSound, SystemSoundType;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
@@ -23,6 +25,7 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   ProviderSubscription<Object?>? _error;
   ProviderSubscription<Object?>? _declineError;
+  ProviderSubscription<String?>? _newOfferPing;
 
   @override
   void initState() {
@@ -55,12 +58,30 @@ class _HomePageState extends ConsumerState<HomePage> {
         context.showAppSnack(msg, type: AppSnackType.error);
       },
     );
+
+    _newOfferPing = ref.listenManual<String?>(
+      newOfferControllerProvider.select((s) => s.currentOffer?.offerId),
+      (previous, next) async {
+        // No offer available -> nothing to notify.
+        if (next == null) return;
+
+        // Same offer id as before -> likely just a rebuild/state refresh, so do not replay the sound.
+        if (previous == next) return;
+
+        // Play a short system alert sound.
+        await SystemSound.play(SystemSoundType.alert);
+
+        // Trigger a light haptic feedback.
+        await HapticFeedback.mediumImpact();
+      },
+    );
   }
 
   @override
   void dispose() {
     _error?.close();
     _declineError?.close();
+    _newOfferPing?.close();
     super.dispose();
   }
 

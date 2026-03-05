@@ -163,5 +163,49 @@
    
   "locationNetworkError": "No internet connection. We can't update your location.",
 
-  "actionSettings": "Settings"
+  "actionSettings": "Settings",
+
+  
+  "todayLabel": "Today",
+  "@todayLabel": {
+    "description": "Label used for trips completed today"
+  },
+  "yesterdayLabel": "Yesterday",
+  "@yesterdayLabel": {
+    "description": "Label used for trips completed yesterday"
+  },
+  "weekdayMonday": "Monday",
+  "@weekdayMonday": {
+    "description": "Weekday label for Monday"
+  },
+  "weekdayTuesday": "Tuesday",
+  "@weekdayTuesday": {
+    "description": "Weekday label for Tuesday"
+  },
+  "weekdayWednesday": "Wednesday",
+  "@weekdayWednesday": {
+    "description": "Weekday label for Wednesday"
+  },
+  "weekdayThursday": "Thursday",
+  "@weekdayThursday": {
+    "description": "Weekday label for Thursday"
+  },
+  "weekdayFriday": "Friday",
+  "@weekdayFriday": {
+    "description": "Weekday label for Friday"
+  },
+  "weekdaySaturday": "Saturday",
+  "@weekdaySaturday": {
+    "description": "Weekday label for Saturday"
+  },
+  "weekdaySunday": "Sunday",
+  "@weekdaySunday": {
+    "description": "Weekday label for Sunday"
+  },
+  
+  "all" : "All",
+  "month" : "Month",
+  "week" : "Week",
+  "day" : "Day"
+   
 }

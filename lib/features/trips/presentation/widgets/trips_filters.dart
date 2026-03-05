@@ -1,105 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/features/trips/presentation/pages/trips_page.dart';
+import 'package:taxi_driver_app/core/constants/app_icons.dart';
+import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
+import 'package:taxi_driver_app/features/trips/domain/entities/completed_offers_result_entity.dart';
+import 'package:taxi_driver_app/l10n/app_localizations.dart';
 
-class TripsFilters extends StatelessWidget {
-  const TripsFilters({
-    required this.selected,
-    required this.allLabel,
-    required this.todayLabel,
-    required this.weekLabel,
+extension CompletedPeriodX on CompletedPeriod {
+  String label(AppLocalizations l10n) => switch (this) {
+    CompletedPeriod.all => l10n.all,
+    CompletedPeriod.day => l10n.day,
+    CompletedPeriod.week => l10n.week,
+    CompletedPeriod.month => l10n.month,
+  };
+}
+
+class FilterDropdown extends StatelessWidget {
+  const FilterDropdown({
+    required this.value,
     required this.onChanged,
+    this.enabled = true,
     super.key,
   });
 
-  final TripsFilterUi selected;
-  final String allLabel;
-  final String todayLabel;
-  final String weekLabel;
-  final ValueChanged<TripsFilterUi> onChanged;
+  final CompletedPeriod value;
+  final ValueChanged<CompletedPeriod?> onChanged;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _FilterChipButton(
-            label: allLabel,
-            selected: selected == TripsFilterUi.all,
-            onTap: () => onChanged(TripsFilterUi.all),
-          ),
-        ),
-
-        AppSpacing.w12,
-
-        Expanded(
-          child: _FilterChipButton(
-            label: todayLabel,
-            selected: selected == TripsFilterUi.today,
-            onTap: () => onChanged(TripsFilterUi.today),
-          ),
-        ),
-
-        AppSpacing.w12,
-
-        Expanded(
-          child: _FilterChipButton(
-            label: weekLabel,
-            selected: selected == TripsFilterUi.week,
-            onTap: () => onChanged(TripsFilterUi.week),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _FilterChipButton extends StatelessWidget {
-  const _FilterChipButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = selected ? AppColors.primary : Colors.white;
-    final borderColor = selected ? Colors.transparent : AppColors.border;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(14.r),
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 12.h),
-        decoration: BoxDecoration(
-          color: bg,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<CompletedPeriod>(
+          value: value,
+          dropdownColor: AppColors.white,
           borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(color: borderColor),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    blurRadius: 16,
-                    offset: const Offset(0, 10),
-                    color: AppColors.primary.withValues(alpha: 0.22),
-                  ),
-                ]
-              : null,
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: AppTypography.labelMd.copyWith(
-              fontWeight: FontWeight.w900,
-              color: AppColors.textPrimary,
-            ),
-          ),
+          icon: const Icon(AppIcons.arrowDown),
+          style: AppTypography.labelMd,
+          onChanged: enabled ? onChanged : null,
+          items: CompletedPeriod.values.map((period) {
+            return DropdownMenuItem<CompletedPeriod>(
+              value: period,
+              child: Text(period.label(context.l10n)),
+            );
+          }).toList(),
         ),
       ),
     );

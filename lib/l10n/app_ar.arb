@@ -163,7 +163,49 @@
   "locationPermissionUnableToDetermine": "تعذّر تحديد صلاحية الموقع. حاول مرة أخرى.",
   
   "locationNetworkError": "لا يوجد اتصال بالإنترنت. لا يمكن تحديث موقعك.",
-  
-  "actionSettings": "الإعدادات"
 
+  "actionSettings": "الإعدادات",
+
+  
+  "todayLabel": "اليوم",
+  "@todayLabel": {
+    "description": "تسمية تستخدم للرحلات المكتملة اليوم"
+  },
+  "yesterdayLabel": "أمس",
+  "@yesterdayLabel": {
+    "description": "تسمية تستخدم للرحلات المكتملة أمس"
+  },
+  "weekdayMonday": "الاثنين",
+  "@weekdayMonday": {
+    "description": "اسم يوم الاثنين"
+  },
+  "weekdayTuesday": "الثلاثاء",
+  "@weekdayTuesday": {
+    "description": "اسم يوم الثلاثاء"
+  },
+  "weekdayWednesday": "الأربعاء",
+  "@weekdayWednesday": {
+    "description": "اسم يوم الأربعاء"
+  },
+  "weekdayThursday": "الخميس",
+  "@weekdayThursday": {
+    "description": "اسم يوم الخميس"
+  },
+  "weekdayFriday": "الجمعة",
+  "@weekdayFriday": {
+    "description": "اسم يوم الجمعة"
+  },
+  "weekdaySaturday": "السبت",
+  "@weekdaySaturday": {
+    "description": "اسم يوم السبت"
+  },
+  "weekdaySunday": "الأحد",
+  "@weekdaySunday": {
+    "description": "اسم يوم الأحد"
+  },
+
+  "all" : "الكل",
+  "month" : "الشهر",
+  "week" : "الاسبوع",
+  "day" : "اليوم"
 }
