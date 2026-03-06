@@ -21,7 +21,7 @@ final class OfferRemoteDatasourceImpl implements OfferRemoteDatasource {
   @override
   Stream<NewOfferModel> watchOffer() {
     return socketClient
-        .on('order_update')
+        .on('new_offer')
         // Keep only Map payloads
         .where((payload) => payload is Map)
         .cast<Map<dynamic, dynamic>>()

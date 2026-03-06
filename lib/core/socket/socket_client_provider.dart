@@ -9,19 +9,34 @@ final socketClientProvider = Provider<SocketClient>(
   },
 );
 
-final socketConnectionManagerProvider = Provider<Future<void>>((ref) async {
-  final socketClient = ref.read(socketClientProvider);
-  final authSession = ref.read(authSessionProvider);
+final socketConnectionManagerProvider = Provider<SocketConnectionManager>(
+  (ref) {
+    return SocketConnectionManager(ref);
+  },
+);
 
-  final token = authSession.token;
-  final driverId = authSession.driverId;
+class SocketConnectionManager {
+  SocketConnectionManager(this.ref);
 
-  if (token == null || token.isEmpty || driverId == null || driverId.isEmpty) {
-    throw StateError('Auth session is not ready (missing token/driverId).');
+  final Ref ref;
+
+  Future<void> connectAndJoin() async {
+    final socketClient = ref.read(socketClientProvider);
+    final authSession = ref.read(authSessionProvider);
+
+    final token = authSession.token;
+    final driverId = authSession.driverId;
+
+    if (token == null ||
+        token.isEmpty ||
+        driverId == null ||
+        driverId.isEmpty) {
+      throw StateError('Auth session is not ready (missing token/driverId).');
+    }
+
+    await socketClient.connect(token: token);
+
+    // Join the driver room so the server can route offers to this driver.
+    socketClient.emit('join_driver_room', driverId);
   }
-
-  await socketClient.connect(token: token);
-
-  // Join the driver room so the server can route offers to this driver.
-  socketClient.emit('join_driver_room', driverId);
-});
+}
