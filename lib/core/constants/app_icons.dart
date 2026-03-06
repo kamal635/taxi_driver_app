@@ -17,6 +17,10 @@ final class AppIcons {
   static const IconData note = Icons.sticky_note_2_outlined;
   static const IconData pickup = Icons.near_me_rounded;
   static const IconData dropoff = Icons.location_on_rounded;
+  static const IconData camera = Icons.camera_alt_rounded;
+  static const IconData gallery = Icons.photo_library_rounded;
+  static const IconData changePhoto = Icons.photo_camera_back_rounded;
+  static const IconData delete = Icons.delete_outline_rounded;
 
   // Snackbars / Status
   static const IconData success = Icons.check_circle_rounded;

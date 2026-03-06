@@ -12,7 +12,11 @@ class LoginHeader extends StatelessWidget {
     return Column(
       children: [
         AppSpacing.h18,
-        Image.asset('assets/images/logo.png', height: 112.r, width: 112.r),
+        Image.asset(
+          'assets/images/logo_taxi_driver.png',
+          height: 112.r,
+          width: 112.r,
+        ),
 
         AppSpacing.h14,
 

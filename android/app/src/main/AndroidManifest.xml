@@ -5,6 +5,13 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
 
+    <!-- ✅ Avatar image pick/camera -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- Android 13+ -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <!-- Android 12 and below -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+
     <!-- ✅ Queries لازم يكونوا قبل application -->
     <queries>
         <intent>

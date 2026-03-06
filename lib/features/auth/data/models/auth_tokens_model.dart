@@ -13,8 +13,8 @@ class AuthSessionModel {
     final access = json['token']?.toString();
     final refreshToken = json['refreshToken']?.toString();
     final driverId = json['userId']?.toString();
-    final driverName = json['phone'].toString();
-    final driverPhone = json['name'].toString();
+    final driverName = json['name'].toString();
+    final driverPhone = json['phone'].toString();
 
     if (access == null || access.isEmpty) {
       throw const FormatException('Missing token');

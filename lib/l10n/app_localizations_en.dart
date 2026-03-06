@@ -436,4 +436,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get day => 'Day';
+
+  @override
+  String get profileAvatarChangePhoto => 'Change photo';
+
+  @override
+  String get profileAvatarRemovePhoto => 'Remove photo';
+
+  @override
+  String get profileAvatarPickFromGallery => 'Choose from gallery';
+
+  @override
+  String get profileAvatarTakePhoto => 'Take a photo';
 }

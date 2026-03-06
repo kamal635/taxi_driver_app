@@ -207,5 +207,21 @@
   "all" : "الكل",
   "month" : "الشهر",
   "week" : "الاسبوع",
-  "day" : "اليوم"
+  "day" : "اليوم",
+  
+  "profileAvatarChangePhoto": "تغيير الصورة",
+  "@profileAvatarChangePhoto": {
+    "description": "زر لتغيير صورة الملف الشخصي"
+  },
+  "profileAvatarRemovePhoto": "إزالة الصورة",
+  "@profileAvatarRemovePhoto": {
+    "description": "زر لإزالة صورة الملف الشخصي"
+  },
+
+ 
+
+  "profileAvatarPickFromGallery": "اختيار من المعرض",
+  "profileAvatarTakePhoto": "التقاط صورة"
+
+
 }

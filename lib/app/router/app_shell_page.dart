@@ -1,4 +1,5 @@
 import 'dart:async' show unawaited;
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,10 +9,12 @@ import 'package:taxi_driver_app/app/router/bottom_nav.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
+import 'package:taxi_driver_app/core/avatar/avatar_controller.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
 import 'package:taxi_driver_app/core/location/location_providers.dart';
 import 'package:taxi_driver_app/core/location/location_result.dart';
+import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/core/widgets/pill_switch.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
@@ -173,6 +176,15 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
       ),
     );
 
+    final avatarAsync = ref.watch(avatarControllerProvider);
+    final avatarPath = avatarAsync.value;
+
+    final session = ref.watch(authSessionProvider);
+    final name = session.driverName?.trim() ?? '';
+    final initial = name.isNotEmpty ? name[0] : '—';
+
+    final hasAvatar = avatarPath != null && avatarPath.isNotEmpty;
+
     return Column(
       children: [
         Row(
@@ -207,22 +219,39 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
                   onLabel: l10n.online,
                   uppercase: false,
                 ),
+
                 AppSpacing.w12,
+
                 GestureDetector(
-                  onTap: widget.onAvatarPressed,
+                  onTap: avatarAsync.isLoading ? null : widget.onAvatarPressed,
                   child: Container(
                     width: 38.r,
                     height: 38.r,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(color: AppColors.primary, width: 2),
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                     alignment: Alignment.center,
-                    child: Text(
-                      widget.avatarText,
-                      style: AppTypography.labelMd,
-                    ),
+                    child: hasAvatar
+                        ? ClipOval(
+                            child: Image.file(
+                              File(avatarPath),
+                              width: 38.r,
+                              height: 38.r,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) {
+                                return Text(
+                                  initial,
+                                  style: AppTypography.labelMd,
+                                );
+                              },
+                            ),
+                          )
+                        : Text(
+                            initial,
+                            style: AppTypography.labelMd,
+                          ),
                   ),
                 ),
               ],

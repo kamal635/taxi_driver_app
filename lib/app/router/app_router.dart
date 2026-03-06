@@ -12,7 +12,6 @@ import 'package:taxi_driver_app/features/auth/presentation/widgets/setup_passwor
 import 'package:taxi_driver_app/features/home/presentation/pages/home_page.dart';
 import 'package:taxi_driver_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:taxi_driver_app/features/profile/presentation/widgets/change_password_page.dart';
-import 'package:taxi_driver_app/features/profile/presentation/widgets/vehicle_info_page.dart';
 import 'package:taxi_driver_app/features/trips/presentation/pages/trips_page.dart';
 
 final class AppRouter {
@@ -166,15 +165,6 @@ final class AppRouter {
         pageBuilder: (context, state) => _fadeSlidePage(
           state: state,
           child: const ChangePasswordPage(),
-        ),
-      ),
-      GoRoute(
-        parentNavigatorKey: _rootNavigatorKey,
-        path: AppRoutes.profileVehicles,
-        name: RouteNames.profileVehicles,
-        pageBuilder: (context, state) => _fadeSlidePage(
-          state: state,
-          child: const VehicleInfoPage(),
         ),
       ),
     ];
