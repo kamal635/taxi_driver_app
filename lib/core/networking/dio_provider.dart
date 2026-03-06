@@ -82,6 +82,8 @@ final dioProvider = Provider<Dio>((ref) {
 
             final data = res.data;
             final driverId = authSession.driverId;
+            final driverName = authSession.driverName;
+            final driverPhone = authSession.driverPhone;
             // Parse tokens from response
             final access = (data is Map ? data['token'] : null)?.toString();
 
@@ -103,6 +105,8 @@ final dioProvider = Provider<Dio>((ref) {
 
             // Persist updated tokens in session + storage
             await authSession.updateTokens(
+              driverName: driverName!,
+              driverPhone: driverPhone!,
               driverId: driverId,
               token: access,
               refreshToken: newRefresh,

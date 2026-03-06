@@ -65,6 +65,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           switch (result) {
             case AuthSignedIn(:final authSessionEntity):
               await authSession.saveAfterLogin(
+                driverName: authSessionEntity.driverName,
+                driverPhone: authSessionEntity.driverPhone,
                 driverId: authSessionEntity.driverId,
                 token: authSessionEntity.accessToken,
                 refreshToken: authSessionEntity.refreshToken,
@@ -75,6 +77,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
             case AuthSetupRequired(:final authSessionEntity):
               await authSession.saveAfterLogin(
+                driverName: authSessionEntity.driverName,
+                driverPhone: authSessionEntity.driverPhone,
                 driverId: authSessionEntity.driverId,
                 token: authSessionEntity.accessToken,
                 refreshToken: authSessionEntity.refreshToken,
