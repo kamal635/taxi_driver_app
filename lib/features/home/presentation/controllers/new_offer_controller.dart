@@ -30,7 +30,7 @@ final class NewOfferController extends Notifier<NewOfferState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await ref.read(socketConnectionManagerProvider);
+      await ref.read(socketConnectionManagerProvider).connectAndJoin();
       debugPrint('Socket Connection Manager success ');
     } on Exception catch (e) {
       state = state.copyWith(error: e.toString(), isLoading: false);
