@@ -7,6 +7,8 @@ final class AuthSessionStorage {
   static const _kAccessToken = 'access_token';
   static const _kRefreshToken = 'refresh_token';
   static const _kDriverId = 'driver_id';
+  static const _driverPhone = 'driver_phone';
+  static const _driverName = 'driver_name';
   static const _kMustChangePassword = 'must_change_password';
 
   final FlutterSecureStorage _storage;
@@ -21,6 +23,14 @@ final class AuthSessionStorage {
 
   Future<String?> readDriverId() async {
     return _storage.read(key: _kDriverId);
+  }
+
+  Future<String?> readDriverPhone() async {
+    return _storage.read(key: _driverPhone);
+  }
+
+  Future<String?> readDriverName() async {
+    return _storage.read(key: _driverName);
   }
 
   Future<bool> readMustChangePassword() async {
@@ -39,11 +49,15 @@ final class AuthSessionStorage {
     required String token,
     required String refreshToken,
     required String driverId,
+    required String driverPhone,
+    required String driverName,
     required bool mustChangePassword,
   }) async {
     await _storage.write(key: _kAccessToken, value: token);
     await _storage.write(key: _kRefreshToken, value: refreshToken);
     await _storage.write(key: _kDriverId, value: driverId);
+    await _storage.write(key: _driverPhone, value: driverPhone);
+    await _storage.write(key: _driverName, value: driverName);
     await _storage.write(
       key: _kMustChangePassword,
       value: mustChangePassword.toString(),
@@ -55,6 +69,8 @@ final class AuthSessionStorage {
       _storage.delete(key: _kAccessToken),
       _storage.delete(key: _kRefreshToken),
       _storage.delete(key: _kDriverId),
+      _storage.delete(key: _driverPhone),
+      _storage.delete(key: _driverName),
       _storage.delete(key: _kMustChangePassword),
     ]);
   }
