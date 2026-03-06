@@ -4,12 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taxi_driver_app/app/router/app_routes.dart';
 import 'package:taxi_driver_app/app/router/route_names.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
+import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/core/widgets/app_confirm_dialog.dart';
 import 'package:taxi_driver_app/features/profile/presentation/controllers/sign_out_controller.dart';
 import 'package:taxi_driver_app/features/profile/presentation/widgets/profile_header_card.dart';
@@ -22,9 +22,7 @@ class ProfilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    // UI-only data (later from providers)
-    const name = 'Ahmad Mohammad';
-    const phone = '0987654321';
+    final authSession = ref.watch(authSessionProvider);
 
     ref.listen(signOutControllerProvider, (prev, next) async {
       await next.whenOrNull(
@@ -53,9 +51,17 @@ class ProfilePage extends ConsumerWidget {
           AppSpacing.h8,
 
           /// profile header with avatar, name, phone
-          const ProfileHeaderCard(
-            name: name,
-            phone: phone,
+          ProfileHeaderCard(
+            name: authSession.driverName?.trim().isNotEmpty ?? false
+                ? authSession.driverName!
+                : '—',
+            phone: authSession.driverPhone?.trim().isNotEmpty ?? false
+                ? authSession.driverPhone!
+                : '—',
+
+            placeholderImage: authSession.driverName?.trim().isNotEmpty ?? false
+                ? authSession.driverName!
+                : '—',
           ),
 
           AppSpacing.h18,
@@ -71,35 +77,6 @@ class ProfilePage extends ConsumerWidget {
                 icon: AppIcons.lock,
                 onPressed: () async {
                   await context.pushNamed(RouteNames.profilePassword);
-                },
-              ),
-
-              const _Divider(),
-
-              /// my vehicles
-              ProfileSectionItem(
-                title: l10n.profileMyVehiclesTitle,
-                subtitle: l10n.profileMyVehiclesSubtitle,
-                icon: AppIcons.car,
-                onPressed: () async {
-                  await context.pushNamed(RouteNames.profileVehicles);
-                },
-              ),
-            ],
-          ),
-
-          AppSpacing.h18,
-
-          /// account section: help center
-          ProfileSection(
-            sectionTitle: l10n.profileSectionSupport,
-            items: [
-              ProfileSectionItem(
-                title: l10n.profileHelpCenterTitle,
-                subtitle: l10n.profileHelpCenterSubtitle,
-                icon: AppIcons.helpCenter,
-                onPressed: () {
-                  /// later: open help center page
                 },
               ),
             ],
@@ -142,19 +119,6 @@ class ProfilePage extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Divider extends StatelessWidget {
-  const _Divider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Divider(
-      height: 2.h,
-      thickness: 1,
-      color: AppColors.border,
     );
   }
 }

@@ -435,4 +435,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get day => 'اليوم';
+
+  @override
+  String get profileAvatarChangePhoto => 'تغيير الصورة';
+
+  @override
+  String get profileAvatarRemovePhoto => 'إزالة الصورة';
+
+  @override
+  String get profileAvatarPickFromGallery => 'اختيار من المعرض';
+
+  @override
+  String get profileAvatarTakePhoto => 'التقاط صورة';
 }

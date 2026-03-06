@@ -9,11 +9,13 @@ class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({
     required this.name,
     required this.phone,
+    required this.placeholderImage,
     super.key,
   });
 
   final String name;
   final String phone;
+  final String placeholderImage;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,7 @@ class ProfileHeaderCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const AvatarImageEditor(),
+          AvatarImageEditor(placeholderImage: placeholderImage),
 
           AppSpacing.h12,
 

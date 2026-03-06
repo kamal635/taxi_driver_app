@@ -913,6 +913,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Day'**
   String get day;
+
+  /// Action label to change the profile avatar photo
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get profileAvatarChangePhoto;
+
+  /// Action label to remove the profile avatar photo
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get profileAvatarRemovePhoto;
+
+  /// No description provided for @profileAvatarPickFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get profileAvatarPickFromGallery;
+
+  /// No description provided for @profileAvatarTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get profileAvatarTakePhoto;
 }
 
 class _AppLocalizationsDelegate

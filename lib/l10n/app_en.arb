@@ -206,6 +206,21 @@
   "all" : "All",
   "month" : "Month",
   "week" : "Week",
-  "day" : "Day"
+  "day" : "Day",
+
+  
+  "profileAvatarChangePhoto": "Change photo",
+  "@profileAvatarChangePhoto": {
+    "description": "Action label to change the profile avatar photo"
+  },
+  "profileAvatarRemovePhoto": "Remove photo",
+  "@profileAvatarRemovePhoto": {
+    "description": "Action label to remove the profile avatar photo"
+  },
+
+ 
+  "profileAvatarPickFromGallery": "Choose from gallery",
+  "profileAvatarTakePhoto": "Take a photo"
+
    
 }
