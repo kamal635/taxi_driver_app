@@ -44,8 +44,8 @@
   "homeRequestCurrentTitle": "Current ride",
   "homeRequestCompletedTitle": "Completed ride",
 
-  "homePickupPrefix": "Pickup:",
-  "homeDropoffPrefix": "Dropoff:",
+  "homePickupPrefix": "Pickup: ",
+  "homeDropoffPrefix": "Dropoff: ",
   "homeFarePrefix": "Fare:",
 
   "homeAvailableIn": "Available in:",
@@ -220,7 +220,14 @@
 
  
   "profileAvatarPickFromGallery": "Choose from gallery",
-  "profileAvatarTakePhoto": "Take a photo"
+  "profileAvatarTakePhoto": "Take a photo",
+
+   "homeOfferExpiresIn": "Expires in:",
+
+   "price":"Price: ",
+
+    "customerPhone": "CUSTOMER PHONE",
+    "tripCompleted": "Trip Completed"
 
    
 }

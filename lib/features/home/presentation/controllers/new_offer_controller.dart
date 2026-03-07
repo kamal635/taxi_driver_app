@@ -12,70 +12,96 @@ final newOfferControllerProvider =
     );
 
 final class NewOfferController extends Notifier<NewOfferState> {
-  StreamSubscription<NewOfferEntity>? _streamSubscription;
+  StreamSubscription<NewOfferEntity>? _streamSub;
 
   @override
   NewOfferState build() {
-    ref.onDispose(
-      () {
-        unawaited(_streamSubscription?.cancel());
-        _streamSubscription = null;
-      },
-    );
+    // Clean up subscription when provider is disposed.
+    ref.onDispose(() {
+      unawaited(_streamSub?.cancel());
+      _streamSub = null;
+    });
+
+    // Hydrate from local storage (if still valid).
+    unawaited(_hydrateFromStorage());
+
     return NewOfferState(isLoading: false);
   }
 
+  /// Load the last stored offer (only if it is still valid / not expired).
+  Future<void> _hydrateFromStorage() async {
+    try {
+      final stored = await ref.read(newOfferStorageProvider).readValid();
+      if (stored == null) return;
+
+      // Avoid overwriting a currently displayed offer.
+      if (state.currentOffer == null) {
+        state = state.copyWith(currentOffer: stored);
+      }
+    } on Exception catch (e) {
+      debugPrint('NewOffer hydrate failed: $e');
+    }
+  }
+
+  /// Start socket connection + subscribe to new offers.
   Future<void> start() async {
-    if (_streamSubscription != null) return;
+    // Guard: don't create multiple subscriptions.
+    if (_streamSub != null) return;
+
     state = state.copyWith(isLoading: true, error: null);
 
+    // Ensure socket is connected and room is joined.
     try {
       await ref.read(socketConnectionManagerProvider).connectAndJoin();
-      debugPrint('Socket Connection Manager success ');
+      debugPrint('Socket Connection Manager success');
     } on Exception catch (e) {
-      state = state.copyWith(error: e.toString(), isLoading: false);
-      debugPrint('Socket Connection Manager Erorr: $e');
+      state = state.copyWith(isLoading: false, error: e.toString());
+      debugPrint('Socket Connection Manager Error: $e');
       return;
     }
 
     final watchOffer = ref.read(watchNewOfferUsecaseProvider);
 
-    _streamSubscription = watchOffer().listen(
-      (newOfferEntity) {
+    // Subscribe to offer stream.
+    _streamSub = watchOffer().listen(
+      (offer) {
+        // Update UI state.
         state = state.copyWith(
-          currentOffer: newOfferEntity,
+          currentOffer: offer,
           isLoading: false,
           error: null,
         );
+
+        // Persist offer locally (best-effort).
+        unawaited(ref.read(newOfferStorageProvider).save(offer));
       },
       onError: (Object err, StackTrace st) {
-        state = state.copyWith(
-          error: err.toString(),
-          isLoading: false,
-        );
-
-        debugPrint('Socket Streaming Controller Erorr: $err');
+        // Surface stream errors to the UI.
+        state = state.copyWith(isLoading: false, error: err.toString());
+        debugPrint('Socket Streaming Error: $err');
       },
     );
 
     debugPrint('Socket start streaming');
   }
 
+  /// Stop listening to offers and disconnect socket.
   Future<void> stop() async {
-    // Cancel stream subscription
-    await _streamSubscription?.cancel();
-    _streamSubscription = null;
+    await _streamSub?.cancel();
+    _streamSub = null;
 
-    // Disconnect socket (optional but recommended)
+    // Disconnect socket (best-effort).
     await ref.read(socketClientProvider).disconnect();
 
-    // Reset UI state
-    state = state.copyWith(isLoading: false, error: null, currentOffer: null);
+    // Keep currentOffer as-is; stop just turns off streaming.
+    state = state.copyWith(isLoading: false, error: null);
 
     debugPrint('Socket stop streaming');
   }
 
-  void clearCurrent() {
+  /// Clear current offer from UI and local storage.
+  Future<void> clearCurrent() async {
+    await ref.read(newOfferStorageProvider).clear();
     state = state.copyWith(currentOffer: null);
   }
 }
@@ -87,10 +113,11 @@ final class NewOfferState {
     this.error,
   });
 
-  final NewOfferEntity? currentOffer;
   final bool isLoading;
+  final NewOfferEntity? currentOffer;
   final String? error;
 
+  // Sentinel to support explicit null (clear currentOffer / error).
   static const Object _unset = Object();
 
   NewOfferState copyWith({
@@ -99,10 +126,10 @@ final class NewOfferState {
     Object? error = _unset,
   }) {
     return NewOfferState(
+      isLoading: isLoading ?? this.isLoading,
       currentOffer: identical(currentOffer, _unset)
           ? this.currentOffer
           : currentOffer as NewOfferEntity?,
-      isLoading: isLoading ?? this.isLoading,
       error: identical(error, _unset) ? this.error : error as String?,
     );
   }

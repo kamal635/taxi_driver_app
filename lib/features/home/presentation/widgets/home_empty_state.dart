@@ -33,13 +33,13 @@ class HomeEmptyState extends StatelessWidget {
               width: 1.2,
             ),
           ),
+
           child: Icon(
             icon,
             size: 40.r,
             color: AppColors.textPrimary.withValues(alpha: 0.85),
           ),
         ),
-
         AppSpacing.h18,
 
         /// Title
@@ -48,7 +48,6 @@ class HomeEmptyState extends StatelessWidget {
           textAlign: TextAlign.center,
           style: AppTypography.titleSm,
         ),
-
         AppSpacing.h10,
 
         /// Subtitle

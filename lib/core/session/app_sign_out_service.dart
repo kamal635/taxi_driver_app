@@ -45,6 +45,13 @@ class AppSignOutService {
       // ignore
     }
 
+    try {
+      await _ref
+          .read(availabilityProvider.notifier)
+          .requestSetOnline(value: false);
+    } on Exception catch (_) {
+      // ignore
+    }
     // 4) Clear auth session (tokens + driverId + mustChangePassword).
     await _ref.read(authSessionProvider).clear();
   }

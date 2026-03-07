@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/errors/failure.dart';
+import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
 import 'package:taxi_driver_app/features/home/domain/usecases/accepte_offer.dart';
+import 'package:taxi_driver_app/features/home/domain/usecases/get_current_order_usecase.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
 
 final accepteOfferControllerProvider =
@@ -14,68 +17,47 @@ final accepteOfferControllerProvider =
 
 final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
   late final AccepteOfferUsecase _accepteOfferUsecase;
+  late final GetCurrentOrderUseCase _getCurrentOrder;
 
   @override
   FutureOr<AccepteOfferState> build() async {
     _accepteOfferUsecase = ref.read(accepteOfferUsecaseProvider);
+    _getCurrentOrder = ref.read(getCurrentOrderUseCaseProvider);
 
-    final doneStorage = ref.read(doneCountdownStorageProvider);
-    final offerStorage = ref.read(acceptedOfferStorageProvider);
+    // Source of truth: ask server if there is an active trip.
+    final current = await _getCurrentOrder();
 
-    final endsAt = await doneStorage.readEndsAt();
-    final accepted = await offerStorage.readAccepted();
-
-    // If one exists without the other, clear both (keep things consistent).
-    if ((endsAt == null) != (accepted == null)) {
-      await doneStorage.clear();
-      await offerStorage.clear();
-      return const AccepteOfferState();
-    }
-
-    if (endsAt == null || accepted == null) {
-      return const AccepteOfferState();
-    }
-
-    // If expired, clear both.
-    if (!endsAt.isAfter(DateTime.now())) {
-      await doneStorage.clear();
-      await offerStorage.clear();
+    if (current == null) {
       return const AccepteOfferState();
     }
 
     return AccepteOfferState(
-      offerAcceptedEntity: accepted,
-      doneEndsAt: endsAt,
+      offerAcceptedEntity: current,
+      // Keep same field name used by UI for the Done countdown.
+      doneEndsAt: current.cooldownUntil,
     );
   }
 
   Future<void> accepte({required String offeroId}) async {
     final alreadyAccepted = state.value?.offerAcceptedEntity != null;
-
-    final hasActiveCountdown =
-        state.value?.doneEndsAt != null &&
-        state.value!.doneEndsAt!.isAfter(DateTime.now());
-
-    if (state.isLoading || alreadyAccepted || hasActiveCountdown) return;
+    if (state.isLoading || alreadyAccepted) return;
 
     state = const AsyncLoading();
 
     try {
+      // Accept offer (HTTP)
       final result = await _accepteOfferUsecase(offeroId: offeroId);
 
-      final doneStorage = ref.read(doneCountdownStorageProvider);
-      final offerStorage = ref.read(acceptedOfferStorageProvider);
+      await ref.read(newOfferControllerProvider.notifier).clearCurrent();
 
-      final endsAtUtc = DateTime.now().toUtc().add(const Duration(minutes: 5));
+      // Reset availability state after a successful accept.
+      ref.invalidate(availabilityProvider);
 
-      // Save both: endsAt + accepted payload
-      await doneStorage.saveEndsAt(endsAtUtc);
-      await offerStorage.saveAccepted(result);
-
+      // Update UI immediately (cooldownUntil comes from server)
       state = AsyncData(
         AccepteOfferState(
           offerAcceptedEntity: result,
-          doneEndsAt: endsAtUtc.toLocal(),
+          doneEndsAt: result.cooldownUntil,
         ),
       );
     } on Failure catch (f, st) {
@@ -85,9 +67,9 @@ final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
     }
   }
 
+  /// Clears only local UI state.
+  /// Real completion should be done via /orders/:id/done (separate controller).
   Future<void> clear() async {
-    await ref.read(doneCountdownStorageProvider).clear();
-    await ref.read(acceptedOfferStorageProvider).clear();
     state = const AsyncData(AccepteOfferState());
   }
 }
@@ -100,5 +82,7 @@ final class AccepteOfferState {
   });
 
   final OfferAcceptedEntity? offerAcceptedEntity;
+
+  /// Server cooldownUntil (when Done becomes enabled).
   final DateTime? doneEndsAt;
 }

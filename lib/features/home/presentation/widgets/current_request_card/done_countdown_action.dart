@@ -27,19 +27,32 @@ class _DoneCountdownActionState extends State<DoneCountdownAction> {
 
   bool get _isDone => !widget.endsAt.isAfter(DateTime.now());
 
-  void _ensureTimer() {
-    // Stop if already done
-    if (_isDone) {
-      _timer?.cancel();
-      _timer = null;
-      return;
-    }
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
 
-    // Start if not running
-    _timer ??= Timer.periodic(const Duration(seconds: 1), (_) {
+  @override
+  void didUpdateWidget(covariant DoneCountdownAction oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.endsAt != widget.endsAt) {
+      _startTimer();
+      setState(() {});
+    }
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = null;
+
+    // Stop immediately if countdown already finished.
+    if (_isDone) return;
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
 
-      // When it reaches zero, stop ticking
       if (_isDone) {
         _timer?.cancel();
         _timer = null;
@@ -50,38 +63,23 @@ class _DoneCountdownActionState extends State<DoneCountdownAction> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _ensureTimer();
-  }
-
-  @override
-  void didUpdateWidget(covariant DoneCountdownAction oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.endsAt != widget.endsAt) {
-      _ensureTimer();
-      setState(() {}); // refresh immediately
-    }
-  }
-
-  @override
   void dispose() {
     _timer?.cancel();
     super.dispose();
   }
 
-  String _mmss(Duration d) {
-    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$m:$s';
+  String _mmss(Duration duration) {
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
   }
 
   @override
   Widget build(BuildContext context) {
     final leftRaw = widget.endsAt.difference(DateTime.now());
     final left = leftRaw.isNegative ? Duration.zero : leftRaw;
-    final canDone = left == Duration.zero;
 
+    final canDone = left == Duration.zero;
     final text = canDone ? widget.label : '${widget.prefix} ${_mmss(left)}';
 
     return SizedBox(
