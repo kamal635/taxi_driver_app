@@ -4,11 +4,17 @@ import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 
-class RequestLine extends StatelessWidget {
-  const RequestLine({required this.icon, required this.text, super.key});
+class OfferInfoRow extends StatelessWidget {
+  const OfferInfoRow({
+    required this.prefixInfo,
+    required this.icon,
+    required this.text,
+    super.key,
+  });
 
   final IconData icon;
   final String text;
+  final String prefixInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +34,22 @@ class RequestLine extends StatelessWidget {
           ),
         ),
         AppSpacing.w8,
-        Expanded(child: Text(text, style: AppTypography.bodyMd)),
+        Expanded(
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: prefixInfo,
+                  style: AppTypography.subtitleMd,
+                ),
+                TextSpan(
+                  text: text,
+                  style: AppTypography.button,
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

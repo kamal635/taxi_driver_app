@@ -10,12 +10,16 @@ class AppButton extends StatelessWidget {
     super.key,
     this.isLoading = false,
     this.backgroundColor,
+    this.borderColor,
+    this.labelColor,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool isLoading;
   final Color? backgroundColor;
+  final Color? borderColor;
+  final Color? labelColor;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +34,7 @@ class AppButton extends StatelessWidget {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.r),
+            side: BorderSide(color: borderColor ?? Colors.transparent),
           ),
         ),
         child: isLoading
@@ -43,7 +48,7 @@ class AppButton extends StatelessWidget {
               )
             : Text(
                 label,
-                style: AppTypography.button,
+                style: AppTypography.button.copyWith(color: labelColor),
                 overflow: TextOverflow.ellipsis,
               ),
       ),

@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
+
+@immutable
 sealed class OfferEntity {
-  OfferEntity({
+  const OfferEntity({
     required this.type,
     required this.offerId,
     required this.pickup,
@@ -14,27 +17,36 @@ sealed class OfferEntity {
   final String price;
 }
 
+@immutable
 final class NewOfferEntity extends OfferEntity {
-  NewOfferEntity({
+  const NewOfferEntity({
     required super.type,
     required super.offerId,
     required super.pickup,
     required super.price,
+    required this.expiresAt,
     super.dropoff,
   });
+
+  final DateTime expiresAt;
 }
 
+@immutable
 final class OfferAcceptedEntity extends OfferEntity {
-  OfferAcceptedEntity({
+  const OfferAcceptedEntity({
     required super.type,
     required super.offerId,
     required super.pickup,
     required super.price,
     required this.customerPhone,
+    required this.cooldownUntil,
     super.dropoff,
     this.notes,
   });
 
   final String customerPhone;
   final String? notes;
+
+  /// Server authority: when Done becomes allowed.
+  final DateTime cooldownUntil;
 }

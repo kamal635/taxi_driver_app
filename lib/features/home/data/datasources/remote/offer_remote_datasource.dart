@@ -1,11 +1,15 @@
 import 'package:taxi_driver_app/core/networking/api_client.dart';
 import 'package:taxi_driver_app/core/socket/socket_client.dart';
+import 'package:taxi_driver_app/features/home/data/models/complete_order_response_model.dart';
+import 'package:taxi_driver_app/features/home/data/models/current_order_response_model.dart';
 import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
 
 abstract interface class OfferRemoteDatasource {
   Stream<NewOfferModel> watchOffer();
   Future<OfferAcceptedModel> accepteOffer({required String offeroId});
   Future<void> declineOffer({required String offeroId});
+  Future<CurrentOrderResponseModel> getCurrentOrder();
+  Future<CompleteOrderResponseModel> completeOrder({required String orderId});
 }
 
 final class OfferRemoteDatasourceImpl implements OfferRemoteDatasource {
@@ -51,5 +55,19 @@ final class OfferRemoteDatasourceImpl implements OfferRemoteDatasource {
       '/api/admin/orders/decline',
       body: {'orderId': offeroId},
     );
+  }
+
+  @override
+  Future<CurrentOrderResponseModel> getCurrentOrder() async {
+    final data = await apiClient.getJson('/api/admin/orders/current');
+    return CurrentOrderResponseModel.fromJson(data);
+  }
+
+  @override
+  Future<CompleteOrderResponseModel> completeOrder({
+    required String orderId,
+  }) async {
+    final data = await apiClient.postJson('/api/admin/orders/$orderId/done');
+    return CompleteOrderResponseModel.fromJson(data);
   }
 }

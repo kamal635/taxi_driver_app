@@ -112,10 +112,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeRequestCompletedTitle => 'طلب مكتمل';
 
   @override
-  String get homePickupPrefix => 'الانطلاق:';
+  String get homePickupPrefix => 'الانطلاق: ';
 
   @override
-  String get homeDropoffPrefix => 'الوجهة:';
+  String get homeDropoffPrefix => 'الوجهة: ';
 
   @override
   String get homeFarePrefix => 'السعر:';
@@ -447,4 +447,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileAvatarTakePhoto => 'التقاط صورة';
+
+  @override
+  String get homeOfferExpiresIn => 'ينتهي خلال:';
+
+  @override
+  String get price => 'السعر: ';
+
+  @override
+  String get customerPhone => 'رقم الزبون';
+
+  @override
+  String get tripCompleted => 'اكتملت الرحلة';
 }

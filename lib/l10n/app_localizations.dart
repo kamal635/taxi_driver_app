@@ -299,13 +299,13 @@ abstract class AppLocalizations {
   /// No description provided for @homePickupPrefix.
   ///
   /// In en, this message translates to:
-  /// **'Pickup:'**
+  /// **'Pickup: '**
   String get homePickupPrefix;
 
   /// No description provided for @homeDropoffPrefix.
   ///
   /// In en, this message translates to:
-  /// **'Dropoff:'**
+  /// **'Dropoff: '**
   String get homeDropoffPrefix;
 
   /// No description provided for @homeFarePrefix.
@@ -937,6 +937,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Take a photo'**
   String get profileAvatarTakePhoto;
+
+  /// No description provided for @homeOfferExpiresIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires in:'**
+  String get homeOfferExpiresIn;
+
+  /// No description provided for @price.
+  ///
+  /// In en, this message translates to:
+  /// **'Price: '**
+  String get price;
+
+  /// No description provided for @customerPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'CUSTOMER PHONE'**
+  String get customerPhone;
+
+  /// No description provided for @tripCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Completed'**
+  String get tripCompleted;
 }
 
 class _AppLocalizationsDelegate

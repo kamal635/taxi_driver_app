@@ -10,6 +10,7 @@ import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/avatar/avatar_controller.dart';
+import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
 import 'package:taxi_driver_app/core/location/location_providers.dart';
@@ -92,6 +93,7 @@ class AppTopBar extends ConsumerStatefulWidget {
 class _AppTopBarState extends ConsumerState<AppTopBar> {
   ProviderSubscription<bool>? _onlineSub;
   ProviderSubscription<LocationFailureReason?>? _errorSub;
+  ProviderSubscription<Object?>? _serverErrorSub;
 
   @override
   void initState() {
@@ -109,7 +111,17 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
         }
       },
     );
+    _serverErrorSub = ref.listenManual<Object?>(
+      availabilityProvider.select((s) => s.serverError),
+      (previous, next) {
+        if (next == null || identical(previous, next)) return;
 
+        final msg = failureToUserMessage(next, l10n: context.l10n);
+        context.showAppSnack(msg, type: AppSnackType.error);
+
+        ref.read(availabilityProvider.notifier).clearServerError();
+      },
+    );
     _errorSub = ref.listenManual<LocationFailureReason?>(
       availabilityProvider.select((s) => s.errorReason),
       (previous, next) {
@@ -162,6 +174,7 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
   void dispose() {
     _onlineSub?.close();
     _errorSub?.close();
+    _serverErrorSub?.close();
     super.dispose();
   }
 

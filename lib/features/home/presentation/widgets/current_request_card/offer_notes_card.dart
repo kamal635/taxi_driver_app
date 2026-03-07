@@ -5,9 +5,10 @@ import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/offer_card_surface.dart';
 
-class RequestNotesCard extends StatelessWidget {
-  const RequestNotesCard({
+class OfferNotesCard extends StatelessWidget {
+  const OfferNotesCard({
     required this.notes,
     super.key,
   });
@@ -16,23 +17,10 @@ class RequestNotesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = notes?.trim() ?? '';
     final l10n = context.l10n;
+    final text = notes?.trim() ?? '';
 
-    return Container(
-      padding: EdgeInsets.all(14.r),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-            color: Colors.black.withValues(alpha: 0.06),
-          ),
-        ],
-      ),
+    return OfferCardSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -21,6 +21,7 @@ final class AppIcons {
   static const IconData gallery = Icons.photo_library_rounded;
   static const IconData changePhoto = Icons.photo_camera_back_rounded;
   static const IconData delete = Icons.delete_outline_rounded;
+  static const IconData timer = Icons.timer_outlined;
 
   // Snackbars / Status
   static const IconData success = Icons.check_circle_rounded;

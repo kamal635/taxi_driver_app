@@ -23,6 +23,7 @@ final class CompletedOffersController
 
   Future<void> getCompletedOffers(CompletedPeriod period) async {
     if (state.isLoading) return;
+
     state = const AsyncLoading();
 
     try {

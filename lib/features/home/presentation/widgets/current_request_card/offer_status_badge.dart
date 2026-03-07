@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/current_request_card.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/offer_card_variant.dart';
 
-class RequestStatusBadge extends StatelessWidget {
-  const RequestStatusBadge({
+class OfferStatusBadge extends StatelessWidget {
+  const OfferStatusBadge({
     required this.badgeTitle,
     required this.variant,
     super.key,
@@ -19,11 +19,11 @@ class RequestStatusBadge extends StatelessWidget {
     final isOffer = variant == CardVariant.offer;
 
     final bgColor = isOffer
-        ? AppColors.textPrimary.withValues(alpha: 0.1)
+        ? AppColors.textPrimary.withValues(alpha: 0.10)
         : AppColors.successBg;
 
     final textColor = isOffer
-        ? AppColors.textPrimary.withValues(alpha: 0.8)
+        ? AppColors.textPrimary.withValues(alpha: 0.80)
         : AppColors.success;
 
     return Container(

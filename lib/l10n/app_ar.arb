@@ -42,8 +42,8 @@
   "homeRequestCurrentTitle": "طلب جاري",
   "homeRequestCompletedTitle": "طلب مكتمل",
 
-  "homePickupPrefix": "الانطلاق:",
-  "homeDropoffPrefix": "الوجهة:",
+  "homePickupPrefix": "الانطلاق: ",
+  "homeDropoffPrefix": "الوجهة: ",
   "homeFarePrefix": "السعر:",
 
   "homeAvailableIn": "متاح بعد:",
@@ -221,7 +221,12 @@
  
 
   "profileAvatarPickFromGallery": "اختيار من المعرض",
-  "profileAvatarTakePhoto": "التقاط صورة"
+  "profileAvatarTakePhoto": "التقاط صورة",
 
+    "homeOfferExpiresIn": "ينتهي خلال:",
 
+   "price":"السعر: ",
+
+   "customerPhone": "رقم الزبون",
+   "tripCompleted": "اكتملت الرحلة"
 }

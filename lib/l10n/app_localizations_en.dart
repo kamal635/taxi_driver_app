@@ -112,10 +112,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeRequestCompletedTitle => 'Completed ride';
 
   @override
-  String get homePickupPrefix => 'Pickup:';
+  String get homePickupPrefix => 'Pickup: ';
 
   @override
-  String get homeDropoffPrefix => 'Dropoff:';
+  String get homeDropoffPrefix => 'Dropoff: ';
 
   @override
   String get homeFarePrefix => 'Fare:';
@@ -448,4 +448,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileAvatarTakePhoto => 'Take a photo';
+
+  @override
+  String get homeOfferExpiresIn => 'Expires in:';
+
+  @override
+  String get price => 'Price: ';
+
+  @override
+  String get customerPhone => 'CUSTOMER PHONE';
+
+  @override
+  String get tripCompleted => 'Trip Completed';
 }
