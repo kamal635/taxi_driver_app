@@ -17,13 +17,13 @@ class HomeOffersSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
 
-    final newOfferState = ref.watch(newOfferControllerProvider);
+    final newOfferAsync = ref.watch(newOfferControllerProvider);
     final acceptAsync = ref.watch(accepteOfferControllerProvider);
     final declineAsync = ref.watch(declineOfferControllerProvider);
 
     final accepted = acceptAsync.value?.offerAcceptedEntity;
     final doneEndsAt = acceptAsync.value?.doneEndsAt;
-    final newOffer = newOfferState.currentOffer;
+    final newOffer = newOfferAsync.value?.currentOffer;
 
     // First priority: show current accepted trip.
     if (accepted != null) {
@@ -48,12 +48,12 @@ class HomeOffersSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (newOfferState.isLoading)
+        if (newOfferAsync.isLoading)
           const CircularProgressIndicator(
             strokeWidth: 3,
             color: AppColors.primary,
           ),
-        if (newOfferState.isLoading) AppSpacing.h16,
+        if (newOfferAsync.isLoading) AppSpacing.h16,
         HomeNewOfferSection(
           newOffer: newOffer,
           isActionLoading: acceptAsync.isLoading || declineAsync.isLoading,

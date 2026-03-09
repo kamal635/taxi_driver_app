@@ -1,14 +1,14 @@
 import 'package:taxi_driver_app/core/networking/api_client.dart';
 import 'package:taxi_driver_app/core/socket/socket_client.dart';
 import 'package:taxi_driver_app/features/home/data/models/complete_order_response_model.dart';
-import 'package:taxi_driver_app/features/home/data/models/current_order_response_model.dart';
+import 'package:taxi_driver_app/features/home/data/models/current_and_pending_offer_model.dart';
 import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
 
 abstract interface class OfferRemoteDatasource {
   Stream<NewOfferModel> watchOffer();
-  Future<OfferAcceptedModel> accepteOffer({required String offeroId});
+  Future<AccepteOfferdModel> accepteOffer({required String offeroId});
   Future<void> declineOffer({required String offeroId});
-  Future<CurrentOrderResponseModel> getCurrentOrder();
+  Future<CurrentAndPendingOfferModel?> getCurrentAndPendingOffer();
   Future<CompleteOrderResponseModel> completeOrder({required String orderId});
 }
 
@@ -37,7 +37,7 @@ final class OfferRemoteDatasourceImpl implements OfferRemoteDatasource {
 
   /// ========= 2- accepte offer
   @override
-  Future<OfferAcceptedModel> accepteOffer({required String offeroId}) async {
+  Future<AccepteOfferdModel> accepteOffer({required String offeroId}) async {
     final data = await apiClient.postJson(
       '/api/admin/orders/accept',
       body: {
@@ -45,7 +45,7 @@ final class OfferRemoteDatasourceImpl implements OfferRemoteDatasource {
       },
     );
 
-    return OfferAcceptedModel.fromJson(data);
+    return AccepteOfferdModel.fromJson(data);
   }
 
   /// ========= 2- accepte offer
@@ -58,9 +58,9 @@ final class OfferRemoteDatasourceImpl implements OfferRemoteDatasource {
   }
 
   @override
-  Future<CurrentOrderResponseModel> getCurrentOrder() async {
+  Future<CurrentAndPendingOfferModel?> getCurrentAndPendingOffer() async {
     final data = await apiClient.getJson('/api/admin/orders/current');
-    return CurrentOrderResponseModel.fromJson(data);
+    return CurrentAndPendingOfferModel.fromJson(data);
   }
 
   @override

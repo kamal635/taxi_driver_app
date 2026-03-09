@@ -1,5 +1,6 @@
 import 'package:taxi_driver_app/features/home/data/datasources/remote/offer_remote_datasource.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/complete_order_result_entity.dart';
+import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
 import 'package:taxi_driver_app/features/home/domain/repositories/offer_repo.dart';
 
@@ -25,11 +26,13 @@ final class OfferRepositoryImpl implements OfferRepository {
   }
 
   @override
-  Future<OfferAcceptedEntity?> getCurrentOrder() async {
-    final res = await remote.getCurrentOrder();
-    final current = res.currentOrder;
-    if (current == null) return null;
-    return current.toEntity();
+  Future<CurrentAndPendingOfferEntity?> getCurrentAndPendingOffer() async {
+    final res = await remote.getCurrentAndPendingOffer();
+
+    return CurrentAndPendingOfferEntity(
+      currentOffer: res?.currentOffer?.toEntity(),
+      pendingOffer: res?.pendingOffer?.toEntity(),
+    );
   }
 
   @override

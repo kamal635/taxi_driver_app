@@ -6,37 +6,56 @@ import 'package:taxi_driver_app/core/errors/failure.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
 import 'package:taxi_driver_app/features/home/domain/usecases/accepte_offer.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/get_current_order_usecase.dart';
+import 'package:taxi_driver_app/features/home/domain/usecases/get_current_and_pending_offer_usecase.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
+
+//-------------------------------------------
+//      - Accepted Offer Controller Provider -
+//-------------------------------------------
 
 final accepteOfferControllerProvider =
     AsyncNotifierProvider<AccepteOfferController, AccepteOfferState>(
       AccepteOfferController.new,
     );
 
+//-------------------------------------------
+//         - Accepted Offer Controller -
+//-------------------------------------------
+
 final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
   late final AccepteOfferUsecase _accepteOfferUsecase;
-  late final GetCurrentOrderUseCase _getCurrentOrder;
+  late final GetCurrentAndPendingOfferUsecase _getCurrentAndPendingOfferUseCase;
+
+  //-------------------------------------------
+  //                - Build -
+  //-------------------------------------------
 
   @override
   FutureOr<AccepteOfferState> build() async {
     _accepteOfferUsecase = ref.read(accepteOfferUsecaseProvider);
-    _getCurrentOrder = ref.read(getCurrentOrderUseCaseProvider);
+    _getCurrentAndPendingOfferUseCase = ref.read(
+      getCurrentAndPendingOfferUseCaseProvider,
+    );
 
-    // Source of truth: ask server if there is an active trip.
-    final current = await _getCurrentOrder();
+    final result = await _getCurrentAndPendingOfferUseCase();
+    final currentOffer = result?.currentOffer;
 
-    if (current == null) {
-      return const AccepteOfferState();
+    // Best-effort: if a current accepted order exists,
+    // force availability to offline.
+    if (currentOffer != null) {
+      unawaited(_setOfflineBestEffort());
     }
 
     return AccepteOfferState(
-      offerAcceptedEntity: current,
-      // Keep same field name used by UI for the Done countdown.
-      doneEndsAt: current.cooldownUntil,
+      offerAcceptedEntity: currentOffer,
+      doneEndsAt: currentOffer?.cooldownUntil,
     );
   }
+
+  //-------------------------------------------
+  //            - Accept New Offer -
+  //-------------------------------------------
 
   Future<void> accepte({required String offeroId}) async {
     final alreadyAccepted = state.value?.offerAcceptedEntity != null;
@@ -45,15 +64,14 @@ final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
     state = const AsyncLoading();
 
     try {
-      // Accept offer (HTTP)
       final result = await _accepteOfferUsecase(offeroId: offeroId);
 
-      await ref.read(newOfferControllerProvider.notifier).clearCurrent();
+      // Clear pending/new offer after successful accept.
+      ref.read(newOfferControllerProvider.notifier).clearCurrent();
 
-      // Reset availability state after a successful accept.
-      ref.invalidate(availabilityProvider);
+      // Best-effort: move driver to offline after accept.
+      unawaited(_setOfflineBestEffort());
 
-      // Update UI immediately (cooldownUntil comes from server)
       state = AsyncData(
         AccepteOfferState(
           offerAcceptedEntity: result,
@@ -67,12 +85,32 @@ final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
     }
   }
 
-  /// Clears only local UI state.
-  /// Real completion should be done via /orders/:id/done (separate controller).
-  Future<void> clear() async {
+  //-------------------------------------------
+  //             - Clear Accepted -
+  //-------------------------------------------
+
+  void clear() {
     state = const AsyncData(AccepteOfferState());
   }
+
+  //-------------------------------------------
+  //        - Availability Helper -
+  //-------------------------------------------
+
+  Future<void> _setOfflineBestEffort() async {
+    try {
+      await ref
+          .read(availabilityProvider.notifier)
+          .requestSetOnline(value: false);
+    } on Exception catch (e) {
+      debugPrint('Failed to set availability offline: $e');
+    }
+  }
 }
+
+//-------------------------------------------
+//           - Accepted Offer State -
+//-------------------------------------------
 
 @immutable
 final class AccepteOfferState {
@@ -83,6 +121,6 @@ final class AccepteOfferState {
 
   final OfferAcceptedEntity? offerAcceptedEntity;
 
-  /// Server cooldownUntil (when Done becomes enabled).
+  /// Server cooldownUntil: when Done becomes enabled.
   final DateTime? doneEndsAt;
 }
