@@ -1,7 +1,12 @@
+import 'package:taxi_driver_app/core/utils/json_reader.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
 
-sealed class OfferModel {
-  const OfferModel({
+//-------------------------------------------
+//           - Base Offer Model -
+//-------------------------------------------
+
+sealed class BaseOfferModel {
+  const BaseOfferModel({
     required this.type,
     required this.offerId,
     required this.pickup,
@@ -16,7 +21,11 @@ sealed class OfferModel {
   final String price;
 }
 
-final class NewOfferModel extends OfferModel {
+//-------------------------------------------
+//            - New Offer Model -
+//-------------------------------------------
+
+final class NewOfferModel extends BaseOfferModel {
   const NewOfferModel({
     required super.type,
     required super.offerId,
@@ -28,12 +37,12 @@ final class NewOfferModel extends OfferModel {
 
   factory NewOfferModel.fromJson(Map<String, dynamic> json) {
     return NewOfferModel(
-      type: _requireString(json, 'type'),
-      offerId: _requireString(json, 'orderId'),
-      pickup: _requireString(json, 'pickupText'),
-      dropoff: _optionalString(json, 'dropoffText'),
-      price: _requireString(json, 'price'),
-      expiresAt: _requireDateTime(json, 'expiresAt'),
+      type: JsonReader.requireString(json, 'type'),
+      offerId: JsonReader.requireString(json, 'orderId'),
+      pickup: JsonReader.requireString(json, 'pickupText'),
+      dropoff: JsonReader.optionalString(json, 'dropoffText'),
+      price: JsonReader.requireString(json, 'price'),
+      expiresAt: JsonReader.requireDateTime(json, 'expiresAt'),
     );
   }
 
@@ -49,8 +58,12 @@ final class NewOfferModel extends OfferModel {
   );
 }
 
-final class OfferAcceptedModel extends OfferModel {
-  const OfferAcceptedModel({
+//-------------------------------------------
+//            - Accepted Offer Model -
+//-------------------------------------------
+
+final class AccepteOfferdModel extends BaseOfferModel {
+  const AccepteOfferdModel({
     required super.type,
     required super.offerId,
     required super.pickup,
@@ -61,16 +74,16 @@ final class OfferAcceptedModel extends OfferModel {
     this.note,
   });
 
-  factory OfferAcceptedModel.fromJson(Map<String, dynamic> json) {
-    return OfferAcceptedModel(
-      type: _requireString(json, 'type'),
-      offerId: _requireString(json, 'orderId'),
-      pickup: _requireString(json, 'pickupText'),
-      dropoff: _optionalString(json, 'dropoffText'),
-      price: _requireString(json, 'price'),
-      customerPhone: _requireString(json, 'customerPhone'),
-      note: _optionalString(json, 'note'),
-      cooldownUntil: _requireDateTime(json, 'cooldownUntil'),
+  factory AccepteOfferdModel.fromJson(Map<String, dynamic> json) {
+    return AccepteOfferdModel(
+      type: JsonReader.requireString(json, 'type'),
+      offerId: JsonReader.requireString(json, 'orderId'),
+      pickup: JsonReader.requireString(json, 'pickupText'),
+      dropoff: JsonReader.optionalString(json, 'dropoffText'),
+      price: JsonReader.requireString(json, 'price'),
+      customerPhone: JsonReader.requireString(json, 'customerPhone'),
+      note: JsonReader.optionalString(json, 'note'),
+      cooldownUntil: JsonReader.requireDateTime(json, 'cooldownUntil'),
     );
   }
 
@@ -88,29 +101,4 @@ final class OfferAcceptedModel extends OfferModel {
     notes: note,
     cooldownUntil: cooldownUntil,
   );
-}
-
-// --------------------
-// Small JSON helpers
-// --------------------
-
-String _requireString(Map<String, dynamic> json, String key) {
-  final v = json[key];
-  if (v == null) throw FormatException('Missing $key');
-  final s = v.toString().trim();
-  if (s.isEmpty) throw FormatException('Empty $key');
-  return s;
-}
-
-String? _optionalString(Map<String, dynamic> json, String key) {
-  final v = json[key];
-  if (v == null) return null;
-  final s = v.toString().trim();
-  return s.isEmpty ? null : s;
-}
-
-DateTime _requireDateTime(Map<String, dynamic> json, String key) {
-  final raw = json[key];
-  if (raw == null) throw FormatException('Missing $key');
-  return DateTime.parse(raw.toString());
 }

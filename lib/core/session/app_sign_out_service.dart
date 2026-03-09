@@ -24,7 +24,7 @@ class AppSignOutService {
     // 2) Clear accepted offer + countdown storage
     //(prevents stale UI after re-login).
     try {
-      await _ref.read(accepteOfferControllerProvider.notifier).clear();
+      _ref.read(accepteOfferControllerProvider.notifier).clear();
     } on Exception catch (_) {
       // ignore
     }

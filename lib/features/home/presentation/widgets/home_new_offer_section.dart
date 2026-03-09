@@ -1,5 +1,3 @@
-import 'dart:async' show unawaited;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
@@ -46,12 +44,10 @@ class HomeNewOfferSection extends ConsumerWidget {
           : () async {
               await ref
                   .read(declineOfferControllerProvider.notifier)
-                  .decline(offeroId: newOffer.offerId);
+                  .decline(offerId: newOffer.offerId);
             },
       onExpired: () {
-        unawaited(
-          ref.read(newOfferControllerProvider.notifier).clearCurrent(),
-        );
+        ref.read(newOfferControllerProvider.notifier).clearCurrent();
       },
     );
   }

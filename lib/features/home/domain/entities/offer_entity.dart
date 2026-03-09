@@ -8,6 +8,7 @@ sealed class OfferEntity {
     required this.pickup,
     required this.price,
     this.dropoff,
+    this.notes,
   });
 
   final String type;
@@ -15,6 +16,7 @@ sealed class OfferEntity {
   final String pickup;
   final String? dropoff;
   final String price;
+  final String? notes;
 }
 
 @immutable
@@ -26,6 +28,7 @@ final class NewOfferEntity extends OfferEntity {
     required super.price,
     required this.expiresAt,
     super.dropoff,
+    super.notes,
   });
 
   final DateTime expiresAt;
@@ -41,11 +44,10 @@ final class OfferAcceptedEntity extends OfferEntity {
     required this.customerPhone,
     required this.cooldownUntil,
     super.dropoff,
-    this.notes,
+    super.notes,
   });
 
   final String customerPhone;
-  final String? notes;
 
   /// Server authority: when Done becomes allowed.
   final DateTime cooldownUntil;

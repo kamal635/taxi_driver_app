@@ -15,14 +15,14 @@ class OfferCardSurface extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(14.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(18.r),
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
             blurRadius: 18,
             offset: const Offset(0, 10),
-            color: Colors.black.withValues(alpha: 0.06),
+            color: AppColors.textPrimary.withValues(alpha: 0.06),
           ),
         ],
       ),

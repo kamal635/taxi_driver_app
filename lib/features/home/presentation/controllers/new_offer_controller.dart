@@ -1,83 +1,112 @@
-import 'dart:async' show StreamSubscription, unawaited;
+import 'dart:async' show FutureOr, StreamSubscription, unawaited;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/socket/socket_client_provider.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
+import 'package:taxi_driver_app/features/home/domain/usecases/get_current_and_pending_offer_usecase.dart';
 import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
 
+//-------------------------------------------
+//       - New Offer Controller Provider -
+//-------------------------------------------
+
 final newOfferControllerProvider =
-    NotifierProvider<NewOfferController, NewOfferState>(
+    AsyncNotifierProvider<NewOfferController, NewOfferState>(
       NewOfferController.new,
     );
 
-final class NewOfferController extends Notifier<NewOfferState> {
+//-------------------------------------------
+//            - New Offer Controller -
+//-------------------------------------------
+
+final class NewOfferController extends AsyncNotifier<NewOfferState> {
+  late final GetCurrentAndPendingOfferUsecase _getCurrentAndPendingOfferUseCase;
   StreamSubscription<NewOfferEntity>? _streamSub;
 
+  //-------------------------------------------
+  //                - Build -
+  //-------------------------------------------
+
   @override
-  NewOfferState build() {
-    // Clean up subscription when provider is disposed.
+  FutureOr<NewOfferState> build() async {
     ref.onDispose(() {
       unawaited(_streamSub?.cancel());
       _streamSub = null;
     });
 
-    // Hydrate from local storage (if still valid).
-    unawaited(_hydrateFromStorage());
+    _getCurrentAndPendingOfferUseCase = ref.read(
+      getCurrentAndPendingOfferUseCaseProvider,
+    );
 
-    return NewOfferState(isLoading: false);
+    final result = await _getCurrentAndPendingOfferUseCase();
+    final pendingOffer = result?.pendingOffer;
+
+    return NewOfferState(currentOffer: pendingOffer);
   }
 
-  /// Load the last stored offer (only if it is still valid / not expired).
-  Future<void> _hydrateFromStorage() async {
-    try {
-      final stored = await ref.read(newOfferStorageProvider).readValid();
-      if (stored == null) return;
+  //-------------------------------------------
+  //          - Current State Helper -
+  //-------------------------------------------
 
-      // Avoid overwriting a currently displayed offer.
-      if (state.currentOffer == null) {
-        state = state.copyWith(currentOffer: stored);
-      }
-    } on Exception catch (e) {
-      debugPrint('NewOffer hydrate failed: $e');
-    }
-  }
+  NewOfferState get _currentState =>
+      state.asData?.value ?? const NewOfferState();
 
-  /// Start socket connection + subscribe to new offers.
+  //-------------------------------------------
+  //          - Start Socket Listening -
+  //-------------------------------------------
+
   Future<void> start() async {
-    // Guard: don't create multiple subscriptions.
     if (_streamSub != null) return;
 
-    state = state.copyWith(isLoading: true, error: null);
+    state = AsyncData(
+      _currentState.copyWith(
+        isConnecting: true,
+        errorMessage: null,
+      ),
+    );
 
-    // Ensure socket is connected and room is joined.
     try {
       await ref.read(socketConnectionManagerProvider).connectAndJoin();
       debugPrint('Socket Connection Manager success');
     } on Exception catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = AsyncData(
+        _currentState.copyWith(
+          isConnecting: false,
+          errorMessage: e.toString(),
+        ),
+      );
       debugPrint('Socket Connection Manager Error: $e');
       return;
     }
 
     final watchOffer = ref.read(watchNewOfferUsecaseProvider);
 
-    // Subscribe to offer stream.
+    // Socket connected successfully.
+    state = AsyncData(
+      _currentState.copyWith(
+        isConnecting: false,
+        errorMessage: null,
+      ),
+    );
+
     _streamSub = watchOffer().listen(
       (offer) {
-        // Update UI state.
-        state = state.copyWith(
-          currentOffer: offer,
-          isLoading: false,
-          error: null,
+        state = AsyncData(
+          _currentState.copyWith(
+            currentOffer: offer,
+            isConnecting: false,
+            errorMessage: null,
+          ),
         );
-
-        // Persist offer locally (best-effort).
-        unawaited(ref.read(newOfferStorageProvider).save(offer));
       },
       onError: (Object err, StackTrace st) {
-        // Surface stream errors to the UI.
-        state = state.copyWith(isLoading: false, error: err.toString());
+        state = AsyncData(
+          _currentState.copyWith(
+            isConnecting: false,
+            errorMessage: err.toString(),
+          ),
+        );
         debugPrint('Socket Streaming Error: $err');
       },
     );
@@ -85,52 +114,78 @@ final class NewOfferController extends Notifier<NewOfferState> {
     debugPrint('Socket start streaming');
   }
 
-  /// Stop listening to offers and disconnect socket.
+  //-------------------------------------------
+  //           - Stop Socket Listening -
+  //-------------------------------------------
+
   Future<void> stop() async {
     await _streamSub?.cancel();
     _streamSub = null;
 
-    // Disconnect socket (best-effort).
     await ref.read(socketClientProvider).disconnect();
 
-    // Keep currentOffer as-is; stop just turns off streaming.
-    state = state.copyWith(isLoading: false, error: null);
+    state = AsyncData(
+      _currentState.copyWith(
+        isConnecting: false,
+        errorMessage: null,
+      ),
+    );
 
     debugPrint('Socket stop streaming');
   }
 
-  /// Clear current offer from UI and local storage.
-  Future<void> clearCurrent() async {
-    await ref.read(newOfferStorageProvider).clear();
-    state = state.copyWith(currentOffer: null);
+  //-------------------------------------------
+  //             - Clear Offer -
+  //-------------------------------------------
+
+  void clearCurrent() {
+    state = AsyncData(
+      _currentState.copyWith(currentOffer: null),
+    );
+  }
+
+  //-------------------------------------------
+  //             - Clear Error -
+  //-------------------------------------------
+
+  void clearError() {
+    state = AsyncData(
+      _currentState.copyWith(errorMessage: null),
+    );
   }
 }
 
+//-------------------------------------------
+//              - New Offer State -
+//-------------------------------------------
+
+@immutable
 final class NewOfferState {
-  NewOfferState({
-    required this.isLoading,
+  const NewOfferState({
     this.currentOffer,
-    this.error,
+    this.isConnecting = false,
+    this.errorMessage,
   });
 
-  final bool isLoading;
   final NewOfferEntity? currentOffer;
-  final String? error;
+  final bool isConnecting;
+  final String? errorMessage;
 
-  // Sentinel to support explicit null (clear currentOffer / error).
   static const Object _unset = Object();
 
   NewOfferState copyWith({
     Object? currentOffer = _unset,
-    bool? isLoading,
-    Object? error = _unset,
+    bool? isConnecting,
+    Object? errorMessage = _unset,
   }) {
     return NewOfferState(
-      isLoading: isLoading ?? this.isLoading,
       currentOffer: identical(currentOffer, _unset)
           ? this.currentOffer
           : currentOffer as NewOfferEntity?,
-      error: identical(error, _unset) ? this.error : error as String?,
+      isConnecting: isConnecting ?? this.isConnecting,
+      errorMessage: identical(errorMessage, _unset)
+          ? this.errorMessage
+          : errorMessage as String?,
     );
   }
 }
