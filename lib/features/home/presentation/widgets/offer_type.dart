@@ -1,0 +1,4 @@
+enum OfferType {
+  newOffer,
+  acceptedOffer,
+}

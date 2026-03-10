@@ -112,10 +112,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeRequestCompletedTitle => 'Completed ride';
 
   @override
-  String get homePickupPrefix => 'Pickup: ';
+  String get homePickupPrefix => 'PICKUP: ';
 
   @override
-  String get homeDropoffPrefix => 'Dropoff: ';
+  String get homeDropoffPrefix => 'DROPOFF: ';
 
   @override
   String get homeFarePrefix => 'Fare:';
@@ -459,5 +459,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customerPhone => 'CUSTOMER PHONE';
 
   @override
-  String get tripCompleted => 'Trip Completed';
+  String get decline => 'Decline';
+
+  @override
+  String get tripCompleted => 'Trip is Completed';
+
+  @override
+  String get tripProgress => 'Trip in Progress..';
+
+  @override
+  String get tapToCall => 'Tap to call customer';
+
+  @override
+  String get totalFare => 'TOTAL FARE';
+
+  @override
+  String get tripNotes => 'TRIP NOTES';
+
+  @override
+  String get timeRemaining => 'Time remaining to start';
 }

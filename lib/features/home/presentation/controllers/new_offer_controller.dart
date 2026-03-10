@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/socket/socket_client_provider.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/get_current_and_pending_offer_usecase.dart';
 import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
 
 //-------------------------------------------
@@ -21,12 +20,7 @@ final newOfferControllerProvider =
 //-------------------------------------------
 
 final class NewOfferController extends AsyncNotifier<NewOfferState> {
-  late final GetCurrentAndPendingOfferUsecase _getCurrentAndPendingOfferUseCase;
   StreamSubscription<NewOfferEntity>? _streamSub;
-
-  //-------------------------------------------
-  //                - Build -
-  //-------------------------------------------
 
   @override
   FutureOr<NewOfferState> build() async {
@@ -35,26 +29,14 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       _streamSub = null;
     });
 
-    _getCurrentAndPendingOfferUseCase = ref.read(
-      getCurrentAndPendingOfferUseCaseProvider,
-    );
-
-    final result = await _getCurrentAndPendingOfferUseCase();
+    final result = await ref.watch(currentAndPendingOfferProvider.future);
     final pendingOffer = result?.pendingOffer;
 
     return NewOfferState(currentOffer: pendingOffer);
   }
 
-  //-------------------------------------------
-  //          - Current State Helper -
-  //-------------------------------------------
-
   NewOfferState get _currentState =>
       state.asData?.value ?? const NewOfferState();
-
-  //-------------------------------------------
-  //          - Start Socket Listening -
-  //-------------------------------------------
 
   Future<void> start() async {
     if (_streamSub != null) return;
@@ -82,7 +64,6 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
 
     final watchOffer = ref.read(watchNewOfferUsecaseProvider);
 
-    // Socket connected successfully.
     state = AsyncData(
       _currentState.copyWith(
         isConnecting: false,
@@ -114,10 +95,6 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     debugPrint('Socket start streaming');
   }
 
-  //-------------------------------------------
-  //           - Stop Socket Listening -
-  //-------------------------------------------
-
   Future<void> stop() async {
     await _streamSub?.cancel();
     _streamSub = null;
@@ -134,19 +111,11 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     debugPrint('Socket stop streaming');
   }
 
-  //-------------------------------------------
-  //             - Clear Offer -
-  //-------------------------------------------
-
   void clearCurrent() {
     state = AsyncData(
       _currentState.copyWith(currentOffer: null),
     );
   }
-
-  //-------------------------------------------
-  //             - Clear Error -
-  //-------------------------------------------
 
   void clearError() {
     state = AsyncData(

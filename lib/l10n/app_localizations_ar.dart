@@ -458,5 +458,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get customerPhone => 'رقم الزبون';
 
   @override
+  String get decline => 'رفض';
+
+  @override
   String get tripCompleted => 'اكتملت الرحلة';
+
+  @override
+  String get tripProgress => 'الرحلة قيد التقدم...';
+
+  @override
+  String get tapToCall => 'اضغط للاتصال بالزبون';
+
+  @override
+  String get totalFare => 'الإجرة الإجمالية';
+
+  @override
+  String get tripNotes => 'ملاحظات الرحلة';
+
+  @override
+  String get timeRemaining => 'الوقت المتبقي للبدء';
 }
