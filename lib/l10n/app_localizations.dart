@@ -299,13 +299,13 @@ abstract class AppLocalizations {
   /// No description provided for @homePickupPrefix.
   ///
   /// In en, this message translates to:
-  /// **'Pickup: '**
+  /// **'PICKUP: '**
   String get homePickupPrefix;
 
   /// No description provided for @homeDropoffPrefix.
   ///
   /// In en, this message translates to:
-  /// **'Dropoff: '**
+  /// **'DROPOFF: '**
   String get homeDropoffPrefix;
 
   /// No description provided for @homeFarePrefix.
@@ -956,11 +956,47 @@ abstract class AppLocalizations {
   /// **'CUSTOMER PHONE'**
   String get customerPhone;
 
+  /// No description provided for @decline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get decline;
+
   /// No description provided for @tripCompleted.
   ///
   /// In en, this message translates to:
-  /// **'Trip Completed'**
+  /// **'Trip is Completed'**
   String get tripCompleted;
+
+  /// No description provided for @tripProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip in Progress..'**
+  String get tripProgress;
+
+  /// No description provided for @tapToCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to call customer'**
+  String get tapToCall;
+
+  /// No description provided for @totalFare.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL FARE'**
+  String get totalFare;
+
+  /// No description provided for @tripNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'TRIP NOTES'**
+  String get tripNotes;
+
+  /// No description provided for @timeRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Time remaining to start'**
+  String get timeRemaining;
 }
 
 class _AppLocalizationsDelegate

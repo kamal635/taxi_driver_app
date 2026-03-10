@@ -228,5 +228,14 @@
    "price":"السعر: ",
 
    "customerPhone": "رقم الزبون",
-   "tripCompleted": "اكتملت الرحلة"
+
+
+   "decline": "رفض",
+
+   "tripProgress":"الرحلة قيد التقدم...",
+   "tripCompleted": "اكتملت الرحلة",
+   "tapToCall":"اضغط للاتصال بالزبون",
+   "totalFare":"الإجرة الإجمالية",
+   "tripNotes":"ملاحظات الرحلة",
+   "timeRemaining":"الوقت المتبقي للبدء"
 }

@@ -44,8 +44,8 @@
   "homeRequestCurrentTitle": "Current ride",
   "homeRequestCompletedTitle": "Completed ride",
 
-  "homePickupPrefix": "Pickup: ",
-  "homeDropoffPrefix": "Dropoff: ",
+  "homePickupPrefix": "PICKUP: ",
+  "homeDropoffPrefix": "DROPOFF: ",
   "homeFarePrefix": "Fare:",
 
   "homeAvailableIn": "Available in:",
@@ -227,7 +227,15 @@
    "price":"Price: ",
 
     "customerPhone": "CUSTOMER PHONE",
-    "tripCompleted": "Trip Completed"
 
-   
+
+
+    "decline": "Decline",
+
+    "tripCompleted": "Trip is Completed",
+    "tripProgress" :"Trip in Progress..",
+    "tapToCall":"Tap to call customer",
+    "totalFare"   :"TOTAL FARE",
+    "tripNotes":"TRIP NOTES",
+    "timeRemaining":"Time remaining to start"
 }

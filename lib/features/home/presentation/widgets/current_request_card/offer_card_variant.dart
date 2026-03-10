@@ -1,4 +1,0 @@
-enum CardVariant {
-  offer,
-  accepted,
-}
