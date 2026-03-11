@@ -6,7 +6,7 @@ import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/accepte_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/complete_order_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/complete_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/decline_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/home_offer_section.dart';
@@ -51,7 +51,7 @@ class HomePage extends ConsumerWidget {
       )
       // Done/complete errors.
       ..listen(
-        completeOrderControllerProvider.select((state) => state.error),
+        completeOfferControllerProvider.select((state) => state.error),
         (previous, next) {
           if (next == null) return;
           if (identical(previous, next)) return;

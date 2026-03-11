@@ -4,7 +4,7 @@ class DeclineOfferUseCase {
   const DeclineOfferUseCase(this._repo);
   final OfferRepository _repo;
 
-  Future<void> call({required String offeroId}) {
-    return _repo.declineOffer(offeroId: offeroId);
+  Future<void> call({required String offerId}) {
+    return _repo.declineOffer(offerId: offerId);
   }
 }

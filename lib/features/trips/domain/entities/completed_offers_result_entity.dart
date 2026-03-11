@@ -7,11 +7,13 @@ final class CompletedOffersResultEntity {
     required this.type,
     required this.period,
     required this.count,
+    required this.totalProfits,
     required this.offers,
   });
 
   final String type;
   final CompletedPeriod period;
   final int count;
+  final String totalProfits;
   final List<CompletedOfferEntity> offers;
 }

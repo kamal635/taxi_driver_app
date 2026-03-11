@@ -45,7 +45,7 @@ final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
     state = const AsyncLoading();
 
     try {
-      final result = await _accepteOfferUsecase(offeroId: offeroId);
+      final result = await _accepteOfferUsecase(offerId: offeroId);
 
       ref.read(newOfferControllerProvider.notifier).clearCurrent();
 

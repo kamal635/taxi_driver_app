@@ -6,7 +6,7 @@ final class AccepteOfferUsecase {
 
   final OfferRepository offerRepository;
 
-  Future<OfferAcceptedEntity> call({required String offeroId}) async {
-    return offerRepository.accepteOfer(offeroId: offeroId);
+  Future<OfferAcceptedEntity> call({required String offerId}) async {
+    return offerRepository.accepteOffer(offerId: offerId);
   }
 }

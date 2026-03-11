@@ -6,7 +6,7 @@ import 'package:taxi_driver_app/features/home/data/repositories/offer_repository
 import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
 import 'package:taxi_driver_app/features/home/domain/repositories/offer_repo.dart';
 import 'package:taxi_driver_app/features/home/domain/usecases/accepte_offer.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/complete_order_usecase.dart';
+import 'package:taxi_driver_app/features/home/domain/usecases/complete_offer_usecase.dart';
 import 'package:taxi_driver_app/features/home/domain/usecases/decline_offer_use_case.dart';
 import 'package:taxi_driver_app/features/home/domain/usecases/get_current_and_pending_offer_usecase.dart';
 import 'package:taxi_driver_app/features/home/domain/usecases/watch_new_offer_usecase.dart';
@@ -82,7 +82,7 @@ currentAndPendingOfferProvider = FutureProvider((ref) async {
 //        - Complete Order Use Case -
 //-------------------------------------------
 
-final completeOrderUseCaseProvider = Provider<CompleteOrderUseCase>((ref) {
+final completeOfferUseCaseProvider = Provider<CompleteOfferUseCase>((ref) {
   final repo = ref.read(offerRepositoryProvider);
-  return CompleteOrderUseCase(repo: repo);
+  return CompleteOfferUseCase(repo: repo);
 });

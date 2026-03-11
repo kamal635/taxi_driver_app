@@ -7,17 +7,13 @@ import 'package:taxi_driver_app/app/theme/app_typography.dart';
 class TripsSummaryCard extends StatelessWidget {
   const TripsSummaryCard({
     required this.title,
-    required this.tripsLabel,
     required this.earningsLabel,
-    required this.tripsCountText,
     required this.earningsText,
     super.key,
   });
 
   final String title;
-  final String tripsLabel;
   final String earningsLabel;
-  final String tripsCountText;
   final String earningsText;
 
   @override
@@ -40,11 +36,13 @@ class TripsSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppTypography.titleSm),
-
+          Text(
+            title,
+            style: AppTypography.titleSm,
+          ),
           AppSpacing.h12,
 
-          _SummaryStat(
+          _TripsSummaryStat(
             icon: Icons.payments_rounded,
             label: earningsLabel,
             value: earningsText,
@@ -56,8 +54,8 @@ class TripsSummaryCard extends StatelessWidget {
   }
 }
 
-class _SummaryStat extends StatelessWidget {
-  const _SummaryStat({
+class _TripsSummaryStat extends StatelessWidget {
+  const _TripsSummaryStat({
     required this.icon,
     required this.label,
     required this.value,
@@ -89,19 +87,22 @@ class _SummaryStat extends StatelessWidget {
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: AppColors.border),
             ),
-            child: Icon(icon, size: 20.r, color: AppColors.textPrimary),
+            child: Icon(
+              icon,
+              size: 20.r,
+              color: AppColors.textPrimary,
+            ),
           ),
-
           AppSpacing.w12,
-
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: AppTypography.subtitleSm),
-
+                Text(
+                  label,
+                  style: AppTypography.subtitleSm,
+                ),
                 AppSpacing.h4,
-
                 Text(
                   value,
                   style: AppTypography.labelMd.copyWith(

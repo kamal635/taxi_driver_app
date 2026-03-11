@@ -5,8 +5,8 @@ import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 
-class TimeRemainingBar extends StatelessWidget {
-  const TimeRemainingBar({
+class AccpetedProgressUi extends StatelessWidget {
+  const AccpetedProgressUi({
     required this.remaining,
     required this.progress,
     super.key,
