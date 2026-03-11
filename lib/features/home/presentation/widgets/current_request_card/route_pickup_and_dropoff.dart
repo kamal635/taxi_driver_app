@@ -17,6 +17,8 @@ class RoutePickupAndDropoff extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isRTL = Directionality.of(context) == TextDirection.rtl;
+
     final l10n = context.l10n;
     final stops = [
       RouteStopData(
@@ -34,15 +36,26 @@ class RoutePickupAndDropoff extends StatelessWidget {
     return Stack(
       children: [
         // Vertical line behind all items
-        Positioned(
-          left: 4.5.r,
-          top: 10.r,
-          bottom: 10.r,
-          child: Container(
-            width: 3.r,
-            color: AppColors.border,
+        if (isRTL)
+          Positioned(
+            right: 4.5.r,
+            top: 10.r,
+            bottom: 10.r,
+            child: Container(
+              width: 3.r,
+              color: AppColors.border,
+            ),
+          )
+        else
+          Positioned(
+            left: 4.5.r,
+            top: 10.r,
+            bottom: 10.r,
+            child: Container(
+              width: 3.r,
+              color: AppColors.border,
+            ),
           ),
-        ),
         Column(
           children: List.generate(2, (index) {
             final stop = stops[index];
