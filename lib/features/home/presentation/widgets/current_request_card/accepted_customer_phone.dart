@@ -7,8 +7,8 @@ import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class CustomerPhoneNumber extends StatelessWidget {
-  const CustomerPhoneNumber({required this.customerPhone, super.key});
+class AcceptedCustomerPhone extends StatelessWidget {
+  const AcceptedCustomerPhone({required this.customerPhone, super.key});
 
   final String customerPhone;
 

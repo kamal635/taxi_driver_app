@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 
 @immutable
-final class CompleteOrderResultEntity {
-  const CompleteOrderResultEntity({
+final class CompleteOfferResultEntity {
+  const CompleteOfferResultEntity({
     required this.type,
     required this.message,
-    required this.orderId,
+    required this.offerId,
   });
 
   final String type;
   final String message;
-  final String orderId;
+  final String offerId;
 }

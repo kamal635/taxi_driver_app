@@ -22,7 +22,7 @@ class TripsEmptyState extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(18.r),
         border: Border.all(color: AppColors.border),
       ),
@@ -38,7 +38,11 @@ class TripsEmptyState extends StatelessWidget {
                 color: AppColors.primary.withValues(alpha: 0.30),
               ),
             ),
-            child: Icon(icon, size: 34.r, color: AppColors.textPrimary),
+            child: Icon(
+              icon,
+              size: 34.r,
+              color: AppColors.textPrimary,
+            ),
           ),
           AppSpacing.h12,
           Text(

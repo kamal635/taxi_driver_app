@@ -3,8 +3,8 @@ import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/widgets/app_button.dart';
 
-class ActionCompletedOffer extends StatelessWidget {
-  const ActionCompletedOffer({
+class AcceptedActions extends StatelessWidget {
+  const AcceptedActions({
     required this.canComplete,
     this.actionCompletedOffer,
     super.key,

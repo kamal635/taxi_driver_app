@@ -1,16 +1,16 @@
-import 'package:taxi_driver_app/features/home/domain/entities/complete_order_result_entity.dart';
+import 'package:taxi_driver_app/features/home/domain/entities/complete_offer_result_entity.dart';
 
-final class CompleteOrderResponseModel {
-  const CompleteOrderResponseModel({
+final class CompleteOfferResponseModel {
+  const CompleteOfferResponseModel({
     required this.type,
     required this.message,
-    required this.orderId,
+    required this.offerId,
   });
 
-  factory CompleteOrderResponseModel.fromJson(Map<String, dynamic> json) {
+  factory CompleteOfferResponseModel.fromJson(Map<String, dynamic> json) {
     final type = json['type']?.toString().trim();
     final message = json['message']?.toString().trim();
-    final orderId = json['orderId']?.toString().trim();
+    final offerId = json['orderId']?.toString().trim();
 
     if (type == null || type.isEmpty) {
       throw const FormatException('Missing type');
@@ -18,26 +18,26 @@ final class CompleteOrderResponseModel {
     if (message == null || message.isEmpty) {
       throw const FormatException('Missing message');
     }
-    if (orderId == null || orderId.isEmpty) {
+    if (offerId == null || offerId.isEmpty) {
       throw const FormatException('Missing orderId');
     }
 
-    return CompleteOrderResponseModel(
+    return CompleteOfferResponseModel(
       type: type,
       message: message,
-      orderId: orderId,
+      offerId: offerId,
     );
   }
 
   final String type;
   final String message;
-  final String orderId;
+  final String offerId;
 
-  CompleteOrderResultEntity toEntity() {
-    return CompleteOrderResultEntity(
+  CompleteOfferResultEntity toEntity() {
+    return CompleteOfferResultEntity(
       type: type,
       message: message,
-      orderId: orderId,
+      offerId: offerId,
     );
   }
 }

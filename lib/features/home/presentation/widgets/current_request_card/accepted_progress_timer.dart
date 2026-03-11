@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/accpeted_offer_time_remaining.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/action_accepted_offer.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/accepted_actions.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/accpeted_progress_ui.dart';
 
-class AcceptedOfferProgressSection extends StatefulWidget {
-  const AcceptedOfferProgressSection({
+class AcceptedProgressTimer extends StatefulWidget {
+  const AcceptedProgressTimer({
     required this.cooldownUntil,
     required this.actionCompletedOffer,
     super.key,
@@ -16,12 +16,10 @@ class AcceptedOfferProgressSection extends StatefulWidget {
   final VoidCallback? actionCompletedOffer;
 
   @override
-  State<AcceptedOfferProgressSection> createState() =>
-      _AcceptedOfferProgressSectionState();
+  State<AcceptedProgressTimer> createState() => _AcceptedProgressTimerState();
 }
 
-class _AcceptedOfferProgressSectionState
-    extends State<AcceptedOfferProgressSection> {
+class _AcceptedProgressTimerState extends State<AcceptedProgressTimer> {
   static const Duration _totalDuration = Duration(minutes: 5);
 
   Timer? _timer;
@@ -46,7 +44,7 @@ class _AcceptedOfferProgressSectionState
   }
 
   @override
-  void didUpdateWidget(covariant AcceptedOfferProgressSection oldWidget) {
+  void didUpdateWidget(covariant AcceptedProgressTimer oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.cooldownUntil != widget.cooldownUntil) {
@@ -85,14 +83,14 @@ class _AcceptedOfferProgressSectionState
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TimeRemainingBar(
+        AccpetedProgressUi(
           remaining: _remaining,
           progress: _progress,
         ),
 
         AppSpacing.h24,
 
-        ActionCompletedOffer(
+        AcceptedActions(
           canComplete: _canComplete,
           actionCompletedOffer: widget.actionCompletedOffer,
         ),

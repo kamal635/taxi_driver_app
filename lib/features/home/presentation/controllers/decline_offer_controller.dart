@@ -41,7 +41,7 @@ final class DeclineOfferController extends AsyncNotifier<void> {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(
-      () => _declineOfferUseCase(offeroId: offerId),
+      () => _declineOfferUseCase(offerId: offerId),
     );
 
     if (!state.hasError) {

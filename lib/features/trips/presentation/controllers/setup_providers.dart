@@ -5,6 +5,7 @@ import 'package:taxi_driver_app/features/trips/data/repositories/completed_offer
 import 'package:taxi_driver_app/features/trips/domain/repositories/completed_offers_repository.dart';
 import 'package:taxi_driver_app/features/trips/domain/usecases/get_completed_offers_usecase.dart';
 
+/// -------------------- remote
 final completedOffersRemoteProvider = Provider<CompletedOffersRemoteDataSource>(
   (ref) {
     final apiClient = ref.read(apiClientProvider);
@@ -12,6 +13,7 @@ final completedOffersRemoteProvider = Provider<CompletedOffersRemoteDataSource>(
   },
 );
 
+/// -------------------- repository
 final completedOffersRepoProvider = Provider<CompletedOffersRepository>(
   (ref) {
     final remote = ref.read(completedOffersRemoteProvider);
@@ -19,6 +21,7 @@ final completedOffersRepoProvider = Provider<CompletedOffersRepository>(
   },
 );
 
+/// -------------------- usecase
 final completedOffersUseCaseProvider = Provider<GetCompletedOffersUseCase>(
   (ref) {
     final repo = ref.read(completedOffersRepoProvider);

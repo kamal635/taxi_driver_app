@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/accepted_offer_progress_section.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/action_row_new_offer.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/customer_phone_number.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/home_header_offer_card.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/accepted_customer_phone.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/accepted_progress_timer.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/header_offer_card.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/new_offer_actions.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/offer_notes.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/route_pickup_and_dropoff.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/offer_card_surface.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/offer_type.dart';
 
-class CurrentOfferCard extends StatelessWidget {
-  const CurrentOfferCard._({
+class BaseOfferCard extends StatelessWidget {
+  const BaseOfferCard._({
     required this.offerType,
     required this.statusOffer,
     required this.totalFare,
@@ -27,7 +27,7 @@ class CurrentOfferCard extends StatelessWidget {
     this.isLoadingDecline,
   });
 
-  factory CurrentOfferCard.newOffer({
+  factory BaseOfferCard.newOffer({
     required String statusOffer,
     required DateTime expiresAt,
     required String totalFare,
@@ -41,7 +41,7 @@ class CurrentOfferCard extends StatelessWidget {
 
     OfferType offerType = OfferType.newOffer,
   }) {
-    return CurrentOfferCard._(
+    return BaseOfferCard._(
       statusOffer: statusOffer,
       expiresAt: expiresAt,
       totalFare: totalFare,
@@ -56,7 +56,7 @@ class CurrentOfferCard extends StatelessWidget {
     );
   }
 
-  factory CurrentOfferCard.acceptedOffer({
+  factory BaseOfferCard.acceptedOffer({
     required String statusOffer,
     required String totalFare,
     required String pickup,
@@ -67,7 +67,7 @@ class CurrentOfferCard extends StatelessWidget {
     required String notes,
     OfferType offerType = OfferType.acceptedOffer,
   }) {
-    return CurrentOfferCard._(
+    return BaseOfferCard._(
       statusOffer: statusOffer,
       totalFare: totalFare,
       pickup: pickup,
@@ -116,7 +116,7 @@ class CurrentOfferCard extends StatelessWidget {
         OfferCardSurface(
           child: Column(
             children: [
-              HomeHeaderOfferCard(
+              HeaderOfferCard(
                 isExpiresAt: isNewOffer,
                 statusOffer: statusOffer,
                 totalFare: totalFare,
@@ -133,20 +133,20 @@ class CurrentOfferCard extends StatelessWidget {
               AppSpacing.h24,
 
               if (!isNewOffer)
-                CustomerPhoneNumber(
+                AcceptedCustomerPhone(
                   customerPhone: customerPhone ?? '',
                 ),
 
               if (!isNewOffer && cooldownUntil != null) ...[
                 AppSpacing.h24,
-                AcceptedOfferProgressSection(
+                AcceptedProgressTimer(
                   cooldownUntil: cooldownUntil!,
                   actionCompletedOffer: actionCompletedOffer,
                 ),
               ],
 
               if (isNewOffer)
-                ActionRowNewOffer(
+                NewOfferActions(
                   isLoadingAccepte: isLoadingAccepte ?? false,
                   isLoadingDecline: isLoadingDecline ?? false,
                   accepteOffer: accepteOffer,

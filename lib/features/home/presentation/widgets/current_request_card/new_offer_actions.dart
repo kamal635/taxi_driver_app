@@ -4,8 +4,8 @@ import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/widgets/app_button.dart';
 
-class ActionRowNewOffer extends StatelessWidget {
-  const ActionRowNewOffer({
+class NewOfferActions extends StatelessWidget {
+  const NewOfferActions({
     required this.isLoadingAccepte,
     required this.isLoadingDecline,
     super.key,

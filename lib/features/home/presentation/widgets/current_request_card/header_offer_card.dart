@@ -9,8 +9,8 @@ import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/utils/price_formatter.dart';
 
-class HomeHeaderOfferCard extends StatefulWidget {
-  const HomeHeaderOfferCard({
+class HeaderOfferCard extends StatefulWidget {
+  const HeaderOfferCard({
     required this.statusOffer,
     required this.totalFare,
     required this.expiresAt,
@@ -24,10 +24,10 @@ class HomeHeaderOfferCard extends StatefulWidget {
   final bool isExpiresAt;
 
   @override
-  State<HomeHeaderOfferCard> createState() => _HomeHeaderOfferCardState();
+  State<HeaderOfferCard> createState() => _HeaderOfferCardState();
 }
 
-class _HomeHeaderOfferCardState extends State<HomeHeaderOfferCard> {
+class _HeaderOfferCardState extends State<HeaderOfferCard> {
   Timer? _timer;
 
   @override
@@ -37,7 +37,7 @@ class _HomeHeaderOfferCardState extends State<HomeHeaderOfferCard> {
   }
 
   @override
-  void didUpdateWidget(covariant HomeHeaderOfferCard oldWidget) {
+  void didUpdateWidget(covariant HeaderOfferCard oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.expiresAt != widget.expiresAt ||

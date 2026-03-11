@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/accepte_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/complete_order_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/current_offer_card.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/complete_offer_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/base_offer_card.dart';
 
 class AcceptedOfferCard extends ConsumerWidget {
   const AcceptedOfferCard({super.key});
@@ -16,7 +16,7 @@ class AcceptedOfferCard extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    return CurrentOfferCard.acceptedOffer(
+    return BaseOfferCard.acceptedOffer(
       statusOffer: acceptedOffer.type,
       totalFare: acceptedOffer.price,
 
@@ -29,8 +29,8 @@ class AcceptedOfferCard extends ConsumerWidget {
 
       actionCompletedOffer: () async {
         await ref
-            .read(completeOrderControllerProvider.notifier)
-            .complete(orderId: acceptedOffer.offerId);
+            .read(completeOfferControllerProvider.notifier)
+            .complete(offerId: acceptedOffer.offerId);
       },
 
       notes: acceptedOffer.notes ?? '',
