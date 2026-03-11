@@ -62,9 +62,6 @@ class TripsContentSection extends StatelessWidget {
                 offer.updatedAt,
               ),
               fareText: 'SYP ${formatOrderPrice(offer.price)}',
-              onTap: () {
-                // Open trip details later.
-              },
             );
           },
         ),

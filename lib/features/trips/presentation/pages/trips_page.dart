@@ -49,6 +49,7 @@ class TripsPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            /// summary card
             TripsSummaryCard(
               title: l10n.tripsSummaryTitle,
               earningsLabel: l10n.tripsSummaryEarningsLabel,
@@ -58,6 +59,7 @@ class TripsPage extends ConsumerWidget {
 
             AppSpacing.h12,
 
+            /// drop down filtter
             TripsFilterDropdown(
               value: result?.period ?? CompletedPeriod.all,
               enabled: !tripsState.isLoading && !tripsState.isRefreshing,
@@ -72,6 +74,7 @@ class TripsPage extends ConsumerWidget {
 
             AppSpacing.h18,
 
+            /// trip title and total trips
             TripsSectionHeader(
               title: l10n.tripsRecentTitle,
               subtitle: l10n.tripsTotalTrips(result?.count ?? 0),
@@ -79,6 +82,7 @@ class TripsPage extends ConsumerWidget {
 
             AppSpacing.h12,
 
+            /// List of trips
             TripsContentSection(
               offers: offers,
               isInitialLoading: isInitialLoading,

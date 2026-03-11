@@ -202,11 +202,6 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
       children: [
         Row(
           children: [
-            IconButton(
-              onPressed: widget.onBellPressed,
-              icon: const Icon(Icons.notifications_none_rounded),
-              color: AppColors.textPrimary,
-            ),
             Expanded(
               child: Text(
                 widget.title,

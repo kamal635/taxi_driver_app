@@ -9,14 +9,12 @@ class CompletedTripCard extends StatelessWidget {
     required this.placeTitle,
     required this.timeText,
     required this.fareText,
-    this.onTap,
     super.key,
   });
 
   final String placeTitle;
   final String timeText;
   final String fareText;
-  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
