@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/location/location_result.dart';
 import 'package:taxi_driver_app/features/availability/domain/entity/driver_status.dart';
 import 'package:taxi_driver_app/features/availability/domain/repositories/location_tracker.dart';
+import 'package:taxi_driver_app/features/availability/presentation/controllers/driver_runtime_controller.dart';
 import 'package:taxi_driver_app/features/availability/presentation/providers/availability_tracking_providers.dart';
 
 final availabilityProvider =
@@ -59,6 +60,7 @@ class AvailabilityController extends Notifier<AvailabilityState> {
     final startUseCase = ref.read(startLocationTrackingUseCaseProvider);
     final tracker = ref.read(locationTrackerProvider);
     final setStatus = ref.read(setDriverStatusUseCaseProvider);
+    final runtime = ref.read(driverRuntimeControllerProvider);
 
     // 1) Ensure GPS + permission are ready, then start tracking.
     final ready = await startUseCase();
@@ -71,13 +73,12 @@ class AvailabilityController extends Notifier<AvailabilityState> {
       return;
     }
 
-    // 2) Tell server: ONLINE (required to receive offers).
+    // 2) Tell server: ONLINE.
     try {
       await setStatus(status: DriverStatus.online);
     } on Exception catch (e, st) {
       debugPrint('setStatus ONLINE failed: $e\n$st');
 
-      // Best-effort: stop tracking, keep offline.
       await _stopTracking();
 
       state = state.copyWith(
@@ -87,24 +88,52 @@ class AvailabilityController extends Notifier<AvailabilityState> {
       return;
     }
 
-    // 3) Subscribe to runtime failures while online.
+    // 3) Start runtime services (socket for now).
+    try {
+      await runtime.startOnlineRuntime();
+    } on Exception catch (e, st) {
+      debugPrint('startOnlineRuntime failed: $e\n$st');
+
+      await _stopTracking();
+
+      try {
+        await setStatus(status: DriverStatus.offline);
+      } on Exception catch (inner, innerSt) {
+        debugPrint('rollback OFFLINE failed: $inner\n$innerSt');
+      }
+
+      state = state.copyWith(
+        isOnline: false,
+        serverError: e,
+      );
+      return;
+    }
+
+    // 4) Listen to runtime location failures.
     _subscribeToFailures(tracker);
 
-    // 4) Mark online.
+    // 5) Mark online.
     state = state.copyWith(isOnline: true);
   }
 
   Future<void> _goOffline() async {
     final setStatus = ref.read(setDriverStatusUseCaseProvider);
+    final runtime = ref.read(driverRuntimeControllerProvider);
 
-    // Update UI immediately
-    //(this will also stop socket streaming via AppTopBar).
+    // Update UI immediately.
     state = state.copyWith(isOnline: false);
+
+    // Stop runtime first.
+    try {
+      await runtime.stopOnlineRuntime();
+    } on Exception catch (e, st) {
+      debugPrint('stopOnlineRuntime failed: $e\n$st');
+    }
 
     // Stop tracking.
     await _stopTracking();
 
-    // Tell server: OFFLINE (best-effort).
+    // Tell server: OFFLINE.
     try {
       await setStatus(status: DriverStatus.offline);
     } on Exception catch (e, st) {
@@ -130,12 +159,18 @@ class AvailabilityController extends Notifier<AvailabilityState> {
     if (_autoStopping) return;
     _autoStopping = true;
 
-    // Update UI immediately.
-    state = state.copyWith(isOnline: false, errorReason: reason);
+    final runtime = ref.read(driverRuntimeControllerProvider);
 
-    // Stop tracking + tell server OFFLINE (best-effort).
+    state = state.copyWith(
+      isOnline: false,
+      errorReason: reason,
+    );
+
     unawaited(
-      _stopTracking().whenComplete(() async {
+      Future.wait([
+        _stopTracking(),
+        runtime.stopOnlineRuntime(),
+      ]).whenComplete(() async {
         try {
           await ref.read(setDriverStatusUseCaseProvider)(
             status: DriverStatus.offline,
