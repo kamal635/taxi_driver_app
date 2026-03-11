@@ -46,7 +46,7 @@ class TripsSummaryCard extends StatelessWidget {
             icon: Icons.payments_rounded,
             label: earningsLabel,
             value: earningsText,
-            valueColor: const Color(0xFF16A34A),
+            valueColor: AppColors.success,
           ),
         ],
       ),
