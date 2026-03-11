@@ -5,6 +5,7 @@ import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomerPhoneNumber extends StatelessWidget {
   const CustomerPhoneNumber({required this.customerPhone, super.key});
@@ -26,7 +27,10 @@ class CustomerPhoneNumber extends StatelessWidget {
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () {},
+            onTap: () async {
+              final uri = Uri.parse('tel:$customerPhone');
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            },
             child: Row(
               children: [
                 Container(
