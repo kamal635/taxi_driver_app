@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/features/availability/data/datasources/driver_location_remote_datasource.dart';
+import 'package:taxi_driver_app/features/availability/data/datasources/remote/driver_location_remote_datasource.dart';
 import 'package:taxi_driver_app/features/availability/domain/repositories/driver_location_repository.dart';
 
 final driverLocationRepositoryProvider = Provider<DriverLocationRepository>(
