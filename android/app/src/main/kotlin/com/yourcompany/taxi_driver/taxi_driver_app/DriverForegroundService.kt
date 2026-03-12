@@ -8,12 +8,38 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 
 class DriverForegroundService : Service() {
+
+    private val serviceHandler = Handler(Looper.getMainLooper())
+
+    private var currentToken: String? = null
+    private var currentDriverId: String? = null
+    private var isLoopRunning = false
+
+    private val backgroundTickRunnable = object : Runnable {
+        override fun run() {
+            if (!isLoopRunning) return
+
+            Log.d(
+                TAG,
+                "background tick -> driverId=$currentDriverId, tokenExists=${!currentToken.isNullOrBlank()}"
+            )
+
+            // Later:
+            // - get current location
+            // - send location to backend
+            // - handle failures / retry logic
+
+            serviceHandler.postDelayed(this, LOCATION_TICK_INTERVAL_MS)
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -29,8 +55,13 @@ class DriverForegroundService : Service() {
 
         return when (action) {
             ACTION_START -> {
-                handleStart(intent)
-                START_STICKY
+                if (intent == null) {
+                    Log.w(TAG, "Start action received with null intent")
+                    START_NOT_STICKY
+                } else {
+                    handleStart(intent)
+                    START_STICKY
+                }
             }
 
             ACTION_STOP -> {
@@ -52,19 +83,20 @@ class DriverForegroundService : Service() {
 
     override fun onDestroy() {
         Log.d(TAG, "Service onDestroy")
+        stopBackgroundLoop()
         isRunning = false
         super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    // Handle service start with incoming runtime data.
+    // Start service runtime with the incoming auth/session data.
     private fun handleStart(intent: Intent) {
-        val token = intent.getStringExtra(EXTRA_TOKEN)
-        val driverId = intent.getStringExtra(EXTRA_DRIVER_ID)
+        currentToken = intent.getStringExtra(EXTRA_TOKEN)
+        currentDriverId = intent.getStringExtra(EXTRA_DRIVER_ID)
 
-        Log.d(TAG, "handleStart -> token exists: ${!token.isNullOrBlank()}")
-        Log.d(TAG, "handleStart -> driverId: $driverId")
+        Log.d(TAG, "handleStart -> token exists: ${!currentToken.isNullOrBlank()}")
+        Log.d(TAG, "handleStart -> driverId: $currentDriverId")
 
         val notification = buildNotification()
 
@@ -83,18 +115,37 @@ class DriverForegroundService : Service() {
 
         Log.d(TAG, "Service moved to foreground")
 
-        // Later:
-        // - use token for authenticated API calls
-        // - start location loop
-        // - start socket runtime
+        startBackgroundLoop()
     }
 
-    // Handle explicit service stop.
+    // Stop the service and clear runtime work.
     private fun handleStop() {
         Log.d(TAG, "handleStop")
 
+        stopBackgroundLoop()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
+    }
+
+    // Start the periodic background tick.
+    private fun startBackgroundLoop() {
+        if (isLoopRunning) {
+            Log.d(TAG, "Background loop already running")
+            return
+        }
+
+        isLoopRunning = true
+        serviceHandler.post(backgroundTickRunnable)
+        Log.d(TAG, "Background loop started")
+    }
+
+    // Stop the periodic background tick.
+    private fun stopBackgroundLoop() {
+        if (!isLoopRunning) return
+
+        isLoopRunning = false
+        serviceHandler.removeCallbacks(backgroundTickRunnable)
+        Log.d(TAG, "Background loop stopped")
     }
 
     private fun buildNotification(): Notification {
@@ -157,6 +208,8 @@ class DriverForegroundService : Service() {
 
         const val EXTRA_TOKEN = "extra_token"
         const val EXTRA_DRIVER_ID = "extra_driver_id"
+
+        private const val LOCATION_TICK_INTERVAL_MS = 15_000L
 
         @Volatile
         var isRunning: Boolean = false
