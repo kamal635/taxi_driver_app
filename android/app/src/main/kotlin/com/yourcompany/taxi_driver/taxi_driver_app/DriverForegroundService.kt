@@ -1,11 +1,13 @@
 package com.yourcompany.taxi_driver.taxi_driver_app
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Handler
@@ -14,6 +16,9 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
 class DriverForegroundService : Service() {
 
@@ -23,19 +28,15 @@ class DriverForegroundService : Service() {
     private var currentDriverId: String? = null
     private var isLoopRunning = false
 
+    private val fusedLocationClient by lazy {
+        LocationServices.getFusedLocationProviderClient(this)
+    }
+
     private val backgroundTickRunnable = object : Runnable {
         override fun run() {
             if (!isLoopRunning) return
 
-            Log.d(
-                TAG,
-                "background tick -> driverId=$currentDriverId, tokenExists=${!currentToken.isNullOrBlank()}"
-            )
-
-            // Later:
-            // - get current location
-            // - send location to backend
-            // - handle failures / retry logic
+            requestCurrentLocation()
 
             serviceHandler.postDelayed(this, LOCATION_TICK_INTERVAL_MS)
         }
@@ -90,7 +91,7 @@ class DriverForegroundService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    // Start service runtime with the incoming auth/session data.
+    // Start service runtime with incoming auth/session data.
     private fun handleStart(intent: Intent) {
         currentToken = intent.getStringExtra(EXTRA_TOKEN)
         currentDriverId = intent.getStringExtra(EXTRA_DRIVER_ID)
@@ -127,7 +128,7 @@ class DriverForegroundService : Service() {
         stopSelf()
     }
 
-    // Start the periodic background tick.
+    // Start the periodic background loop.
     private fun startBackgroundLoop() {
         if (isLoopRunning) {
             Log.d(TAG, "Background loop already running")
@@ -139,13 +140,56 @@ class DriverForegroundService : Service() {
         Log.d(TAG, "Background loop started")
     }
 
-    // Stop the periodic background tick.
+    // Stop the periodic background loop.
     private fun stopBackgroundLoop() {
         if (!isLoopRunning) return
 
         isLoopRunning = false
         serviceHandler.removeCallbacks(backgroundTickRunnable)
         Log.d(TAG, "Background loop stopped")
+    }
+
+    // Fetch current location once and log it.
+    private fun requestCurrentLocation() {
+        if (!hasLocationPermission()) {
+            Log.w(TAG, "Location permission is missing")
+            return
+        }
+
+        fusedLocationClient
+            .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+            .addOnSuccessListener { location ->
+                if (location == null) {
+                    Log.w(TAG, "Current location is null")
+                    return@addOnSuccessListener
+                }
+
+                Log.d(
+                    TAG,
+                    "location tick -> driverId=$currentDriverId, lat=${location.latitude}, lon=${location.longitude}"
+                )
+
+                // Later:
+                // - send location to backend using currentToken
+            }
+            .addOnFailureListener { error ->
+                Log.e(TAG, "Failed to get current location", error)
+            }
+    }
+
+    // Check whether location permission is available.
+    private fun hasLocationPermission(): Boolean {
+        val fineGranted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val coarseGranted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        return fineGranted || coarseGranted
     }
 
     private fun buildNotification(): Notification {
