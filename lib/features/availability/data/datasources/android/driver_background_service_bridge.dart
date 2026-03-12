@@ -32,9 +32,19 @@ class DriverBackgroundServiceBridge {
     return result ?? false;
   }
 
-  // Ask Android to start the foreground service.
-  Future<void> startService() async {
-    await _channel.invokeMethod('startService');
+  // Ask Android to start the foreground service
+  // with the runtime data it needs.
+  Future<void> startService({
+    required String token,
+    required String driverId,
+  }) async {
+    await _channel.invokeMethod(
+      'startService',
+      {
+        'token': token,
+        'driverId': driverId,
+      },
+    );
   }
 
   // Ask Android to stop the foreground service.

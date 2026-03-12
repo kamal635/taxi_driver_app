@@ -25,6 +25,47 @@ class DriverForegroundService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "Service onStartCommand")
 
+        val action = intent?.action
+
+        return when (action) {
+            ACTION_START -> {
+                handleStart(intent)
+                START_STICKY
+            }
+
+            ACTION_STOP -> {
+                handleStop()
+                START_NOT_STICKY
+            }
+
+            else -> {
+                Log.w(TAG, "Unknown service action: $action")
+                START_NOT_STICKY
+            }
+        }
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        Log.d(TAG, "Service onTaskRemoved")
+        super.onTaskRemoved(rootIntent)
+    }
+
+    override fun onDestroy() {
+        Log.d(TAG, "Service onDestroy")
+        isRunning = false
+        super.onDestroy()
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    // Handle service start with incoming runtime data.
+    private fun handleStart(intent: Intent) {
+        val token = intent.getStringExtra(EXTRA_TOKEN)
+        val driverId = intent.getStringExtra(EXTRA_DRIVER_ID)
+
+        Log.d(TAG, "handleStart -> token exists: ${!token.isNullOrBlank()}")
+        Log.d(TAG, "handleStart -> driverId: $driverId")
+
         val notification = buildNotification()
 
         val foregroundType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -43,25 +84,18 @@ class DriverForegroundService : Service() {
         Log.d(TAG, "Service moved to foreground")
 
         // Later:
+        // - use token for authenticated API calls
         // - start location loop
-        // - start socket
-        // - start reconnect logic
-
-        return START_STICKY
+        // - start socket runtime
     }
 
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        Log.d(TAG, "Service onTaskRemoved")
-        super.onTaskRemoved(rootIntent)
-    }
+    // Handle explicit service stop.
+    private fun handleStop() {
+        Log.d(TAG, "handleStop")
 
-    override fun onDestroy() {
-        Log.d(TAG, "Service onDestroy")
-        isRunning = false
-        super.onDestroy()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
     }
-
-    override fun onBind(intent: Intent?): IBinder? = null
 
     private fun buildNotification(): Notification {
         val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
@@ -115,9 +149,14 @@ class DriverForegroundService : Service() {
     companion object {
         private const val TAG = "DriverService"
 
-        // Change channel id if you want a fresh channel behavior.
         const val CHANNEL_ID = "driver_background_service_v2"
         const val NOTIFICATION_ID = 1001
+
+        const val ACTION_START = "driver_background_service.action.START"
+        const val ACTION_STOP = "driver_background_service.action.STOP"
+
+        const val EXTRA_TOKEN = "extra_token"
+        const val EXTRA_DRIVER_ID = "extra_driver_id"
 
         @Volatile
         var isRunning: Boolean = false

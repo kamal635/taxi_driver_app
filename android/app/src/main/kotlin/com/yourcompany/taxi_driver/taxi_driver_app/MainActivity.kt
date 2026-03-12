@@ -40,7 +40,23 @@ class MainActivity : FlutterActivity() {
                 "startService" -> {
                     Log.d("DriverService", "MainActivity -> startService called")
 
-                    val intent = Intent(this, DriverForegroundService::class.java)
+                    val token = call.argument<String>("token")
+                    val driverId = call.argument<String>("driverId")
+
+                    if (token.isNullOrBlank() || driverId.isNullOrBlank()) {
+                        result.error(
+                            "invalid_args",
+                            "Missing token or driverId for service start.",
+                            null
+                        )
+                        return@setMethodCallHandler
+                    }
+
+                    val intent = Intent(this, DriverForegroundService::class.java).apply {
+                        action = DriverForegroundService.ACTION_START
+                        putExtra(DriverForegroundService.EXTRA_TOKEN, token)
+                        putExtra(DriverForegroundService.EXTRA_DRIVER_ID, driverId)
+                    }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         startForegroundService(intent)
@@ -54,8 +70,15 @@ class MainActivity : FlutterActivity() {
                 "stopService" -> {
                     Log.d("DriverService", "MainActivity -> stopService called")
 
-                    val intent = Intent(this, DriverForegroundService::class.java)
-                    stopService(intent)
+                    val intent = Intent(this, DriverForegroundService::class.java).apply {
+                        action = DriverForegroundService.ACTION_STOP
+                    }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        startForegroundService(intent)
+                    } else {
+                        startService(intent)
+                    }
 
                     result.success(true)
                 }

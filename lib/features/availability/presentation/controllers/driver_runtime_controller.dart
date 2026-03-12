@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 
@@ -14,12 +15,27 @@ class DriverRuntimeController {
 
   // Start the full online runtime.
   // Current flow:
-  // 1) Request notification permission
-  // 2) Start Android foreground service
-  // 3) Verify that the service is running
-  // 4) Start socket offer listening
+  // 1) Read auth session data
+  // 2) Request notification permission
+  // 3) Start Android foreground service with runtime extras
+  // 4) Verify that the service is running
+  // 5) Start socket offer listening
   Future<void> startOnlineRuntime() async {
     final bridge = ref.read(driverBackgroundServiceBridgeProvider);
+    final session = ref.read(authSessionProvider);
+
+    final token = session.token;
+    final driverId = session.driverId;
+
+    // Runtime start requires valid auth data.
+    if (token == null ||
+        token.isEmpty ||
+        driverId == null ||
+        driverId.isEmpty) {
+      throw StateError(
+        'Auth session is not ready for background driver mode.',
+      );
+    }
 
     // Notification permission is required on Android 13+.
     final permissionGranted = await bridge.ensureNotificationPermission();
@@ -30,8 +46,12 @@ class DriverRuntimeController {
       );
     }
 
-    // Start the native Android foreground service.
-    await bridge.startService();
+    // Start the native Android foreground service
+    // and pass the runtime data it needs.
+    await bridge.startService(
+      token: token,
+      driverId: driverId,
+    );
 
     // Verify that the service is actually running.
     final isRunning = await bridge.isServiceRunning();
