@@ -40,7 +40,8 @@ class DriverForegroundService : Service() {
     private var currentToken: String? = null
     private var currentDriverId: String? = null
     private var isLoopRunning = false
-
+    
+    private val isStoppingService = AtomicBoolean(false)
     private val isSendingLocation = AtomicBoolean(false)
     private val consecutiveSendFailures = AtomicInteger(0)
     private val nextAllowedSendAtMs = AtomicLong(0L)
@@ -103,23 +104,28 @@ class DriverForegroundService : Service() {
         super.onTaskRemoved(rootIntent)
     }
 
-    override fun onDestroy() {
-        Log.d(TAG, "Service onDestroy")
-        stopBackgroundLoop()
-        isSendingLocation.set(false)
-        consecutiveSendFailures.set(0)
-        nextAllowedSendAtMs.set(0L)
-        networkExecutor.shutdownNow()
-        isRunning = false
-        super.onDestroy()
-        
-    }
+   override fun onDestroy() {
+    Log.d(TAG, "Service onDestroy")
+    stopBackgroundLoop()
+    isSendingLocation.set(false)
+    isStoppingService.set(false)
+    consecutiveSendFailures.set(0)
+    nextAllowedSendAtMs.set(0L)
+    networkExecutor.shutdownNow()
+    isRunning = false
+    super.onDestroy()
+}
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun handleStart(intent: Intent) {
         currentToken = intent.getStringExtra(EXTRA_TOKEN)
         currentDriverId = intent.getStringExtra(EXTRA_DRIVER_ID)
+
+        isSendingLocation.set(false)
+        isStoppingService.set(false)
+        consecutiveSendFailures.set(0)
+        nextAllowedSendAtMs.set(0L)
 
         Log.d(TAG, "handleStart -> token exists: ${!currentToken.isNullOrBlank()}")
         Log.d(TAG, "handleStart -> driverId: $currentDriverId")
@@ -145,12 +151,34 @@ class DriverForegroundService : Service() {
     }
 
     private fun handleStop() {
+        if (!isStoppingService.compareAndSet(false, true)) {
+            Log.d(TAG, "handleStop ignored: service is already stopping")
+            return
+        }
+
         Log.d(TAG, "handleStop")
 
         stopBackgroundLoop()
+
+        currentToken = null
+        currentDriverId = null
+        isSendingLocation.set(false)
+        consecutiveSendFailures.set(0)
+        nextAllowedSendAtMs.set(0L)
+
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
-    }
+        }
+
+
+    private fun stopServiceDueToUnauthorized() {
+    Log.e(TAG, "Unauthorized token detected. Stopping driver background service.")
+
+    serviceHandler.post {
+        handleStop()
+            }
+        }
+
 
     private fun startBackgroundLoop() {
         if (isLoopRunning) {
@@ -252,25 +280,25 @@ class DriverForegroundService : Service() {
                 )
             }
                 private fun sendLocationToBackend(
-    token: String,
-    driverId: String,
-    latitude: Double,
-    longitude: Double
-) {
-    networkExecutor.execute {
-        var connection: HttpURLConnection? = null
+                        token: String,
+                        driverId: String,
+                        latitude: Double,
+                        longitude: Double
+            ) {
+                    networkExecutor.execute {
+                    var connection: HttpURLConnection? = null
 
-        try {
-            val url = URL(LOCATION_UPDATE_URL)
-            connection = (url.openConnection() as HttpURLConnection).apply {
-                requestMethod = "PUT"
-                connectTimeout = 15_000
-                readTimeout = 15_000
-                doInput = true
-                doOutput = true
-                setRequestProperty("Content-Type", "application/json")
-                setRequestProperty("Accept", "application/json")
-                setRequestProperty("Authorization", "Bearer $token")
+             try {
+                    val url = URL(LOCATION_UPDATE_URL)
+                    connection = (url.openConnection() as HttpURLConnection).apply {
+                    requestMethod = "PUT"
+                    connectTimeout = 15_000
+                    readTimeout = 15_000
+                    doInput = true
+                    doOutput = true
+                      setRequestProperty("Content-Type", "application/json")
+                      setRequestProperty("Accept", "application/json")
+                      setRequestProperty("Authorization", "Bearer $token")
             }
 
             val body = JSONObject().apply {
@@ -283,30 +311,42 @@ class DriverForegroundService : Service() {
                 writer.flush()
             }
 
-            val responseCode = connection.responseCode
+                            val responseCode = connection.responseCode
 
-            if (responseCode in 200..299) {
-                consecutiveSendFailures.set(0)
-                nextAllowedSendAtMs.set(0L)
+                    if (responseCode in 200..299) {
+                        consecutiveSendFailures.set(0)
+                        nextAllowedSendAtMs.set(0L)
 
-                Log.d(
-                    TAG,
-                    "Location sent successfully -> code=$responseCode, driverId=$driverId, lat=$latitude, lon=$longitude"
-                )
-            } else {
-                val errorBody = try {
-                    connection.errorStream?.bufferedReader()?.use { it.readText() }
-                } catch (_: Exception) {
-                    null
-                }
+                        Log.d(
+                            TAG,
+                            "Location sent successfully -> code=$responseCode, driverId=$driverId, lat=$latitude, lon=$longitude"
+                        )
+                    } else {
+                        val errorBody = try {
+                            connection.errorStream?.bufferedReader()?.use { it.readText() }
+                        } catch (_: Exception) {
+                            null
+                        }
 
-                scheduleNextRetry()
+                        if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                            Log.e(
+                                TAG,
+                                "Location send unauthorized -> code=$responseCode, body=$errorBody"
+                            )
 
-                Log.e(
-                    TAG,
-                    "Location send failed -> code=$responseCode, body=$errorBody"
-                )
-            }
+                            consecutiveSendFailures.set(0)
+                            nextAllowedSendAtMs.set(0L)
+
+                            stopServiceDueToUnauthorized()
+                        } else {
+                            scheduleNextRetry()
+
+                            Log.e(
+                                TAG,
+                                "Location send failed -> code=$responseCode, body=$errorBody"
+                            )
+                        }
+                    }
         } catch (error: Exception) {
             scheduleNextRetry()
             Log.e(TAG, "Failed to send location to backend", error)

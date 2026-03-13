@@ -71,18 +71,19 @@ class MainActivity : FlutterActivity() {
                 "stopService" -> {
                     Log.d("DriverService", "MainActivity -> stopService called")
 
+                    if (!DriverForegroundService.isRunning) {
+                        Log.d("DriverService", "stopService ignored: service is not running")
+                        result.success(true)
+                        return@setMethodCallHandler
+                    }
+
                     val intent = Intent(this, DriverForegroundService::class.java).apply {
                         action = DriverForegroundService.ACTION_STOP
                     }
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        startForegroundService(intent)
-                    } else {
-                        startService(intent)
-                    }
-
+                    startService(intent)
                     result.success(true)
-                }
+                    }
 
                 "isServiceRunning" -> {
                     result.success(DriverForegroundService.isRunning)
