@@ -13,13 +13,26 @@ final driverBackgroundServiceBridgeProvider =
       return bridge;
     });
 
-// Represents an event coming from the native background service.
+// Represents a stop event coming from the native background service.
 final class DriverBackgroundServiceEvent {
   const DriverBackgroundServiceEvent({
     required this.reason,
   });
 
   final String reason;
+}
+
+// Represents an offer event coming from the native background service.
+final class DriverBackgroundOfferEvent {
+  const DriverBackgroundOfferEvent({
+    required this.offerId,
+    required this.title,
+    required this.pickupAddress,
+  });
+
+  final String offerId;
+  final String title;
+  final String pickupAddress;
 }
 
 class DriverBackgroundServiceBridge {
@@ -38,9 +51,16 @@ class DriverBackgroundServiceBridge {
   final StreamController<DriverBackgroundServiceEvent> _eventsController =
       StreamController<DriverBackgroundServiceEvent>.broadcast();
 
+  final StreamController<DriverBackgroundOfferEvent> _offerEventsController =
+      StreamController<DriverBackgroundOfferEvent>.broadcast();
+
   // Public stream of native service events.
   Stream<DriverBackgroundServiceEvent> get serviceEvents =>
       _eventsController.stream;
+
+  // Public stream of native offer events.
+  Stream<DriverBackgroundOfferEvent> get offerEvents =>
+      _offerEventsController.stream;
 
   // ---------------------------------------------------------------------------
   // Native callbacks
@@ -59,6 +79,24 @@ class DriverBackgroundServiceBridge {
         _eventsController.add(
           DriverBackgroundServiceEvent(reason: reason),
         );
+
+      case 'offerReceived':
+        final args = Map<Object?, Object?>.from(
+          call.arguments as Map? ?? const {},
+        );
+
+        final offerId = args['offerId']?.toString() ?? 'unknown';
+        final title = args['title']?.toString() ?? 'Untitled offer';
+        final pickupAddress =
+            args['pickupAddress']?.toString() ?? 'Unknown pickup';
+
+        _offerEventsController.add(
+          DriverBackgroundOfferEvent(
+            offerId: offerId,
+            title: title,
+            pickupAddress: pickupAddress,
+          ),
+        );
     }
   }
 
@@ -66,7 +104,6 @@ class DriverBackgroundServiceBridge {
   // Permissions
   // ---------------------------------------------------------------------------
 
-  // Request notification permission when needed.
   Future<bool> ensureNotificationPermission() async {
     final result = await _channel.invokeMethod<bool>(
       'ensureNotificationPermission',
@@ -74,7 +111,6 @@ class DriverBackgroundServiceBridge {
     return result ?? false;
   }
 
-  // Check whether notifications are enabled for the app.
   Future<bool> areNotificationsEnabled() async {
     final result = await _channel.invokeMethod<bool>(
       'areNotificationsEnabled',
@@ -86,7 +122,6 @@ class DriverBackgroundServiceBridge {
   // Service control
   // ---------------------------------------------------------------------------
 
-  // Start the native foreground service with runtime data.
   Future<void> startService({
     required String token,
     required String driverId,
@@ -100,24 +135,27 @@ class DriverBackgroundServiceBridge {
     );
   }
 
-  // Stop the native foreground service.
   Future<void> stopService() async {
     await _channel.invokeMethod('stopService');
   }
 
-  // Check whether the native service is currently running.
   Future<bool> isServiceRunning() async {
     final result = await _channel.invokeMethod<bool>('isServiceRunning');
     return result ?? false;
+  }
+
+  // Temporary test hook for native-to-Flutter offer pipeline.
+  Future<void> emitTestOffer() async {
+    await _channel.invokeMethod('emitTestOffer');
   }
 
   // ---------------------------------------------------------------------------
   // Cleanup
   // ---------------------------------------------------------------------------
 
-  // Release native callbacks and close the event stream.
   void dispose() {
     _channel.setMethodCallHandler(null);
     unawaited(_eventsController.close());
+    unawaited(_offerEventsController.close());
   }
 }

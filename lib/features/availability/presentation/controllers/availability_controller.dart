@@ -18,6 +18,7 @@ final availabilityProvider =
 class AvailabilityController extends Notifier<AvailabilityState> {
   StreamSubscription<LocationFailureReason>? _failuresSub;
   StreamSubscription<DriverBackgroundServiceEvent>? _serviceEventsSub;
+  StreamSubscription<DriverBackgroundOfferEvent>? _offerEventsSub;
 
   bool _autoStopping = false;
 
@@ -33,15 +34,20 @@ class AvailabilityController extends Notifier<AvailabilityState> {
       _handleNativeServiceEvent,
     );
 
+    _offerEventsSub ??= bridge.offerEvents.listen(
+      _handleNativeOfferEvent,
+    );
+
     ref.onDispose(() {
       unawaited(_failuresSub?.cancel());
       unawaited(_serviceEventsSub?.cancel());
+      unawaited(_offerEventsSub?.cancel());
 
       _failuresSub = null;
       _serviceEventsSub = null;
+      _offerEventsSub = null;
     });
 
-    // Restore the last requested online state.
     unawaited(Future.microtask(_restoreStoredStatus));
 
     return const AvailabilityState(
@@ -124,6 +130,14 @@ class AvailabilityController extends Notifier<AvailabilityState> {
     );
   }
 
+  void _handleNativeOfferEvent(DriverBackgroundOfferEvent event) {
+    debugPrint(
+      'Native background offer received -> '
+      'offerId=${event.offerId}, '
+      'title=${event.title}, '
+      'pickup=${event.pickupAddress}',
+    );
+  }
   // ---------------------------------------------------------------------------
   // Online flow
   // ---------------------------------------------------------------------------

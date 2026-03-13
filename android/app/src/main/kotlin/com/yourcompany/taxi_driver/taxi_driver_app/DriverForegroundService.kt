@@ -40,6 +40,7 @@ class DriverForegroundService : Service() {
     private var currentToken: String? = null
     private var currentDriverId: String? = null
     private var isLoopRunning = false
+    private var hasEmittedStartupTestOffer = false
     
     private val isStoppingService = AtomicBoolean(false)
     private val isSendingLocation = AtomicBoolean(false)
@@ -113,6 +114,7 @@ class DriverForegroundService : Service() {
     nextAllowedSendAtMs.set(0L)
     networkExecutor.shutdownNow()
     isRunning = false
+    hasEmittedStartupTestOffer = false
     super.onDestroy()
 }
 
@@ -126,6 +128,7 @@ class DriverForegroundService : Service() {
         isStoppingService.set(false)
         consecutiveSendFailures.set(0)
         nextAllowedSendAtMs.set(0L)
+        hasEmittedStartupTestOffer = false
 
         Log.d(TAG, "handleStart -> token exists: ${!currentToken.isNullOrBlank()}")
         Log.d(TAG, "handleStart -> driverId: $currentDriverId")
@@ -148,6 +151,11 @@ class DriverForegroundService : Service() {
         Log.d(TAG, "Service moved to foreground")
 
         startBackgroundLoop()
+
+        serviceHandler.postDelayed(
+    { emitStartupTestOfferOnce() },
+    3000L
+)
     }
 
     private fun handleStop() {
@@ -162,15 +170,29 @@ class DriverForegroundService : Service() {
 
         currentToken = null
         currentDriverId = null
+        hasEmittedStartupTestOffer = false
         isSendingLocation.set(false)
         consecutiveSendFailures.set(0)
         nextAllowedSendAtMs.set(0L)
+        
 
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
         }
 
+private fun emitStartupTestOfferOnce() {
+    if (hasEmittedStartupTestOffer) return
 
+    hasEmittedStartupTestOffer = true
+
+    Log.d(TAG, "Emitting startup test offer from DriverForegroundService")
+
+    MainActivity.notifyFlutterOfferReceived(
+        offerId = "service-test-offer-001",
+        title = "Service test background offer",
+        pickupAddress = "Downtown Pickup Point"
+    )
+}
     private fun stopServiceDueToUnauthorized() {
     Log.e(TAG, "Unauthorized token detected. Stopping driver background service.")
 
