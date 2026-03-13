@@ -1,5 +1,10 @@
 package com.yourcompany.taxi_driver.taxi_driver_app
 
+import android.os.SystemClock
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
+import kotlin.math.min
+import java.util.concurrent.atomic.AtomicBoolean
 import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
@@ -19,14 +24,30 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import org.json.JSONObject
+import java.io.BufferedWriter
+import java.io.OutputStreamWriter
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class DriverForegroundService : Service() {
 
     private val serviceHandler = Handler(Looper.getMainLooper())
+    
 
     private var currentToken: String? = null
     private var currentDriverId: String? = null
     private var isLoopRunning = false
+
+    private val isSendingLocation = AtomicBoolean(false)
+    private val consecutiveSendFailures = AtomicInteger(0)
+    private val nextAllowedSendAtMs = AtomicLong(0L)
+    
+    private val networkExecutor: ExecutorService by lazy {
+        Executors.newSingleThreadExecutor()
+    }
 
     private val fusedLocationClient by lazy {
         LocationServices.getFusedLocationProviderClient(this)
@@ -85,13 +106,17 @@ class DriverForegroundService : Service() {
     override fun onDestroy() {
         Log.d(TAG, "Service onDestroy")
         stopBackgroundLoop()
+        isSendingLocation.set(false)
+        consecutiveSendFailures.set(0)
+        nextAllowedSendAtMs.set(0L)
+        networkExecutor.shutdownNow()
         isRunning = false
         super.onDestroy()
+        
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    // Start service runtime with incoming auth/session data.
     private fun handleStart(intent: Intent) {
         currentToken = intent.getStringExtra(EXTRA_TOKEN)
         currentDriverId = intent.getStringExtra(EXTRA_DRIVER_ID)
@@ -119,7 +144,6 @@ class DriverForegroundService : Service() {
         startBackgroundLoop()
     }
 
-    // Stop the service and clear runtime work.
     private fun handleStop() {
         Log.d(TAG, "handleStop")
 
@@ -128,7 +152,6 @@ class DriverForegroundService : Service() {
         stopSelf()
     }
 
-    // Start the periodic background loop.
     private fun startBackgroundLoop() {
         if (isLoopRunning) {
             Log.d(TAG, "Background loop already running")
@@ -140,7 +163,6 @@ class DriverForegroundService : Service() {
         Log.d(TAG, "Background loop started")
     }
 
-    // Stop the periodic background loop.
     private fun stopBackgroundLoop() {
         if (!isLoopRunning) return
 
@@ -149,7 +171,6 @@ class DriverForegroundService : Service() {
         Log.d(TAG, "Background loop stopped")
     }
 
-    // Fetch current location once and log it.
     private fun requestCurrentLocation() {
         if (!hasLocationPermission()) {
             Log.w(TAG, "Location permission is missing")
@@ -158,26 +179,144 @@ class DriverForegroundService : Service() {
 
         fusedLocationClient
             .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
-            .addOnSuccessListener { location ->
-                if (location == null) {
-                    Log.w(TAG, "Current location is null")
-                    return@addOnSuccessListener
+                        .addOnSuccessListener { location ->
+                    if (location == null) {
+                        Log.w(TAG, "Current location is null")
+                        return@addOnSuccessListener
+                    }
+
+                    val token = currentToken
+                    val driverId = currentDriverId
+
+                    Log.d(
+                        TAG,
+                        "location tick -> driverId=$driverId, lat=${location.latitude}, lon=${location.longitude}"
+                    )
+
+                    if (token.isNullOrBlank() || driverId.isNullOrBlank()) {
+                        Log.w(TAG, "Skipping location send: token or driverId is missing")
+                        return@addOnSuccessListener
+                    }
+
+                    val now = SystemClock.elapsedRealtime()
+                    val nextAllowedAt = nextAllowedSendAtMs.get()
+
+                    if (now < nextAllowedAt) {
+                        val remainingMs = nextAllowedAt - now
+                        Log.d(
+                            TAG,
+                            "Skipping location send: backoff active, remainingMs=$remainingMs"
+                        )
+                        return@addOnSuccessListener
+                    }
+
+                    if (!isSendingLocation.compareAndSet(false, true)) {
+                        Log.d(TAG, "Skipping location send: previous request is still running")
+                        return@addOnSuccessListener
+                    }
+
+                    sendLocationToBackend(
+                        token = token,
+                        driverId = driverId,
+                        latitude = location.latitude,
+                        longitude = location.longitude
+                    )
                 }
-
-                Log.d(
-                    TAG,
-                    "location tick -> driverId=$currentDriverId, lat=${location.latitude}, lon=${location.longitude}"
-                )
-
-                // Later:
-                // - send location to backend using currentToken
-            }
             .addOnFailureListener { error ->
                 Log.e(TAG, "Failed to get current location", error)
             }
     }
+            private fun scheduleNextRetry() {
+                val failureCount = consecutiveSendFailures.incrementAndGet()
+                val backoffMs = calculateBackoffMs(failureCount)
+                val nextAllowedAt = SystemClock.elapsedRealtime() + backoffMs
 
-    // Check whether location permission is available.
+                nextAllowedSendAtMs.set(nextAllowedAt)
+
+                Log.w(
+                    TAG,
+                    "Location retry scheduled -> failures=$failureCount, backoffMs=$backoffMs"
+                )
+            }
+
+            private fun calculateBackoffMs(failureCount: Int): Long {
+                val multiplier = when (failureCount) {
+                    1 -> 1L
+                    2 -> 2L
+                    else -> 4L
+                }
+
+                return min(
+                    INITIAL_RETRY_BACKOFF_MS * multiplier,
+                    MAX_RETRY_BACKOFF_MS
+                )
+            }
+                private fun sendLocationToBackend(
+    token: String,
+    driverId: String,
+    latitude: Double,
+    longitude: Double
+) {
+    networkExecutor.execute {
+        var connection: HttpURLConnection? = null
+
+        try {
+            val url = URL(LOCATION_UPDATE_URL)
+            connection = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "PUT"
+                connectTimeout = 15_000
+                readTimeout = 15_000
+                doInput = true
+                doOutput = true
+                setRequestProperty("Content-Type", "application/json")
+                setRequestProperty("Accept", "application/json")
+                setRequestProperty("Authorization", "Bearer $token")
+            }
+
+            val body = JSONObject().apply {
+                put("lat", latitude)
+                put("lon", longitude)
+            }
+
+            BufferedWriter(OutputStreamWriter(connection.outputStream)).use { writer ->
+                writer.write(body.toString())
+                writer.flush()
+            }
+
+            val responseCode = connection.responseCode
+
+            if (responseCode in 200..299) {
+                consecutiveSendFailures.set(0)
+                nextAllowedSendAtMs.set(0L)
+
+                Log.d(
+                    TAG,
+                    "Location sent successfully -> code=$responseCode, driverId=$driverId, lat=$latitude, lon=$longitude"
+                )
+            } else {
+                val errorBody = try {
+                    connection.errorStream?.bufferedReader()?.use { it.readText() }
+                } catch (_: Exception) {
+                    null
+                }
+
+                scheduleNextRetry()
+
+                Log.e(
+                    TAG,
+                    "Location send failed -> code=$responseCode, body=$errorBody"
+                )
+            }
+        } catch (error: Exception) {
+            scheduleNextRetry()
+            Log.e(TAG, "Failed to send location to backend", error)
+        } finally {
+            connection?.disconnect()
+            isSendingLocation.set(false)
+        }
+    }
+}
+
     private fun hasLocationPermission(): Boolean {
         val fineGranted = ContextCompat.checkSelfPermission(
             this,
@@ -254,6 +393,13 @@ class DriverForegroundService : Service() {
         const val EXTRA_DRIVER_ID = "extra_driver_id"
 
         private const val LOCATION_TICK_INTERVAL_MS = 15_000L
+
+        
+        private const val LOCATION_UPDATE_URL =
+            "http://10.0.2.2:3000/api/admin/drivers/location"
+
+        private const val INITIAL_RETRY_BACKOFF_MS = 15_000L
+        private const val MAX_RETRY_BACKOFF_MS = 60_000L
 
         @Volatile
         var isRunning: Boolean = false
