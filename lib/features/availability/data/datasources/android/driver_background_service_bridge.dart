@@ -1,22 +1,72 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Provides access to the native Android background service bridge.
 final driverBackgroundServiceBridgeProvider =
-    Provider<DriverBackgroundServiceBridge>(
-      (ref) => const DriverBackgroundServiceBridge(),
-    );
+    Provider<DriverBackgroundServiceBridge>((ref) {
+      final bridge = DriverBackgroundServiceBridge();
+
+      ref.onDispose(bridge.dispose);
+
+      return bridge;
+    });
+
+// Represents an event coming from the native background service.
+final class DriverBackgroundServiceEvent {
+  const DriverBackgroundServiceEvent({
+    required this.reason,
+  });
+
+  final String reason;
+}
 
 class DriverBackgroundServiceBridge {
-  const DriverBackgroundServiceBridge();
+  DriverBackgroundServiceBridge() {
+    _channel.setMethodCallHandler(_handleNativeCall);
+  }
 
-  // Method channel used to communicate with native Android code.
+  // ---------------------------------------------------------------------------
+  // Channel
+  // ---------------------------------------------------------------------------
+
   static const MethodChannel _channel = MethodChannel(
     'driver_background_service',
   );
 
-  // Request notification permission.
-  // Needed on Android 13+ before starting the foreground service.
+  final StreamController<DriverBackgroundServiceEvent> _eventsController =
+      StreamController<DriverBackgroundServiceEvent>.broadcast();
+
+  // Public stream of native service events.
+  Stream<DriverBackgroundServiceEvent> get serviceEvents =>
+      _eventsController.stream;
+
+  // ---------------------------------------------------------------------------
+  // Native callbacks
+  // ---------------------------------------------------------------------------
+
+  // Handle incoming calls from native Android code.
+  Future<void> _handleNativeCall(MethodCall call) async {
+    switch (call.method) {
+      case 'serviceStopped':
+        final args = Map<Object?, Object?>.from(
+          call.arguments as Map? ?? const {},
+        );
+
+        final reason = args['reason']?.toString() ?? 'unknown';
+
+        _eventsController.add(
+          DriverBackgroundServiceEvent(reason: reason),
+        );
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Permissions
+  // ---------------------------------------------------------------------------
+
+  // Request notification permission when needed.
   Future<bool> ensureNotificationPermission() async {
     final result = await _channel.invokeMethod<bool>(
       'ensureNotificationPermission',
@@ -32,8 +82,11 @@ class DriverBackgroundServiceBridge {
     return result ?? false;
   }
 
-  // Ask Android to start the foreground service
-  // with the runtime data it needs.
+  // ---------------------------------------------------------------------------
+  // Service control
+  // ---------------------------------------------------------------------------
+
+  // Start the native foreground service with runtime data.
   Future<void> startService({
     required String token,
     required String driverId,
@@ -47,14 +100,24 @@ class DriverBackgroundServiceBridge {
     );
   }
 
-  // Ask Android to stop the foreground service.
+  // Stop the native foreground service.
   Future<void> stopService() async {
     await _channel.invokeMethod('stopService');
   }
 
-  // Check whether the native foreground service is currently running.
+  // Check whether the native service is currently running.
   Future<bool> isServiceRunning() async {
     final result = await _channel.invokeMethod<bool>('isServiceRunning');
     return result ?? false;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Cleanup
+  // ---------------------------------------------------------------------------
+
+  // Release native callbacks and close the event stream.
+  void dispose() {
+    _channel.setMethodCallHandler(null);
+    unawaited(_eventsController.close());
   }
 }

@@ -1,6 +1,7 @@
 package com.yourcompany.taxi_driver.taxi_driver_app
 
-
+import android.os.Handler
+import android.os.Looper
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -23,10 +24,14 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
-        MethodChannel(
-            flutterEngine.dartExecutor.binaryMessenger,
-            channelName
-        ).setMethodCallHandler { call, result ->
+        val channel = MethodChannel(
+                    flutterEngine.dartExecutor.binaryMessenger,
+                    channelName
+                )
+
+            serviceMethodChannel = channel
+
+        channel.setMethodCallHandler { call, result ->
             when (call.method) {
                 "ensureNotificationPermission" -> {
                     ensureNotificationPermission(result)
@@ -147,4 +152,18 @@ class MainActivity : FlutterActivity() {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
+    companion object {
+    private var serviceMethodChannel: MethodChannel? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    fun notifyFlutterServiceStopped(reason: String) {
+        mainHandler.post {
+            serviceMethodChannel?.invokeMethod(
+                "serviceStopped",
+                mapOf("reason" to reason)
+            )
+        }
+    }
+}
 }

@@ -13,13 +13,17 @@ class DriverRuntimeController {
 
   final Ref ref;
 
+  // ---------------------------------------------------------------------------
+  // Start
+  // ---------------------------------------------------------------------------
+
   // Start the full online runtime.
-  // Current flow:
-  // 1) Read auth session data
+  // Flow:
+  // 1) Read auth session
   // 2) Request notification permission
-  // 3) Start Android foreground service with runtime extras
-  // 4) Verify that the service is running
-  // 5) Start socket offer listening
+  // 3) Start native foreground service
+  // 4) Verify service state
+  // 5) Start offer socket runtime
   Future<void> startOnlineRuntime() async {
     final bridge = ref.read(driverBackgroundServiceBridgeProvider);
     final session = ref.read(authSessionProvider);
@@ -46,8 +50,7 @@ class DriverRuntimeController {
       );
     }
 
-    // Start the native Android foreground service
-    // and pass the runtime data it needs.
+    // Start the native foreground service with runtime data.
     await bridge.startService(
       token: token,
       driverId: driverId,
@@ -66,10 +69,14 @@ class DriverRuntimeController {
     await ref.read(newOfferControllerProvider.notifier).start();
   }
 
+  // ---------------------------------------------------------------------------
+  // Stop
+  // ---------------------------------------------------------------------------
+
   // Stop the full online runtime.
-  // Current flow:
-  // 1) Stop socket offer listening
-  // 2) Stop Android foreground service
+  // Flow:
+  // 1) Stop offer socket runtime
+  // 2) Stop native foreground service
   Future<void> stopOnlineRuntime() async {
     // Stop socket-based runtime first.
     await ref.read(newOfferControllerProvider.notifier).stop();

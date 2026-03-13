@@ -174,10 +174,12 @@ class DriverForegroundService : Service() {
     private fun stopServiceDueToUnauthorized() {
     Log.e(TAG, "Unauthorized token detected. Stopping driver background service.")
 
+    MainActivity.notifyFlutterServiceStopped("unauthorized")
+
     serviceHandler.post {
         handleStop()
-            }
-        }
+    }
+}
 
 
     private fun startBackgroundLoop() {
