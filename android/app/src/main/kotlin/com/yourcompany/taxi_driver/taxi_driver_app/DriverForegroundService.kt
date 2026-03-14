@@ -40,12 +40,13 @@ class DriverForegroundService : Service() {
     private var currentToken: String? = null
     private var currentDriverId: String? = null
     private var isLoopRunning = false
-    private var hasEmittedStartupTestOffer = false
+  
     
     private val isStoppingService = AtomicBoolean(false)
     private val isSendingLocation = AtomicBoolean(false)
     private val consecutiveSendFailures = AtomicInteger(0)
     private val nextAllowedSendAtMs = AtomicLong(0L)
+    private val offerSocketManager = DriverOfferSocketManager()
     
     private val networkExecutor: ExecutorService by lazy {
         Executors.newSingleThreadExecutor()
@@ -108,13 +109,13 @@ class DriverForegroundService : Service() {
    override fun onDestroy() {
     Log.d(TAG, "Service onDestroy")
     stopBackgroundLoop()
+    offerSocketManager.stop()
     isSendingLocation.set(false)
     isStoppingService.set(false)
     consecutiveSendFailures.set(0)
     nextAllowedSendAtMs.set(0L)
     networkExecutor.shutdownNow()
     isRunning = false
-    hasEmittedStartupTestOffer = false
     super.onDestroy()
 }
 
@@ -128,7 +129,7 @@ class DriverForegroundService : Service() {
         isStoppingService.set(false)
         consecutiveSendFailures.set(0)
         nextAllowedSendAtMs.set(0L)
-        hasEmittedStartupTestOffer = false
+      
 
         Log.d(TAG, "handleStart -> token exists: ${!currentToken.isNullOrBlank()}")
         Log.d(TAG, "handleStart -> driverId: $currentDriverId")
@@ -152,10 +153,14 @@ class DriverForegroundService : Service() {
 
         startBackgroundLoop()
 
-        serviceHandler.postDelayed(
-    { emitStartupTestOfferOnce() },
-    3000L
-)
+        if (!currentToken.isNullOrBlank() && !currentDriverId.isNullOrBlank()) {
+    offerSocketManager.start(
+        token = currentToken!!,
+        driverId = currentDriverId!!,
+    )
+}
+
+ 
     }
 
     private fun handleStop() {
@@ -167,10 +172,10 @@ class DriverForegroundService : Service() {
         Log.d(TAG, "handleStop")
 
         stopBackgroundLoop()
+        offerSocketManager.stop()
 
         currentToken = null
         currentDriverId = null
-        hasEmittedStartupTestOffer = false
         isSendingLocation.set(false)
         consecutiveSendFailures.set(0)
         nextAllowedSendAtMs.set(0L)
@@ -180,19 +185,7 @@ class DriverForegroundService : Service() {
         stopSelf()
         }
 
-private fun emitStartupTestOfferOnce() {
-    if (hasEmittedStartupTestOffer) return
 
-    hasEmittedStartupTestOffer = true
-
-    Log.d(TAG, "Emitting startup test offer from DriverForegroundService")
-
-    MainActivity.notifyFlutterOfferReceived(
-        offerId = "service-test-offer-001",
-        title = "Service test background offer",
-        pickupAddress = "Downtown Pickup Point"
-    )
-}
     private fun stopServiceDueToUnauthorized() {
     Log.e(TAG, "Unauthorized token detected. Stopping driver background service.")
 

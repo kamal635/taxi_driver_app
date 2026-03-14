@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 
 // Provides the runtime coordinator for driver online mode.
 final driverRuntimeControllerProvider = Provider<DriverRuntimeController>(
@@ -23,7 +22,6 @@ class DriverRuntimeController {
   // 2) Request notification permission
   // 3) Start native foreground service
   // 4) Verify service state
-  // 5) Start offer socket runtime
   Future<void> startOnlineRuntime() async {
     final bridge = ref.read(driverBackgroundServiceBridgeProvider);
     final session = ref.read(authSessionProvider);
@@ -31,7 +29,6 @@ class DriverRuntimeController {
     final token = session.token;
     final driverId = session.driverId;
 
-    // Runtime start requires valid auth data.
     if (token == null ||
         token.isEmpty ||
         driverId == null ||
@@ -41,7 +38,6 @@ class DriverRuntimeController {
       );
     }
 
-    // Notification permission is required on Android 13+.
     final permissionGranted = await bridge.ensureNotificationPermission();
 
     if (!permissionGranted) {
@@ -50,37 +46,44 @@ class DriverRuntimeController {
       );
     }
 
-    // Start the native foreground service with runtime data.
     await bridge.startService(
       token: token,
       driverId: driverId,
     );
 
-    // Verify that the service is actually running.
-    final isRunning = await bridge.isServiceRunning();
+    final isRunning = await _waitForServiceRunning(bridge);
 
     if (!isRunning) {
       throw StateError(
         'Background service did not start successfully.',
       );
     }
-
-    // Start socket-based offer listening.
-    await ref.read(newOfferControllerProvider.notifier).start();
   }
 
+  Future<bool> _waitForServiceRunning(
+    DriverBackgroundServiceBridge bridge,
+  ) async {
+    const maxAttempts = 20;
+    const delay = Duration(milliseconds: 150);
+
+    for (var i = 0; i < maxAttempts; i++) {
+      final isRunning = await bridge.isServiceRunning();
+
+      if (isRunning) return true;
+
+      await Future<void>.delayed(delay);
+    }
+
+    return false;
+  }
   // ---------------------------------------------------------------------------
   // Stop
   // ---------------------------------------------------------------------------
 
   // Stop the full online runtime.
   // Flow:
-  // 1) Stop offer socket runtime
-  // 2) Stop native foreground service
+  // 1) Stop native foreground service
   Future<void> stopOnlineRuntime() async {
-    // Stop socket-based runtime first.
-    await ref.read(newOfferControllerProvider.notifier).stop();
-
     // Stop the native Android foreground service.
     await ref.read(driverBackgroundServiceBridgeProvider).stopService();
   }
