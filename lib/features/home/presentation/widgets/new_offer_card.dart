@@ -36,7 +36,7 @@ class NewOfferCard extends ConsumerWidget {
       accepteOffer: () async {
         await ref
             .read(accepteOfferControllerProvider.notifier)
-            .accepte(offeroId: newOffer.offerId);
+            .accepte(offerId: newOffer.offerId);
       },
       isLoadingAccepte: isLoadingAccepte,
 

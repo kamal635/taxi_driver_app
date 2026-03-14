@@ -49,9 +49,9 @@ final watchNewOfferUsecaseProvider = Provider<WatchNewOfferUseCase>((ref) {
 //         - Accept Offer Use Case -
 //-------------------------------------------
 
-final accepteOfferUsecaseProvider = Provider<AccepteOfferUsecase>((ref) {
+final accepteOfferUsecaseProvider = Provider<AcceptOfferUseCase>((ref) {
   final repo = ref.read(offerRepositoryProvider);
-  return AccepteOfferUsecase(offerRepository: repo);
+  return AcceptOfferUseCase(offerRepository: repo);
 });
 
 //-------------------------------------------

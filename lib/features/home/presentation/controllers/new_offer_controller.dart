@@ -1,7 +1,7 @@
 import 'dart:async' show FutureOr, StreamSubscription, Timer, unawaited;
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
 import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
@@ -16,7 +16,10 @@ final newOfferControllerProvider =
 
 final class NewOfferController extends AsyncNotifier<NewOfferState> {
   StreamSubscription<DriverBackgroundOfferEvent>? _offerEventsSub;
+  AppLifecycleListener? _appLifecycleListener;
   Timer? _expiryTimer;
+
+  bool _isSyncingFromBackend = false;
 
   // ---------------------------------------------------------------------------
   // Build
@@ -30,12 +33,18 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       _handleNativeOfferEvent,
     );
 
+    _appLifecycleListener ??= AppLifecycleListener(
+      onResume: _handleAppResumed,
+    );
+
     ref.onDispose(() {
       unawaited(_offerEventsSub?.cancel());
       _offerEventsSub = null;
 
-      _expiryTimer?.cancel();
-      _expiryTimer = null;
+      _cancelExpiryTimer();
+
+      _appLifecycleListener?.dispose();
+      _appLifecycleListener = null;
     });
 
     final result = await ref.watch(currentAndPendingOfferProvider.future);
@@ -60,7 +69,7 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     );
   }
 
-  // Clear the last visible parsing error.
+  // Clear the last visible error message.
   void clearError() {
     state = AsyncData(
       _currentState.copyWith(errorMessage: null),
@@ -93,6 +102,46 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       );
 
       debugPrint('Failed to parse native background offer: $e\n$st');
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // App lifecycle sync
+  // ---------------------------------------------------------------------------
+
+  // Refresh the pending offer when the app returns to foreground.
+  void _handleAppResumed() {
+    unawaited(_syncPendingOfferFromBackend());
+  }
+
+  // Sync the current pending offer from backend state.
+  Future<void> _syncPendingOfferFromBackend() async {
+    if (_isSyncingFromBackend) return;
+
+    _isSyncingFromBackend = true;
+
+    try {
+      final result = await ref.refresh(currentAndPendingOfferProvider.future);
+      final pendingOffer = _prepareInitialOffer(result?.pendingOffer);
+
+      state = AsyncData(
+        _currentState.copyWith(
+          currentOffer: pendingOffer,
+          errorMessage: null,
+        ),
+      );
+
+      debugPrint(
+        'Pending offer synced from backend -> id=${pendingOffer?.offerId}',
+      );
+    } on Exception catch (e, st) {
+      state = AsyncData(
+        _currentState.copyWith(errorMessage: e.toString()),
+      );
+
+      debugPrint('Failed to sync pending offer from backend: $e\n$st');
+    } finally {
+      _isSyncingFromBackend = false;
     }
   }
 
