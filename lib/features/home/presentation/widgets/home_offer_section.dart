@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/accepte_offer_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/accepted_offer_card.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/home_empty_state.dart';

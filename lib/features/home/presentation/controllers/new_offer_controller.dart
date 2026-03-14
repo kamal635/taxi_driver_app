@@ -16,6 +16,9 @@ final newOfferControllerProvider =
 
 final class NewOfferController extends AsyncNotifier<NewOfferState> {
   StreamSubscription<DriverBackgroundOfferEvent>? _offerEventsSub;
+  StreamSubscription<DriverOfferNotificationOpenEvent>?
+  _offerNotificationOpensSub;
+
   AppLifecycleListener? _appLifecycleListener;
   Timer? _expiryTimer;
 
@@ -33,6 +36,10 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       _handleNativeOfferEvent,
     );
 
+    _offerNotificationOpensSub ??= bridge.offerNotificationOpens.listen(
+      _handleOfferNotificationOpened,
+    );
+
     _appLifecycleListener ??= AppLifecycleListener(
       onResume: _handleAppResumed,
     );
@@ -40,6 +47,9 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     ref.onDispose(() {
       unawaited(_offerEventsSub?.cancel());
       _offerEventsSub = null;
+
+      unawaited(_offerNotificationOpensSub?.cancel());
+      _offerNotificationOpensSub = null;
 
       _cancelExpiryTimer();
 
@@ -103,6 +113,21 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
 
       debugPrint('Failed to parse native background offer: $e\n$st');
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Notification open events
+  // ---------------------------------------------------------------------------
+
+  // Handle app launch/open coming from an offer notification tap.
+  void _handleOfferNotificationOpened(
+    DriverOfferNotificationOpenEvent event,
+  ) {
+    debugPrint(
+      'Offer notification opened -> offerId=${event.offerId}',
+    );
+
+    unawaited(_syncPendingOfferFromBackend());
   }
 
   // ---------------------------------------------------------------------------

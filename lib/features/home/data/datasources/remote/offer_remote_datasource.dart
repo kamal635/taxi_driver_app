@@ -1,11 +1,9 @@
 import 'package:taxi_driver_app/core/networking/api_client.dart';
-import 'package:taxi_driver_app/core/socket/socket_client.dart';
 import 'package:taxi_driver_app/features/home/data/models/complete_offer_response_model.dart';
 import 'package:taxi_driver_app/features/home/data/models/current_and_pending_offer_model.dart';
 import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
 
 abstract interface class OfferRemoteDatasource {
-  Stream<NewOfferModel> watchOffer();
   Future<AccepteOfferdModel> accepteOffer({required String offerId});
   Future<void> declineOffer({required String offerId});
   Future<CurrentAndPendingOfferModel?> getCurrentAndPendingOffer();
@@ -14,26 +12,10 @@ abstract interface class OfferRemoteDatasource {
 
 final class OfferRemoteDatasourceImpl implements OfferRemoteDatasource {
   OfferRemoteDatasourceImpl({
-    required this.socketClient,
     required this.apiClient,
   });
 
   final ApiClient apiClient;
-  final SocketClient socketClient;
-
-  /// ========= 1- watch offer
-  @override
-  Stream<NewOfferModel> watchOffer() {
-    return socketClient
-        .on('new_offer')
-        // Keep only Map payloads
-        .where((payload) => payload is Map)
-        .cast<Map<dynamic, dynamic>>()
-        .map((payload) {
-          final json = Map<String, dynamic>.from(payload);
-          return NewOfferModel.fromJson(json);
-        });
-  }
 
   /// ========= 2- accepte offer
   @override

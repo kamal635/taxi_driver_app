@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:async' show StreamController, unawaited;
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,13 +22,22 @@ final class DriverBackgroundServiceEvent {
   final String reason;
 }
 
-// Represents an offer event coming from the native background service.
+// Represents an incoming offer payload from the native background service.
 final class DriverBackgroundOfferEvent {
   const DriverBackgroundOfferEvent({
     required this.payloadJson,
   });
 
   final String payloadJson;
+}
+
+// Represents opening the app from an offer notification.
+final class DriverOfferNotificationOpenEvent {
+  const DriverOfferNotificationOpenEvent({
+    required this.offerId,
+  });
+
+  final String? offerId;
 }
 
 class DriverBackgroundServiceBridge {
@@ -44,19 +53,28 @@ class DriverBackgroundServiceBridge {
     'driver_background_service',
   );
 
-  final StreamController<DriverBackgroundServiceEvent> _eventsController =
+  final StreamController<DriverBackgroundServiceEvent>
+  _serviceEventsController =
       StreamController<DriverBackgroundServiceEvent>.broadcast();
 
   final StreamController<DriverBackgroundOfferEvent> _offerEventsController =
       StreamController<DriverBackgroundOfferEvent>.broadcast();
 
-  // Public stream of native service events.
-  Stream<DriverBackgroundServiceEvent> get serviceEvents =>
-      _eventsController.stream;
+  final StreamController<DriverOfferNotificationOpenEvent>
+  _offerNotificationOpenController =
+      StreamController<DriverOfferNotificationOpenEvent>.broadcast();
 
-  // Public stream of native offer events.
+  // Public stream of native service stop events.
+  Stream<DriverBackgroundServiceEvent> get serviceEvents =>
+      _serviceEventsController.stream;
+
+  // Public stream of incoming native offer payloads.
   Stream<DriverBackgroundOfferEvent> get offerEvents =>
       _offerEventsController.stream;
+
+  // Public stream of app opens triggered by offer notifications.
+  Stream<DriverOfferNotificationOpenEvent> get offerNotificationOpens =>
+      _offerNotificationOpenController.stream;
 
   // ---------------------------------------------------------------------------
   // Native callbacks
@@ -72,7 +90,7 @@ class DriverBackgroundServiceBridge {
 
         final reason = args['reason']?.toString() ?? 'unknown';
 
-        _eventsController.add(
+        _serviceEventsController.add(
           DriverBackgroundServiceEvent(reason: reason),
         );
 
@@ -88,6 +106,17 @@ class DriverBackgroundServiceBridge {
             payloadJson: payloadJson,
           ),
         );
+
+      case 'offerNotificationOpened':
+        final args = Map<Object?, Object?>.from(
+          call.arguments as Map? ?? const {},
+        );
+
+        final offerId = args['offerId']?.toString();
+
+        _offerNotificationOpenController.add(
+          DriverOfferNotificationOpenEvent(offerId: offerId),
+        );
     }
   }
 
@@ -95,6 +124,7 @@ class DriverBackgroundServiceBridge {
   // Permissions
   // ---------------------------------------------------------------------------
 
+  // Request notification permission when needed.
   Future<bool> ensureNotificationPermission() async {
     final result = await _channel.invokeMethod<bool>(
       'ensureNotificationPermission',
@@ -102,6 +132,7 @@ class DriverBackgroundServiceBridge {
     return result ?? false;
   }
 
+  // Check whether notifications are enabled for the app.
   Future<bool> areNotificationsEnabled() async {
     final result = await _channel.invokeMethod<bool>(
       'areNotificationsEnabled',
@@ -113,6 +144,7 @@ class DriverBackgroundServiceBridge {
   // Service control
   // ---------------------------------------------------------------------------
 
+  // Start the native foreground service with runtime data.
   Future<void> startService({
     required String token,
     required String driverId,
@@ -126,10 +158,12 @@ class DriverBackgroundServiceBridge {
     );
   }
 
+  // Stop the native foreground service.
   Future<void> stopService() async {
     await _channel.invokeMethod('stopService');
   }
 
+  // Check whether the native service is currently running.
   Future<bool> isServiceRunning() async {
     final result = await _channel.invokeMethod<bool>('isServiceRunning');
     return result ?? false;
@@ -144,9 +178,12 @@ class DriverBackgroundServiceBridge {
   // Cleanup
   // ---------------------------------------------------------------------------
 
+  // Release native callbacks and close all event streams.
   void dispose() {
     _channel.setMethodCallHandler(null);
-    unawaited(_eventsController.close());
+
+    unawaited(_serviceEventsController.close());
     unawaited(_offerEventsController.close());
+    unawaited(_offerNotificationOpenController.close());
   }
 }

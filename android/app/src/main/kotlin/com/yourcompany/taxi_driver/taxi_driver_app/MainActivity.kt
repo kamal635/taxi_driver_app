@@ -1,11 +1,11 @@
 package com.yourcompany.taxi_driver.taxi_driver_app
 
-import android.os.Handler
-import android.os.Looper
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
@@ -21,15 +21,20 @@ class MainActivity : FlutterActivity() {
 
     private var pendingNotificationPermissionResult: MethodChannel.Result? = null
 
+    // -------------------------------------------------------------------------
+    // Flutter engine
+    // -------------------------------------------------------------------------
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
         val channel = MethodChannel(
-                    flutterEngine.dartExecutor.binaryMessenger,
-                    channelName
-                )
+            flutterEngine.dartExecutor.binaryMessenger,
+            channelName
+        )
 
-            serviceMethodChannel = channel
+        serviceMethodChannel = channel
+        notifyFlutterIfLaunchedFromOffer(intent)
 
         channel.setMethodCallHandler { call, result ->
             when (call.method) {
@@ -44,7 +49,7 @@ class MainActivity : FlutterActivity() {
                 }
 
                 "startService" -> {
-                    Log.d("DriverService", "MainActivity -> startService called")
+                    Log.d(TAG, "MainActivity -> startService called")
 
                     val token = call.argument<String>("token")
                     val driverId = call.argument<String>("driverId")
@@ -74,10 +79,10 @@ class MainActivity : FlutterActivity() {
                 }
 
                 "stopService" -> {
-                    Log.d("DriverService", "MainActivity -> stopService called")
+                    Log.d(TAG, "MainActivity -> stopService called")
 
                     if (!DriverForegroundService.isRunning) {
-                        Log.d("DriverService", "stopService ignored: service is not running")
+                        Log.d(TAG, "stopService ignored: service is not running")
                         result.success(true)
                         return@setMethodCallHandler
                     }
@@ -88,35 +93,65 @@ class MainActivity : FlutterActivity() {
 
                     startService(intent)
                     result.success(true)
-                    }
+                }
 
                 "isServiceRunning" -> {
                     result.success(DriverForegroundService.isRunning)
-                } 
-               "emitTestOffer" -> {
-    Log.d("DriverService", "MainActivity -> emitTestOffer called")
+                }
 
-    notifyFlutterOfferReceived(
-        payloadJson = """
-            {
-              "id": "test-offer-001",
-              "pickup_address": "Airport Terminal 1",
-              "title": "Test background offer"
-            }
-        """.trimIndent()
-    )
+                "emitTestOffer" -> {
+                    Log.d(TAG, "MainActivity -> emitTestOffer called")
 
-    result.success(true)
-}
+                    notifyFlutterOfferReceived(
+                        payloadJson = """
+                            {
+                              "id": "test-offer-001",
+                              "pickup_address": "Airport Terminal 1",
+                              "title": "Test background offer"
+                            }
+                        """.trimIndent()
+                    )
+
+                    result.success(true)
+                }
 
                 else -> result.notImplemented()
-
-
-                 
             }
         }
     }
 
+    // -------------------------------------------------------------------------
+    // Launch intents
+    // -------------------------------------------------------------------------
+
+    // Notify Flutter if the app was opened from an offer notification.
+    private fun notifyFlutterIfLaunchedFromOffer(intent: Intent?) {
+        val launchSource = intent?.getStringExtra(
+            DriverForegroundService.EXTRA_LAUNCH_SOURCE
+        ) ?: return
+
+        if (launchSource != DriverForegroundService.LAUNCH_SOURCE_OFFER_NOTIFICATION) {
+            return
+        }
+
+        val offerId = intent.getStringExtra(
+            DriverForegroundService.EXTRA_LAUNCHED_OFFER_ID
+        )
+
+        notifyFlutterOfferNotificationOpened(offerId)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        notifyFlutterIfLaunchedFromOffer(intent)
+    }
+
+    // -------------------------------------------------------------------------
+    // Notification permission
+    // -------------------------------------------------------------------------
+
+    // Request notification permission on Android 13+.
     private fun ensureNotificationPermission(result: MethodChannel.Result) {
         // Android 12 and below: no runtime notification permission.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
@@ -171,26 +206,44 @@ class MainActivity : FlutterActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    companion object {
-    private var serviceMethodChannel: MethodChannel? = null
-    private val mainHandler = Handler(Looper.getMainLooper())
+    // -------------------------------------------------------------------------
+    // Flutter callbacks
+    // -------------------------------------------------------------------------
 
-    fun notifyFlutterServiceStopped(reason: String) {
-        mainHandler.post {
-            serviceMethodChannel?.invokeMethod(
-                "serviceStopped",
-                mapOf("reason" to reason)
-            )
+    companion object {
+        private const val TAG = "DriverService"
+
+        private var serviceMethodChannel: MethodChannel? = null
+        private val mainHandler = Handler(Looper.getMainLooper())
+
+        // Notify Flutter that the background service stopped.
+        fun notifyFlutterServiceStopped(reason: String) {
+            mainHandler.post {
+                serviceMethodChannel?.invokeMethod(
+                    "serviceStopped",
+                    mapOf("reason" to reason)
+                )
+            }
+        }
+
+        // Notify Flutter that a new offer payload was received.
+        fun notifyFlutterOfferReceived(payloadJson: String) {
+            mainHandler.post {
+                serviceMethodChannel?.invokeMethod(
+                    "offerReceived",
+                    mapOf("payloadJson" to payloadJson)
+                )
+            }
+        }
+
+        // Notify Flutter that the app was opened from an offer notification.
+        fun notifyFlutterOfferNotificationOpened(offerId: String?) {
+            mainHandler.post {
+                serviceMethodChannel?.invokeMethod(
+                    "offerNotificationOpened",
+                    mapOf("offerId" to offerId)
+                )
+            }
         }
     }
-           fun notifyFlutterOfferReceived(payloadJson: String) {
-    mainHandler.post {
-        serviceMethodChannel?.invokeMethod(
-            "offerReceived",
-            mapOf("payloadJson" to payloadJson)
-        )
-    }
-}
-
-}
 }

@@ -11,11 +11,16 @@ class DriverOfferSocketManager {
 
     private var socket: Socket? = null
     private var isRunning = false
+
     private var currentToken: String? = null
     private var currentDriverId: String? = null
     private var onOfferReceived: ((DriverOfferPayload) -> Unit)? = null
 
-    // Start the offer runtime.
+    // -------------------------------------------------------------------------
+    // Start / Stop
+    // -------------------------------------------------------------------------
+
+    // Start the native offer runtime.
     fun start(
         token: String,
         driverId: String,
@@ -26,8 +31,8 @@ class DriverOfferSocketManager {
             return
         }
 
-        this.currentToken = token
-        this.currentDriverId = driverId
+        currentToken = token
+        currentDriverId = driverId
         this.onOfferReceived = onOfferReceived
         isRunning = true
 
@@ -43,41 +48,11 @@ class DriverOfferSocketManager {
         val newSocket = IO.socket(URI.create(BASE_URL), options)
         socket = newSocket
 
-        newSocket.on(Socket.EVENT_CONNECT) {
-            Log.d(TAG, "Socket connected -> joining driver room: $driverId")
-            newSocket.emit("join_driver_room", driverId)
-        }
-
-        newSocket.on(Socket.EVENT_CONNECT_ERROR) { args ->
-            val error = args.firstOrNull()?.toString() ?: "unknown_connect_error"
-            Log.e(TAG, "Socket connect error -> $error")
-        }
-
-        newSocket.on(Socket.EVENT_DISCONNECT) { args ->
-            val reason = args.firstOrNull()?.toString() ?: "unknown_disconnect"
-            Log.d(TAG, "Socket disconnected -> $reason")
-        }
-
-        newSocket.on("new_offer") { args ->
-            val raw = args.firstOrNull() ?: return@on
-
-            val payloadJson = when (raw) {
-                is JSONObject -> raw.toString()
-                is String -> raw
-                else -> JSONObject.wrap(raw)?.toString()
-            } ?: return@on
-
-            Log.d(TAG, "Socket new_offer received")
-
-            onOfferReceived?.invoke(
-                DriverOfferPayload(payloadJson = payloadJson)
-            )
-        }
-
+        attachSocketListeners(newSocket, driverId)
         newSocket.connect()
     }
 
-    // Stop the offer runtime.
+    // Stop the native offer runtime.
     fun stop() {
         if (!isRunning) return
 
@@ -93,12 +68,59 @@ class DriverOfferSocketManager {
         Log.d(TAG, "Offer runtime stopped")
     }
 
+    // -------------------------------------------------------------------------
+    // Socket listeners
+    // -------------------------------------------------------------------------
+
+    // Attach socket listeners for connection and incoming offers.
+    private fun attachSocketListeners(
+        socket: Socket,
+        driverId: String
+    ) {
+        socket.on(Socket.EVENT_CONNECT) {
+            Log.d(TAG, "Socket connected -> joining driver room: $driverId")
+            socket.emit("join_driver_room", driverId)
+        }
+
+        socket.on(Socket.EVENT_CONNECT_ERROR) { args ->
+            val error = args.firstOrNull()?.toString() ?: "unknown_connect_error"
+            Log.e(TAG, "Socket connect error -> $error")
+        }
+
+        socket.on(Socket.EVENT_DISCONNECT) { args ->
+            val reason = args.firstOrNull()?.toString() ?: "unknown_disconnect"
+            Log.d(TAG, "Socket disconnected -> $reason")
+        }
+
+        socket.on(EVENT_NEW_OFFER) { args ->
+            val raw = args.firstOrNull() ?: return@on
+
+            val payloadJson = when (raw) {
+                is JSONObject -> raw.toString()
+                is String -> raw
+                else -> JSONObject.wrap(raw)?.toString()
+            } ?: return@on
+
+            Log.d(TAG, "Socket new_offer received")
+
+            onOfferReceived?.invoke(
+                DriverOfferPayload(payloadJson = payloadJson)
+            )
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Constants
+    // -------------------------------------------------------------------------
+
     companion object {
         private const val TAG = "DriverOfferRuntime"
         private const val BASE_URL = "http://10.0.2.2:3000"
+        private const val EVENT_NEW_OFFER = "new_offer"
     }
 }
 
+// Holds the raw offer payload received from native socket runtime.
 data class DriverOfferPayload(
     val payloadJson: String
 )
