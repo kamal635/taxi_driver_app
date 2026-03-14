@@ -1,5 +1,4 @@
 import 'dart:async' show StreamSubscription, unawaited;
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +9,6 @@ import 'package:taxi_driver_app/features/availability/domain/entity/driver_statu
 import 'package:taxi_driver_app/features/availability/domain/repositories/location_tracker.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/driver_runtime_controller.dart';
 import 'package:taxi_driver_app/features/availability/presentation/providers/availability_tracking_providers.dart';
-import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
 
 final availabilityProvider =
     NotifierProvider<AvailabilityController, AvailabilityState>(
@@ -20,7 +18,6 @@ final availabilityProvider =
 class AvailabilityController extends Notifier<AvailabilityState> {
   StreamSubscription<LocationFailureReason>? _failuresSub;
   StreamSubscription<DriverBackgroundServiceEvent>? _serviceEventsSub;
-  StreamSubscription<DriverBackgroundOfferEvent>? _offerEventsSub;
 
   bool _autoStopping = false;
 
@@ -30,26 +27,21 @@ class AvailabilityController extends Notifier<AvailabilityState> {
 
   @override
   AvailabilityState build() {
-    final bridge = ref.watch(driverBackgroundServiceBridgeProvider);
+    final bridge = ref.read(driverBackgroundServiceBridgeProvider);
 
     _serviceEventsSub ??= bridge.serviceEvents.listen(
       _handleNativeServiceEvent,
     );
 
-    _offerEventsSub ??= bridge.offerEvents.listen(
-      _handleNativeOfferEvent,
-    );
-
     ref.onDispose(() {
       unawaited(_failuresSub?.cancel());
       unawaited(_serviceEventsSub?.cancel());
-      unawaited(_offerEventsSub?.cancel());
 
       _failuresSub = null;
       _serviceEventsSub = null;
-      _offerEventsSub = null;
     });
 
+    // Restore the last requested online state.
     unawaited(Future.microtask(_restoreStoredStatus));
 
     return const AvailabilityState(
@@ -104,7 +96,7 @@ class AvailabilityController extends Notifier<AvailabilityState> {
   // Native service events
   // ---------------------------------------------------------------------------
 
-  // Handle stop events coming from native Android service.
+  // Handle stop events coming from the native Android service.
   void _handleNativeServiceEvent(DriverBackgroundServiceEvent event) {
     if (!state.isOnline) return;
     if (_autoStopping) return;
@@ -132,29 +124,6 @@ class AvailabilityController extends Notifier<AvailabilityState> {
     );
   }
 
-  void _handleNativeOfferEvent(DriverBackgroundOfferEvent event) {
-    try {
-      final decoded = jsonDecode(event.payloadJson);
-
-      if (decoded is! Map) {
-        throw const FormatException(
-          'Native offer payload is not a JSON object.',
-        );
-      }
-
-      final json = Map<String, dynamic>.from(decoded);
-      final offer = NewOfferModel.fromJson(json);
-
-      debugPrint(
-        'Native background offer parsed successfully -> '
-        'id=${offer.offerId}',
-      );
-    } on Exception catch (e, st) {
-      debugPrint('Failed to parse native background offer: $e\n$st');
-
-      state = state.copyWith(serverError: e);
-    }
-  }
   // ---------------------------------------------------------------------------
   // Online flow
   // ---------------------------------------------------------------------------
@@ -256,7 +225,7 @@ class AvailabilityController extends Notifier<AvailabilityState> {
       state = state.copyWith(serverError: e);
     }
 
-    // Persist final state.
+    // Persist final offline state.
     await local.saveOnlineRequested(value: false);
   }
 

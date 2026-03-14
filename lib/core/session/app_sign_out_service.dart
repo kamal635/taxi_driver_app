@@ -3,7 +3,6 @@ import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/core/socket/socket_client_provider.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/accepte_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 
 final appSignOutServiceProvider = Provider<AppSignOutService>(
   AppSignOutService.new,
@@ -16,7 +15,7 @@ class AppSignOutService {
   Future<void> signOut() async {
     // 1) Stop offer streaming (also disconnects socket inside stop()).
     try {
-      await _ref.read(newOfferControllerProvider.notifier).stop();
+      // await _ref.read(newOfferControllerProvider.notifier).stop();
     } on Exception catch (_) {
       // ignore: best-effort cleanup
     }
