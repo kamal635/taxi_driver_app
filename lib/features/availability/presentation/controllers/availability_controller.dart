@@ -1,4 +1,5 @@
 import 'dart:async' show StreamSubscription, unawaited;
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,7 @@ import 'package:taxi_driver_app/features/availability/domain/entity/driver_statu
 import 'package:taxi_driver_app/features/availability/domain/repositories/location_tracker.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/driver_runtime_controller.dart';
 import 'package:taxi_driver_app/features/availability/presentation/providers/availability_tracking_providers.dart';
+import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
 
 final availabilityProvider =
     NotifierProvider<AvailabilityController, AvailabilityState>(
@@ -131,7 +133,27 @@ class AvailabilityController extends Notifier<AvailabilityState> {
   }
 
   void _handleNativeOfferEvent(DriverBackgroundOfferEvent event) {
-    debugPrint('Native background offer payload -> ${event.payloadJson}');
+    try {
+      final decoded = jsonDecode(event.payloadJson);
+
+      if (decoded is! Map) {
+        throw const FormatException(
+          'Native offer payload is not a JSON object.',
+        );
+      }
+
+      final json = Map<String, dynamic>.from(decoded);
+      final offer = NewOfferModel.fromJson(json);
+
+      debugPrint(
+        'Native background offer parsed successfully -> '
+        'id=${offer.offerId}',
+      );
+    } on Exception catch (e, st) {
+      debugPrint('Failed to parse native background offer: $e\n$st');
+
+      state = state.copyWith(serverError: e);
+    }
   }
   // ---------------------------------------------------------------------------
   // Online flow
