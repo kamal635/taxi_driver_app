@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/features/availability/data/datasources/driver_status_remote_datasource.dart';
+import 'package:taxi_driver_app/features/availability/data/datasources/remote/driver_status_remote_datasource.dart';
 import 'package:taxi_driver_app/features/availability/domain/entity/driver_status.dart';
 import 'package:taxi_driver_app/features/availability/domain/repositories/driver_status_repository.dart';
 

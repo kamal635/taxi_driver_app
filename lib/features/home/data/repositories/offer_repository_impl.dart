@@ -9,12 +9,6 @@ final class OfferRepositoryImpl implements OfferRepository {
 
   final OfferRemoteDatasource remote;
 
-  ///  1- watch new Offer
-  @override
-  Stream<NewOfferEntity> watchOffer() {
-    return remote.watchOffer().map((m) => m.toEntity());
-  }
-
   ///  2- accepte Offer
   @override
   Future<OfferAcceptedEntity> accepteOffer({required String offerId}) async {

@@ -5,7 +5,7 @@ import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/accepte_offer_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/complete_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/decline_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';

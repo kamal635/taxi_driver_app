@@ -3,7 +3,6 @@ import 'package:taxi_driver_app/features/home/domain/entities/current_and_pendin
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
 
 abstract interface class OfferRepository {
-  Stream<NewOfferEntity> watchOffer();
   Future<OfferAcceptedEntity> accepteOffer({required String offerId});
   Future<void> declineOffer({required String offerId});
   Future<CurrentAndPendingOfferEntity?> getCurrentAndPendingOffer();

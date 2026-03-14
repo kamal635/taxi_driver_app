@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/accepte_offer_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/complete_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/current_request_card/base_offer_card.dart';
 

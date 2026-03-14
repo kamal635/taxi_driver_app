@@ -18,7 +18,6 @@ import 'package:taxi_driver_app/core/location/location_result.dart';
 import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/core/widgets/pill_switch.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 
 class AppShellPage extends StatelessWidget {
   const AppShellPage({required this.navigationShell, super.key});
@@ -91,7 +90,6 @@ class AppTopBar extends ConsumerStatefulWidget {
 }
 
 class _AppTopBarState extends ConsumerState<AppTopBar> {
-  ProviderSubscription<bool>? _onlineSub;
   ProviderSubscription<LocationFailureReason?>? _errorSub;
   ProviderSubscription<Object?>? _serverErrorSub;
 
@@ -99,18 +97,6 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
   void initState() {
     super.initState();
 
-    _onlineSub = ref.listenManual<bool>(
-      availabilityProvider.select((s) => s.isOnline),
-      (prev, next) {
-        if (prev == next) return;
-
-        if (next) {
-          unawaited(ref.read(newOfferControllerProvider.notifier).start());
-        } else {
-          unawaited(ref.read(newOfferControllerProvider.notifier).stop());
-        }
-      },
-    );
     _serverErrorSub = ref.listenManual<Object?>(
       availabilityProvider.select((s) => s.serverError),
       (previous, next) {
@@ -172,7 +158,6 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
 
   @override
   void dispose() {
-    _onlineSub?.close();
     _errorSub?.close();
     _serverErrorSub?.close();
     super.dispose();
