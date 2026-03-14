@@ -161,5 +161,3 @@ The project already includes a working Android background driver mode foundation
 ---
 
 Built with Flutter for scalable driver operations.
-
-```
