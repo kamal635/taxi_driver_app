@@ -93,17 +93,21 @@ class MainActivity : FlutterActivity() {
                 "isServiceRunning" -> {
                     result.success(DriverForegroundService.isRunning)
                 } 
-                   "emitTestOffer" -> {
-                    Log.d("DriverService", "MainActivity -> emitTestOffer called")
+               "emitTestOffer" -> {
+    Log.d("DriverService", "MainActivity -> emitTestOffer called")
 
-                    notifyFlutterOfferReceived(
-                        offerId = "test-offer-001",
-                        title = "Test background offer",
-                        pickupAddress = "Airport Terminal 1"
-                    )
+    notifyFlutterOfferReceived(
+        payloadJson = """
+            {
+              "id": "test-offer-001",
+              "pickup_address": "Airport Terminal 1",
+              "title": "Test background offer"
+            }
+        """.trimIndent()
+    )
 
-                    result.success(true)
-                }
+    result.success(true)
+}
 
                 else -> result.notImplemented()
 
@@ -179,22 +183,14 @@ class MainActivity : FlutterActivity() {
             )
         }
     }
-            fun notifyFlutterOfferReceived(
-                offerId: String,
-                title: String,
-                pickupAddress: String
-            ) {
-                mainHandler.post {
-                    serviceMethodChannel?.invokeMethod(
-                        "offerReceived",
-                        mapOf(
-                            "offerId" to offerId,
-                            "title" to title,
-                            "pickupAddress" to pickupAddress
-                        )
-                    )
-                }
-            }
+           fun notifyFlutterOfferReceived(payloadJson: String) {
+    mainHandler.post {
+        serviceMethodChannel?.invokeMethod(
+            "offerReceived",
+            mapOf("payloadJson" to payloadJson)
+        )
+    }
+}
 
 }
 }

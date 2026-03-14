@@ -153,16 +153,23 @@ class DriverForegroundService : Service() {
 
         startBackgroundLoop()
 
-        if (!currentToken.isNullOrBlank() && !currentDriverId.isNullOrBlank()) {
-    offerSocketManager.start(
-        token = currentToken!!,
-        driverId = currentDriverId!!,
-    )
+  if (!currentToken.isNullOrBlank() && !currentDriverId.isNullOrBlank()) {
+   offerSocketManager.start(
+    token = currentToken!!,
+    driverId = currentDriverId!!,
+    onOfferReceived = ::handleOfferReceived,
+)
 }
 
  
     }
+private fun handleOfferReceived(payload: DriverOfferPayload) {
+    Log.d(TAG, "Offer received in service")
 
+    MainActivity.notifyFlutterOfferReceived(
+        payloadJson = payload.payloadJson
+    )
+}
     private fun handleStop() {
         if (!isStoppingService.compareAndSet(false, true)) {
             Log.d(TAG, "handleStop ignored: service is already stopping")

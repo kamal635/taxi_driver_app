@@ -131,12 +131,7 @@ class AvailabilityController extends Notifier<AvailabilityState> {
   }
 
   void _handleNativeOfferEvent(DriverBackgroundOfferEvent event) {
-    debugPrint(
-      'Native background offer received -> '
-      'offerId=${event.offerId}, '
-      'title=${event.title}, '
-      'pickup=${event.pickupAddress}',
-    );
+    debugPrint('Native background offer payload -> ${event.payloadJson}');
   }
   // ---------------------------------------------------------------------------
   // Online flow

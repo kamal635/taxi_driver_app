@@ -40,4 +40,5 @@ flutter {
 
 dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("io.socket:socket.io-client:2.1.2")
 }

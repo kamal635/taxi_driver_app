@@ -25,14 +25,10 @@ final class DriverBackgroundServiceEvent {
 // Represents an offer event coming from the native background service.
 final class DriverBackgroundOfferEvent {
   const DriverBackgroundOfferEvent({
-    required this.offerId,
-    required this.title,
-    required this.pickupAddress,
+    required this.payloadJson,
   });
 
-  final String offerId;
-  final String title;
-  final String pickupAddress;
+  final String payloadJson;
 }
 
 class DriverBackgroundServiceBridge {
@@ -85,16 +81,11 @@ class DriverBackgroundServiceBridge {
           call.arguments as Map? ?? const {},
         );
 
-        final offerId = args['offerId']?.toString() ?? 'unknown';
-        final title = args['title']?.toString() ?? 'Untitled offer';
-        final pickupAddress =
-            args['pickupAddress']?.toString() ?? 'Unknown pickup';
+        final payloadJson = args['payloadJson']?.toString() ?? '{}';
 
         _offerEventsController.add(
           DriverBackgroundOfferEvent(
-            offerId: offerId,
-            title: title,
-            pickupAddress: pickupAddress,
+            payloadJson: payloadJson,
           ),
         );
     }
