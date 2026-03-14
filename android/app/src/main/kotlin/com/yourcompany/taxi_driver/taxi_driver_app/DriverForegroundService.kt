@@ -257,10 +257,10 @@ class DriverForegroundService : Service() {
         val notificationManager = NotificationManagerCompat.from(this)
         val payloadJson = payload.payloadJson
 
-        val title: String
-        val body: String
-        val notificationId: Int
-        val offerIdForLaunch: String?
+        var title: String
+        var body: String
+        var notificationId: Int
+        var offerIdForLaunch: String?
 
         try {
             val json = JSONObject(payloadJson)
