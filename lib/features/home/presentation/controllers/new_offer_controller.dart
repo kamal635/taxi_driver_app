@@ -1,4 +1,4 @@
-import 'dart:async' show FutureOr, StreamSubscription, unawaited;
+import 'dart:async' show FutureOr, StreamSubscription, Timer, unawaited;
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -16,6 +16,7 @@ final newOfferControllerProvider =
 
 final class NewOfferController extends AsyncNotifier<NewOfferState> {
   StreamSubscription<DriverBackgroundOfferEvent>? _offerEventsSub;
+  Timer? _expiryTimer;
 
   // ---------------------------------------------------------------------------
   // Build
@@ -32,10 +33,13 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     ref.onDispose(() {
       unawaited(_offerEventsSub?.cancel());
       _offerEventsSub = null;
+
+      _expiryTimer?.cancel();
+      _expiryTimer = null;
     });
 
     final result = await ref.watch(currentAndPendingOfferProvider.future);
-    final pendingOffer = result?.pendingOffer;
+    final pendingOffer = _prepareInitialOffer(result?.pendingOffer);
 
     return NewOfferState(currentOffer: pendingOffer);
   }
@@ -49,6 +53,8 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
 
   // Clear the currently stored pending offer.
   void clearCurrent() {
+    _cancelExpiryTimer();
+
     state = AsyncData(
       _currentState.copyWith(currentOffer: null),
     );
@@ -80,16 +86,7 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       final model = NewOfferModel.fromJson(json);
       final offer = _mapToEntity(model);
 
-      state = AsyncData(
-        _currentState.copyWith(
-          currentOffer: offer,
-          errorMessage: null,
-        ),
-      );
-
-      debugPrint(
-        'Native background offer stored successfully -> id=${offer.offerId}',
-      );
+      _storeOfferIfActive(offer);
     } on Exception catch (e, st) {
       state = AsyncData(
         _currentState.copyWith(errorMessage: e.toString()),
@@ -98,6 +95,96 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       debugPrint('Failed to parse native background offer: $e\n$st');
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // Offer expiry
+  // ---------------------------------------------------------------------------
+
+  // Prepare the initial pending offer loaded from backend state.
+  NewOfferEntity? _prepareInitialOffer(NewOfferEntity? offer) {
+    _cancelExpiryTimer();
+
+    if (offer == null) return null;
+
+    if (_isExpired(offer)) {
+      debugPrint(
+        'Skipping expired initial pending offer -> id=${offer.offerId}',
+      );
+      return null;
+    }
+
+    _scheduleExpiryTimer(offer);
+    return offer;
+  }
+
+  // Store a new offer only if it is still active.
+  void _storeOfferIfActive(NewOfferEntity offer) {
+    _cancelExpiryTimer();
+
+    if (_isExpired(offer)) {
+      state = AsyncData(
+        _currentState.copyWith(
+          currentOffer: null,
+          errorMessage: null,
+        ),
+      );
+
+      debugPrint(
+        'Ignoring expired native background offer -> id=${offer.offerId}',
+      );
+      return;
+    }
+
+    _scheduleExpiryTimer(offer);
+
+    state = AsyncData(
+      _currentState.copyWith(
+        currentOffer: offer,
+        errorMessage: null,
+      ),
+    );
+
+    debugPrint(
+      'Native background offer stored successfully -> id=${offer.offerId}',
+    );
+  }
+
+  // Schedule automatic removal when the offer expires.
+  void _scheduleExpiryTimer(NewOfferEntity offer) {
+    final remaining = offer.expiresAt.difference(DateTime.now());
+
+    if (remaining <= Duration.zero) {
+      clearCurrent();
+      return;
+    }
+
+    _expiryTimer = Timer(remaining, () {
+      final currentOffer = state.asData?.value.currentOffer;
+
+      if (currentOffer?.offerId != offer.offerId) return;
+
+      state = AsyncData(
+        _currentState.copyWith(currentOffer: null),
+      );
+
+      debugPrint(
+        'Pending offer expired locally -> id=${offer.offerId}',
+      );
+    });
+  }
+
+  void _cancelExpiryTimer() {
+    _expiryTimer?.cancel();
+    _expiryTimer = null;
+  }
+
+  bool _isExpired(NewOfferEntity offer) {
+    return !offer.expiresAt.isAfter(DateTime.now());
+  }
+
+  // ---------------------------------------------------------------------------
+  // Mapping
+  // ---------------------------------------------------------------------------
 
   // Map the data model to a presentation-ready domain entity.
   NewOfferEntity _mapToEntity(NewOfferModel model) {
