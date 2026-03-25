@@ -40,7 +40,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
-        android:label="Taxi Driver"
+        android:label="بوابة السائق"
         android:usesCleartextTraffic="true">
 
         <service
