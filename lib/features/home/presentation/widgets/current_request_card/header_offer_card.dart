@@ -76,7 +76,7 @@ class _HeaderOfferCardState extends State<HeaderOfferCard> {
     final expiresAt = widget.expiresAt;
 
     final remaining = expiresAt!.difference(DateTime.now());
-    return 'Expires in ${_mmss(remaining)}';
+    return 'ينتهي في: ${_mmss(remaining)}';
   }
 
   @override
@@ -96,7 +96,7 @@ class _HeaderOfferCardState extends State<HeaderOfferCard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
+              padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 14.w),
               decoration: BoxDecoration(
                 color: AppColors.infoBg,
                 borderRadius: BorderRadius.circular(999.r),

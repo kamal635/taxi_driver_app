@@ -39,8 +39,8 @@
 
     <application
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
-        android:label="taxi_driver_app"
+        android:icon="@mipmap/launcher_icon"
+        android:label="Taxi Driver"
         android:usesCleartextTraffic="true">
 
         <service

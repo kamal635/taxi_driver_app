@@ -33,6 +33,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_localization: ^0.3.3
+  flutter_native_splash: ^2.4.7
   flutter_riverpod: ^3.2.1
   flutter_screenutil: ^5.9.3
   flutter_secure_storage: ^10.0.0
@@ -46,10 +47,22 @@ dependencies:
   url_launcher: ^6.3.2
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
   very_good_analysis: ^10.1.0
+  
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/launcher_icon.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+
+  adaptive_icon_background: "#FDF8E6"
+  adaptive_icon_foreground: "assets/images/launcher_icon.png"
+  adaptive_icon_foreground_inset: 4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

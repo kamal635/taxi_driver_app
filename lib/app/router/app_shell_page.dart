@@ -187,6 +187,23 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
       children: [
         Row(
           children: [
+            AppSpacing.w10,
+            PillSwitch(
+              value: isOnline,
+              onChanged: isBusy
+                  ? null
+                  : (v) {
+                      unawaited(
+                        ref
+                            .read(availabilityProvider.notifier)
+                            .requestSetOnline(value: v),
+                      );
+                    },
+              offLabel: l10n.offline,
+              onLabel: l10n.online,
+              uppercase: false,
+            ),
+
             Expanded(
               child: Text(
                 widget.title,
@@ -194,60 +211,40 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
                 style: AppTypography.titleSm,
               ),
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                PillSwitch(
-                  value: isOnline,
-                  onChanged: isBusy
-                      ? null
-                      : (v) {
-                          unawaited(
-                            ref
-                                .read(availabilityProvider.notifier)
-                                .requestSetOnline(value: v),
-                          );
-                        },
-                  offLabel: l10n.offline,
-                  onLabel: l10n.online,
-                  uppercase: false,
-                ),
 
-                AppSpacing.w12,
+            AppSpacing.w12,
 
-                GestureDetector(
-                  onTap: avatarAsync.isLoading ? null : widget.onAvatarPressed,
-                  child: Container(
-                    width: 38.r,
-                    height: 38.r,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.primary, width: 2),
-                      color: AppColors.white,
-                    ),
-                    alignment: Alignment.center,
-                    child: hasAvatar
-                        ? ClipOval(
-                            child: Image.file(
-                              File(avatarPath),
-                              width: 38.r,
-                              height: 38.r,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) {
-                                return Text(
-                                  initial,
-                                  style: AppTypography.labelMd,
-                                );
-                              },
-                            ),
-                          )
-                        : Text(
-                            initial,
-                            style: AppTypography.labelMd,
-                          ),
-                  ),
+            GestureDetector(
+              onTap: avatarAsync.isLoading ? null : widget.onAvatarPressed,
+              child: Container(
+                width: 38.r,
+                height: 38.r,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.primary, width: 2),
+                  color: AppColors.white,
                 ),
-              ],
+                alignment: Alignment.center,
+                child: hasAvatar
+                    ? ClipOval(
+                        child: Image.file(
+                          File(avatarPath),
+                          width: 38.r,
+                          height: 38.r,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) {
+                            return Text(
+                              initial,
+                              style: AppTypography.labelMd,
+                            );
+                          },
+                        ),
+                      )
+                    : Text(
+                        initial,
+                        style: AppTypography.labelMd,
+                      ),
+              ),
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/decline_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
@@ -15,7 +16,7 @@ class NewOfferCard extends ConsumerWidget {
     final isLoadingAccepte = ref.watch(
       accepteOfferControllerProvider.select((s) => s.isLoading),
     );
-
+    final l10n = context.l10n;
     final newOffer = asyncNewOffer.value?.currentOffer;
 
     if (newOffer == null) {
@@ -23,7 +24,8 @@ class NewOfferCard extends ConsumerWidget {
     }
 
     return BaseOfferCard.newOffer(
-      statusOffer: newOffer.type,
+      statusOffer: l10n.homeRequestNewTitle,
+      //  newOffer.type,
       expiresAt: newOffer.expiresAt,
       totalFare: newOffer.price,
 
