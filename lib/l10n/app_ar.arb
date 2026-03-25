@@ -1,7 +1,7 @@
 {
   "@@locale": "ar",
   "appTitle": "تطبيق سائق التكسي",
-  "brandName": "التكسي السوري",
+  "brandName": "بوابة السائق",
   "brandSubtitle": "منصة السائقين المعتمدين",
   "emailLabel": "البريد الإلكتروني",
   "emailHint": "example@example.com",
@@ -11,7 +11,7 @@
   "passwordHint": "••••••••",
   "signIn": "تسجيل الدخول",
   "forgotPassword": "هل نسيت كلمة المرور؟",
-  "copyright": "© 2026 تطبيق سائق التكسي",
+  "copyright": "© 2026 تطبيق بوابة السائق",
   "notes":"ملاحظات",
   "unknown":"غير معروف",
 
