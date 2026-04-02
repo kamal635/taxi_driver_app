@@ -40,8 +40,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
-        android:label="بوابة السائق"
-        android:usesCleartextTraffic="true">
+        android:label="بوابة السائق">
 
         <service
             android:name=".DriverForegroundService"

@@ -19,7 +19,6 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
   StreamSubscription<DriverOfferNotificationOpenEvent>?
   _offerNotificationOpensSub;
 
-  AppLifecycleListener? _appLifecycleListener;
   Timer? _expiryTimer;
 
   bool _isSyncingFromBackend = false;
@@ -40,10 +39,6 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       _handleOfferNotificationOpened,
     );
 
-    _appLifecycleListener ??= AppLifecycleListener(
-      onResume: _handleAppResumed,
-    );
-
     ref.onDispose(() {
       unawaited(_offerEventsSub?.cancel());
       _offerEventsSub = null;
@@ -52,12 +47,9 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       _offerNotificationOpensSub = null;
 
       _cancelExpiryTimer();
-
-      _appLifecycleListener?.dispose();
-      _appLifecycleListener = null;
     });
 
-    final result = await ref.watch(currentAndPendingOfferProvider.future);
+    final result = await ref.read(currentAndPendingOfferProvider.future);
     final pendingOffer = _prepareInitialOffer(result?.pendingOffer);
 
     return NewOfferState(currentOffer: pendingOffer);
@@ -127,20 +119,15 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       'Offer notification opened -> offerId=${event.offerId}',
     );
 
-    unawaited(_syncPendingOfferFromBackend());
+    unawaited(syncPendingOfferFromBackend());
   }
 
   // ---------------------------------------------------------------------------
-  // App lifecycle sync
+  // Backend sync
   // ---------------------------------------------------------------------------
-
-  // Refresh the pending offer when the app returns to foreground.
-  void _handleAppResumed() {
-    unawaited(_syncPendingOfferFromBackend());
-  }
 
   // Sync the current pending offer from backend state.
-  Future<void> _syncPendingOfferFromBackend() async {
+  Future<void> syncPendingOfferFromBackend() async {
     if (_isSyncingFromBackend) return;
 
     _isSyncingFromBackend = true;
