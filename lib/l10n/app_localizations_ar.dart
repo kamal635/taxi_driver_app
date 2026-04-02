@@ -12,7 +12,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appTitle => 'تطبيق سائق التكسي';
 
   @override
-  String get brandName => 'التكسي السوري';
+  String get brandName => 'بوابة السائق';
 
   @override
   String get brandSubtitle => 'منصة السائقين المعتمدين';
@@ -42,7 +42,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get forgotPassword => 'هل نسيت كلمة المرور؟';
 
   @override
-  String get copyright => '© 2026 تطبيق سائق التكسي';
+  String get copyright => '© 2026 تطبيق بوابة السائق';
 
   @override
   String get notes => 'ملاحظات';

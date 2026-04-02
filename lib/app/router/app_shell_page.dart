@@ -18,16 +18,56 @@ import 'package:taxi_driver_app/core/location/location_result.dart';
 import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/core/widgets/pill_switch.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 
-class AppShellPage extends StatelessWidget {
+class AppShellPage extends ConsumerStatefulWidget {
   const AppShellPage({required this.navigationShell, super.key});
+
   final StatefulNavigationShell navigationShell;
+
+  @override
+  ConsumerState<AppShellPage> createState() => _AppShellPageState();
+}
+
+class _AppShellPageState extends ConsumerState<AppShellPage> {
+  AppLifecycleListener? _appLifecycleListener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _appLifecycleListener = AppLifecycleListener(
+      onResume: _handleAppResumed,
+    );
+  }
+
+  void _handleAppResumed() {
+    unawaited(
+      ref
+          .read(newOfferControllerProvider.notifier)
+          .syncPendingOfferFromBackend(),
+    );
+
+    unawaited(
+      ref
+          .read(accepteOfferControllerProvider.notifier)
+          .syncAcceptedOfferFromBackend(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _appLifecycleListener?.dispose();
+    _appLifecycleListener = null;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    final pageTitle = switch (navigationShell.currentIndex) {
+    final pageTitle = switch (widget.navigationShell.currentIndex) {
       0 => l10n.navHome,
       1 => l10n.navTrips,
       _ => l10n.navProfile,
@@ -56,13 +96,13 @@ class AppShellPage extends StatelessWidget {
                 ],
               ),
             ),
-            Expanded(child: navigationShell),
+            Expanded(child: widget.navigationShell),
           ],
         ),
       ),
       bottomNavigationBar: BottomNav(
-        index: navigationShell.currentIndex,
-        onChanged: navigationShell.goBranch,
+        index: widget.navigationShell.currentIndex,
+        onChanged: widget.navigationShell.goBranch,
         homeLabel: l10n.navHome,
         tripsLabel: l10n.navTrips,
         profileLabel: l10n.navProfile,
@@ -108,6 +148,7 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
         ref.read(availabilityProvider.notifier).clearServerError();
       },
     );
+
     _errorSub = ref.listenManual<LocationFailureReason?>(
       availabilityProvider.select((s) => s.errorReason),
       (previous, next) {
@@ -167,7 +208,6 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
 
-    // Read both values in one watch (rebuild only when either changes).
     final (:isOnline, :isBusy) = ref.watch(
       availabilityProvider.select(
         (s) => (isOnline: s.isOnline, isBusy: s.isBusy),
@@ -203,7 +243,6 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
               onLabel: l10n.online,
               uppercase: false,
             ),
-
             Expanded(
               child: Text(
                 widget.title,
@@ -211,9 +250,7 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
                 style: AppTypography.titleSm,
               ),
             ),
-
             AppSpacing.w12,
-
             GestureDetector(
               onTap: avatarAsync.isLoading ? null : widget.onAvatarPressed,
               child: Container(

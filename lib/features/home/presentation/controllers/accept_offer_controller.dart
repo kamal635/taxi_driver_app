@@ -18,7 +18,6 @@ final accepteOfferControllerProvider =
 final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
   late final AcceptOfferUseCase _accepteOfferUsecase;
 
-  AppLifecycleListener? _appLifecycleListener;
   bool _isSyncingFromBackend = false;
 
   // ---------------------------------------------------------------------------
@@ -29,16 +28,7 @@ final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
   FutureOr<AccepteOfferState> build() async {
     _accepteOfferUsecase = ref.read(accepteOfferUsecaseProvider);
 
-    _appLifecycleListener ??= AppLifecycleListener(
-      onResume: _handleAppResumed,
-    );
-
-    ref.onDispose(() {
-      _appLifecycleListener?.dispose();
-      _appLifecycleListener = null;
-    });
-
-    final result = await ref.watch(currentAndPendingOfferProvider.future);
+    final result = await ref.read(currentAndPendingOfferProvider.future);
     final currentOffer = result?.currentOffer;
 
     return AccepteOfferState(
@@ -92,13 +82,8 @@ final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
   // Resume sync
   // ---------------------------------------------------------------------------
 
-  // Refresh the accepted offer when the app returns to foreground.
-  void _handleAppResumed() {
-    unawaited(_syncAcceptedOfferFromBackend());
-  }
-
   // Sync the accepted/current offer from backend state.
-  Future<void> _syncAcceptedOfferFromBackend() async {
+  Future<void> syncAcceptedOfferFromBackend() async {
     if (_isSyncingFromBackend) return;
 
     _isSyncingFromBackend = true;
