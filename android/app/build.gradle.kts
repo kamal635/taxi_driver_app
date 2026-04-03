@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.yourcompany.taxi_driver.taxi_driver_app"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
