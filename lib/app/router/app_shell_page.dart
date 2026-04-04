@@ -18,11 +18,12 @@ import 'package:taxi_driver_app/core/location/location_result.dart';
 import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/core/widgets/pill_switch.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 
 class AppShellPage extends ConsumerStatefulWidget {
-  const AppShellPage({required this.navigationShell, super.key});
+  const AppShellPage({
+    required this.navigationShell,
+    super.key,
+  });
 
   final StatefulNavigationShell navigationShell;
 
@@ -46,18 +47,6 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
     if (mounted) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
     }
-
-    unawaited(
-      ref
-          .read(newOfferControllerProvider.notifier)
-          .syncPendingOfferFromBackend(),
-    );
-
-    unawaited(
-      ref
-          .read(accepteOfferControllerProvider.notifier)
-          .syncAcceptedOfferFromBackend(),
-    );
 
     unawaited(
       ref
@@ -106,7 +95,9 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
                 ],
               ),
             ),
-            Expanded(child: widget.navigationShell),
+            Expanded(
+              child: widget.navigationShell,
+            ),
           ],
         ),
       ),
@@ -268,7 +259,10 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
                 height: 38.r,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.primary, width: 2),
+                  border: Border.all(
+                    color: AppColors.primary,
+                    width: 2,
+                  ),
                   color: AppColors.white,
                 ),
                 alignment: Alignment.center,

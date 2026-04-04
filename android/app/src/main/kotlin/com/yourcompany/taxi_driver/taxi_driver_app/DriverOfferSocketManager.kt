@@ -2,6 +2,7 @@ package com.yourcompany.taxi_driver.taxi_driver_app
 
 import android.util.Log
 import io.socket.client.IO
+import io.socket.client.Manager
 import io.socket.client.Socket
 import io.socket.engineio.client.transports.WebSocket
 import org.json.JSONObject
@@ -62,6 +63,7 @@ class DriverOfferSocketManager {
         onOfferReceived = null
 
         socket?.disconnect()
+        socket?.off()
         socket?.close()
         socket = null
 
@@ -78,7 +80,7 @@ class DriverOfferSocketManager {
         driverId: String
     ) {
         socket.on(Socket.EVENT_CONNECT) {
-            Log.d(TAG, "Socket connected -> joining driver room: $driverId")
+            Log.d(TAG, "Socket connected -> id=${socket.id()} -> joining driver room: $driverId")
             socket.emit("join_driver_room", driverId)
         }
 
@@ -89,7 +91,26 @@ class DriverOfferSocketManager {
 
         socket.on(Socket.EVENT_DISCONNECT) { args ->
             val reason = args.firstOrNull()?.toString() ?: "unknown_disconnect"
-            Log.d(TAG, "Socket disconnected -> $reason")
+            Log.w(TAG, "Socket disconnected -> $reason")
+        }
+
+        socket.io().on(Manager.EVENT_RECONNECT_ATTEMPT) { args ->
+            val attempt = args.firstOrNull()?.toString() ?: "unknown"
+            Log.w(TAG, "Socket reconnect attempt -> $attempt")
+        }
+
+        socket.io().on(Manager.EVENT_RECONNECT) { args ->
+            val attempt = args.firstOrNull()?.toString() ?: "unknown"
+            Log.d(TAG, "Socket reconnected successfully -> attempt=$attempt")
+        }
+
+        socket.io().on(Manager.EVENT_RECONNECT_ERROR) { args ->
+            val error = args.firstOrNull()?.toString() ?: "unknown_reconnect_error"
+            Log.e(TAG, "Socket reconnect error -> $error")
+        }
+
+        socket.io().on(Manager.EVENT_RECONNECT_FAILED) {
+            Log.e(TAG, "Socket reconnect failed permanently")
         }
 
         socket.on(EVENT_NEW_OFFER) { args ->
@@ -102,7 +123,6 @@ class DriverOfferSocketManager {
             } ?: return@on
 
             Log.d(TAG, "Socket new_offer received")
-
             onOfferReceived?.invoke(
                 DriverOfferPayload(payloadJson = payloadJson)
             )

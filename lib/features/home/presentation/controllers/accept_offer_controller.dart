@@ -18,30 +18,13 @@ final accepteOfferControllerProvider =
 final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
   late final AcceptOfferUseCase _accepteOfferUsecase;
 
-  bool _isSyncingFromBackend = false;
-
-  // ---------------------------------------------------------------------------
-  // Build
-  // ---------------------------------------------------------------------------
-
   @override
-  FutureOr<AccepteOfferState> build() async {
+  FutureOr<AccepteOfferState> build() {
     _accepteOfferUsecase = ref.read(accepteOfferUsecaseProvider);
 
-    final result = await ref.read(currentAndPendingOfferProvider.future);
-    final currentOffer = result?.currentOffer;
-
-    return AccepteOfferState(
-      offerAcceptedEntity: currentOffer,
-      doneEndsAt: currentOffer?.cooldownUntil,
-    );
+    return const AccepteOfferState();
   }
 
-  // ---------------------------------------------------------------------------
-  // Accept
-  // ---------------------------------------------------------------------------
-
-  // Accept the current pending offer if it is still valid.
   Future<void> accepte({required String offerId}) async {
     final alreadyAccepted = state.value?.offerAcceptedEntity != null;
     if (state.isLoading || alreadyAccepted) return;
@@ -54,10 +37,8 @@ final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
     try {
       final result = await _accepteOfferUsecase(offerId: offerId);
 
-      // Clear the pending offer after successful acceptance.
       ref.read(newOfferControllerProvider.notifier).clearCurrent();
 
-      // Move availability offline after accepting an offer.
       unawaited(_setOfflineBestEffort());
 
       state = AsyncData(
@@ -73,48 +54,10 @@ final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
     }
   }
 
-  // Clear the accepted offer state.
   void clear() {
     state = const AsyncData(AccepteOfferState());
   }
 
-  // ---------------------------------------------------------------------------
-  // Resume sync
-  // ---------------------------------------------------------------------------
-
-  // Sync the accepted/current offer from backend state.
-  Future<void> syncAcceptedOfferFromBackend() async {
-    if (_isSyncingFromBackend) return;
-
-    _isSyncingFromBackend = true;
-
-    try {
-      final result = await ref.refresh(currentAndPendingOfferProvider.future);
-      final currentOffer = result?.currentOffer;
-
-      state = AsyncData(
-        AccepteOfferState(
-          offerAcceptedEntity: currentOffer,
-          doneEndsAt: currentOffer?.cooldownUntil,
-        ),
-      );
-
-      debugPrint(
-        'Accepted offer synced from backend -> id=${currentOffer?.offerId}',
-      );
-    } on Exception catch (e, st) {
-      state = AsyncError(e, st);
-      debugPrint('Failed to sync accepted offer from backend: $e\n$st');
-    } finally {
-      _isSyncingFromBackend = false;
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Validation
-  // ---------------------------------------------------------------------------
-
-  // Read the current pending offer and make sure it is still valid.
   NewOfferEntity? _readActivePendingOffer({
     required String expectedOfferId,
   }) {
@@ -150,11 +93,6 @@ final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
     return pendingOffer;
   }
 
-  // ---------------------------------------------------------------------------
-  // Helpers
-  // ---------------------------------------------------------------------------
-
-  // Best-effort move to offline after accepting an offer.
   Future<void> _setOfflineBestEffort() async {
     try {
       await ref
@@ -166,7 +104,6 @@ final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
   }
 }
 
-// Holds the accepted offer state.
 @immutable
 final class AccepteOfferState {
   const AccepteOfferState({
@@ -175,7 +112,5 @@ final class AccepteOfferState {
   });
 
   final OfferAcceptedEntity? offerAcceptedEntity;
-
-  /// Server cooldownUntil: when Done becomes enabled.
   final DateTime? doneEndsAt;
 }
