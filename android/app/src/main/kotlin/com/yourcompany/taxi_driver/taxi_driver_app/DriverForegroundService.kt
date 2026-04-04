@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.location.LocationManager
@@ -22,6 +23,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationAvailability
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import org.json.JSONException
@@ -43,7 +47,6 @@ class DriverForegroundService : Service() {
 
     private var currentToken: String? = null
     private var currentDriverId: String? = null
-    private var isLoopRunning = false
 
     private val isStoppingService = AtomicBoolean(false)
     private val isSendingLocation = AtomicBoolean(false)
@@ -60,20 +63,19 @@ class DriverForegroundService : Service() {
         LocationServices.getFusedLocationProviderClient(this)
     }
 
-    // Periodic location loop.
-    private val backgroundTickRunnable = object : Runnable {
-        override fun run() {
-             Log.d(TAG, "BACKGROUND_TICK_FIRED -> isLoopRunning=$isLoopRunning")
-            if (!isLoopRunning) return
-
-            requestCurrentLocation()
-            serviceHandler.postDelayed(this, LOCATION_TICK_INTERVAL_MS)
-        }
+    private val prefs: SharedPreferences by lazy {
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
     }
 
-    // -------------------------------------------------------------------------
-    // Lifecycle
-    // -------------------------------------------------------------------------
+    private val locationRequest by lazy {
+        LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            LOCATION_TICK_INTERVAL_MS
+        )
+            .setMinUpdateIntervalMillis(10_000L)
+            .setWaitForAccurateLocation(false)
+            .build()
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -87,17 +89,12 @@ class DriverForegroundService : Service() {
         flags: Int,
         startId: Int
     ): Int {
-        Log.d(TAG, "Service onStartCommand")
+        Log.d(TAG, "Service onStartCommand -> action=${intent?.action}")
 
         return when (intent?.action) {
             ACTION_START -> {
-                if (intent == null) {
-                    Log.w(TAG, "Start action received with null intent")
-                    START_NOT_STICKY
-                } else {
-                    handleStart(intent)
-                    START_STICKY
-                }
+                handleStart(intent)
+                START_STICKY
             }
 
             ACTION_STOP -> {
@@ -105,9 +102,19 @@ class DriverForegroundService : Service() {
                 START_NOT_STICKY
             }
 
+            ACTION_LOCATION_UPDATE -> {
+                handleLocationUpdateIntent(intent)
+                START_STICKY
+            }
+
             else -> {
-                Log.w(TAG, "Unknown service action: ${intent?.action}")
-                START_NOT_STICKY
+                if (intent == null) {
+                    Log.w(TAG, "Service restarted with null intent")
+                    restoreRuntimeStateIfNeeded()
+                } else {
+                    Log.w(TAG, "Unknown service action: ${intent.action}")
+                }
+                START_STICKY
             }
         }
     }
@@ -120,7 +127,7 @@ class DriverForegroundService : Service() {
     override fun onDestroy() {
         Log.d(TAG, "Service onDestroy")
 
-        stopBackgroundLoop()
+        stopLocationUpdates()
         offerSocketManager.stop()
 
         isSendingLocation.set(false)
@@ -136,22 +143,29 @@ class DriverForegroundService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    // -------------------------------------------------------------------------
-    // Start / Stop
-    // -------------------------------------------------------------------------
-
-    // Start the foreground service runtime.
     private fun handleStart(intent: Intent) {
-        currentToken = intent.getStringExtra(EXTRA_TOKEN)
-        currentDriverId = intent.getStringExtra(EXTRA_DRIVER_ID)
+        currentToken = intent.getStringExtra(EXTRA_TOKEN) ?: currentToken
+        currentDriverId = intent.getStringExtra(EXTRA_DRIVER_ID) ?: currentDriverId
+
+        restoreRuntimeStateIfNeeded()
+
+        if (currentToken.isNullOrBlank() || currentDriverId.isNullOrBlank()) {
+            Log.e(TAG, "handleStart aborted: token or driverId is missing")
+            stopSelf()
+            return
+        }
+
+        saveRuntimeState(
+            token = currentToken!!,
+            driverId = currentDriverId!!
+        )
 
         isSendingLocation.set(false)
         isStoppingService.set(false)
         consecutiveSendFailures.set(0)
         nextAllowedSendAtMs.set(0L)
 
-        Log.d(TAG, "handleStart -> token exists: ${!currentToken.isNullOrBlank()}")
-        Log.d(TAG, "handleStart -> driverId: $currentDriverId")
+        Log.d(TAG, "handleStart -> driverId=$currentDriverId")
 
         val notification = buildServiceNotification()
 
@@ -170,18 +184,16 @@ class DriverForegroundService : Service() {
 
         Log.d(TAG, "Service moved to foreground")
 
-        startBackgroundLoop()
+        startLocationUpdates()
 
-        if (!currentToken.isNullOrBlank() && !currentDriverId.isNullOrBlank()) {
-            offerSocketManager.start(
-                token = currentToken!!,
-                driverId = currentDriverId!!,
-                onOfferReceived = ::handleOfferReceived
-            )
-        }
+        offerSocketManager.stop()
+        offerSocketManager.start(
+            token = currentToken!!,
+            driverId = currentDriverId!!,
+            onOfferReceived = ::handleOfferReceived
+        )
     }
 
-    // Stop the service safely.
     private fun handleStop() {
         if (!isStoppingService.compareAndSet(false, true)) {
             Log.d(TAG, "handleStop ignored: service is already stopping")
@@ -190,11 +202,13 @@ class DriverForegroundService : Service() {
 
         Log.d(TAG, "handleStop")
 
-        stopBackgroundLoop()
+        stopLocationUpdates()
         offerSocketManager.stop()
 
         currentToken = null
         currentDriverId = null
+        clearRuntimeState()
+
         isSendingLocation.set(false)
         consecutiveSendFailures.set(0)
         nextAllowedSendAtMs.set(0L)
@@ -203,10 +217,8 @@ class DriverForegroundService : Service() {
         stopSelf()
     }
 
-    // Stop the service when auth becomes invalid.
     private fun stopServiceDueToUnauthorized() {
-        Log.e(TAG, "Unauthorized token detected. Stopping driver background service.")
-
+        Log.e(TAG, "Unauthorized token detected. Stopping service.")
         MainActivity.notifyFlutterServiceStopped("unauthorized")
 
         serviceHandler.post {
@@ -214,10 +226,8 @@ class DriverForegroundService : Service() {
         }
     }
 
-    // Stop the service when location requirements are no longer valid.
     private fun stopServiceDueToLocationIssue(reason: String) {
-        Log.w(TAG, "Stopping driver background service due to location issue: $reason")
-
+        Log.w(TAG, "Stopping service due to location issue: $reason")
         MainActivity.notifyFlutterServiceStopped(reason)
 
         serviceHandler.post {
@@ -225,36 +235,109 @@ class DriverForegroundService : Service() {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Background loop
-    // -------------------------------------------------------------------------
-
-    // Start the periodic location loop.
-    private fun startBackgroundLoop() {
-        if (isLoopRunning) {
-            Log.d(TAG, "Background loop already running")
+    private fun startLocationUpdates() {
+        if (!hasLocationPermission()) {
+            Log.w(TAG, "Cannot start location updates: permission missing")
+            stopServiceDueToLocationIssue("location_permission_missing")
             return
         }
 
-        isLoopRunning = true
-        serviceHandler.post(backgroundTickRunnable)
-        Log.d(TAG, "Background loop started")
+        if (!isLocationServiceEnabled()) {
+            Log.w(TAG, "Cannot start location updates: location service disabled")
+            stopServiceDueToLocationIssue("location_service_disabled")
+            return
+        }
+
+        try {
+            fusedLocationClient
+                .requestLocationUpdates(
+                    locationRequest,
+                    locationUpdatePendingIntent()
+                )
+                .addOnSuccessListener {
+                    Log.d(TAG, "Location updates registered")
+                }
+                .addOnFailureListener { error ->
+                    Log.e(TAG, "Failed to register location updates", error)
+                }
+        } catch (error: SecurityException) {
+            Log.e(TAG, "SecurityException while registering location updates", error)
+            stopServiceDueToLocationIssue("location_permission_missing")
+        }
     }
 
-    // Stop the periodic location loop.
-    private fun stopBackgroundLoop() {
-        if (!isLoopRunning) return
-
-        isLoopRunning = false
-        serviceHandler.removeCallbacks(backgroundTickRunnable)
-        Log.d(TAG, "Background loop stopped")
+    private fun stopLocationUpdates() {
+        fusedLocationClient
+            .removeLocationUpdates(locationUpdatePendingIntent())
+            .addOnSuccessListener {
+                Log.d(TAG, "Location updates removed")
+            }
+            .addOnFailureListener { error ->
+                Log.e(TAG, "Failed to remove location updates", error)
+            }
     }
 
-    // -------------------------------------------------------------------------
-    // Offer handling
-    // -------------------------------------------------------------------------
+    private fun handleLocationUpdateIntent(intent: Intent?) {
+        restoreRuntimeStateIfNeeded()
 
-    // Handle an offer received from the native socket runtime.
+        if (intent == null) {
+            Log.w(TAG, "Location update intent is null")
+            return
+        }
+
+        val availability = LocationAvailability.extractLocationAvailability(intent)
+        val result = LocationResult.extractResult(intent)
+        val location = result?.lastLocation
+
+        if (location == null) {
+            Log.w(
+                TAG,
+                "Location update received but location is null. available=${availability?.isLocationAvailable}"
+            )
+
+            if (!hasLocationPermission()) {
+                stopServiceDueToLocationIssue("location_permission_missing")
+                return
+            }
+
+            if (!isLocationServiceEnabled()) {
+                stopServiceDueToLocationIssue("location_service_disabled")
+                return
+            }
+
+            return
+        }
+
+        val token = currentToken
+        val driverId = currentDriverId
+
+        if (token.isNullOrBlank() || driverId.isNullOrBlank()) {
+            Log.w(TAG, "Skipping location send: token or driverId is missing")
+            return
+        }
+
+        val now = SystemClock.elapsedRealtime()
+        val nextAllowedAt = nextAllowedSendAtMs.get()
+
+        if (now < nextAllowedAt) {
+            val remainingMs = nextAllowedAt - now
+            Log.d(TAG, "Skipping location send: backoff active, remainingMs=$remainingMs")
+            return
+        }
+
+        if (!isSendingLocation.compareAndSet(false, true)) {
+            Log.d(TAG, "Skipping location send: previous request is still running")
+            return
+        }
+
+        sendLocationToBackend(
+            token = token,
+            driverId = driverId,
+            latitude = location.latitude,
+            longitude = location.longitude
+        )
+    }
+
     private fun handleOfferReceived(payload: DriverOfferPayload) {
         Log.d(TAG, "Offer received in service")
 
@@ -265,7 +348,6 @@ class DriverForegroundService : Service() {
         )
     }
 
-    // Show a local notification for a new offer.
     private fun showOfferNotification(payload: DriverOfferPayload) {
         val notificationManager = NotificationManagerCompat.from(this)
         val payloadJson = payload.payloadJson
@@ -322,101 +404,9 @@ class DriverForegroundService : Service() {
         )
 
         notificationManager.notify(notificationId, notification)
-
         Log.d(TAG, "Offer notification shown -> id=$notificationId")
     }
 
-    // -------------------------------------------------------------------------
-    // Location sending
-    // -------------------------------------------------------------------------
-
-    // Request the current device location once.
-    private fun requestCurrentLocation() {
-            Log.d(TAG, "REQUEST_CURRENT_LOCATION_START")
-        if (!hasLocationPermission()) {
-            Log.w(TAG, "Location permission is missing")
-            stopServiceDueToLocationIssue("location_permission_missing")
-            return
-        }
-
-        if (!isLocationServiceEnabled()) {
-            Log.w(TAG, "Location service is disabled")
-            stopServiceDueToLocationIssue("location_service_disabled")
-            return
-        }
-
-        fusedLocationClient
-            .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
-            .addOnSuccessListener { location ->
-                if (location == null) {
-                    Log.w(TAG, "Current location is null")
-
-                    if (!hasLocationPermission()) {
-                        stopServiceDueToLocationIssue("location_permission_missing")
-                        return@addOnSuccessListener
-                    }
-
-                    if (!isLocationServiceEnabled()) {
-                        stopServiceDueToLocationIssue("location_service_disabled")
-                        return@addOnSuccessListener
-                    }
-
-                    return@addOnSuccessListener
-                }
-
-                val token = currentToken
-                val driverId = currentDriverId
-
-                Log.d(
-                    TAG,
-                    "location tick -> driverId=$driverId, lat=${location.latitude}, lon=${location.longitude}"
-                )
-
-                if (token.isNullOrBlank() || driverId.isNullOrBlank()) {
-                    Log.w(TAG, "Skipping location send: token or driverId is missing")
-                    return@addOnSuccessListener
-                }
-
-                val now = SystemClock.elapsedRealtime()
-                val nextAllowedAt = nextAllowedSendAtMs.get()
-
-                if (now < nextAllowedAt) {
-                    val remainingMs = nextAllowedAt - now
-                    Log.d(
-                        TAG,
-                        "Skipping location send: backoff active, remainingMs=$remainingMs"
-                    )
-                    return@addOnSuccessListener
-                }
-
-                if (!isSendingLocation.compareAndSet(false, true)) {
-                    Log.d(TAG, "Skipping location send: previous request is still running")
-                    return@addOnSuccessListener
-                }
-
-                sendLocationToBackend(
-                    token = token,
-                    driverId = driverId,
-                    latitude = location.latitude,
-                    longitude = location.longitude
-                )
-            }
-            .addOnFailureListener { error ->
-                Log.e(TAG, "Failed to get current location", error)
-
-                if (!hasLocationPermission()) {
-                    stopServiceDueToLocationIssue("location_permission_missing")
-                    return@addOnFailureListener
-                }
-
-                if (!isLocationServiceEnabled()) {
-                    stopServiceDueToLocationIssue("location_service_disabled")
-                    return@addOnFailureListener
-                }
-            }
-    }
-
-    // Send the current location to backend.
     private fun sendLocationToBackend(
         token: String,
         driverId: String,
@@ -457,7 +447,7 @@ class DriverForegroundService : Service() {
 
                     Log.d(
                         TAG,
-                        "Location sent successfully -> code=$responseCode, driverId=$driverId, lat=$latitude, lon=$longitude"
+                        "Location sent successfully -> code=$responseCode, driverId=$driverId"
                     )
                 } else {
                     val errorBody = try {
@@ -478,7 +468,6 @@ class DriverForegroundService : Service() {
                         stopServiceDueToUnauthorized()
                     } else {
                         scheduleNextRetry()
-
                         Log.e(
                             TAG,
                             "Location send failed -> code=$responseCode, body=$errorBody"
@@ -495,7 +484,6 @@ class DriverForegroundService : Service() {
         }
     }
 
-    // Schedule the next retry window after a failed send.
     private fun scheduleNextRetry() {
         val failureCount = consecutiveSendFailures.incrementAndGet()
         val backoffMs = calculateBackoffMs(failureCount)
@@ -509,7 +497,6 @@ class DriverForegroundService : Service() {
         )
     }
 
-    // Calculate exponential-like retry backoff.
     private fun calculateBackoffMs(failureCount: Int): Long {
         val multiplier = when (failureCount) {
             1 -> 1L
@@ -523,11 +510,6 @@ class DriverForegroundService : Service() {
         )
     }
 
-    // -------------------------------------------------------------------------
-    // Permissions
-    // -------------------------------------------------------------------------
-
-    // Check whether location permission is granted.
     private fun hasLocationPermission(): Boolean {
         val fineGranted = ContextCompat.checkSelfPermission(
             this,
@@ -542,7 +524,6 @@ class DriverForegroundService : Service() {
         return fineGranted || coarseGranted
     }
 
-    // Check whether the device location service is enabled.
     private fun isLocationServiceEnabled(): Boolean {
         val locationManager = getSystemService(LocationManager::class.java)
 
@@ -560,11 +541,6 @@ class DriverForegroundService : Service() {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Notifications
-    // -------------------------------------------------------------------------
-
-    // Build the persistent foreground service notification.
     private fun buildServiceNotification(): Notification {
         val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
 
@@ -588,7 +564,6 @@ class DriverForegroundService : Service() {
             .build()
     }
 
-    // Build the notification shown for a new trip offer.
     private fun buildOfferNotification(
         title: String,
         body: String,
@@ -626,7 +601,6 @@ class DriverForegroundService : Service() {
             .build()
     }
 
-    // Create notification channels for service and offers.
     private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
@@ -664,11 +638,26 @@ class DriverForegroundService : Service() {
         manager.createNotificationChannel(offersChannel)
     }
 
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
+    private fun locationUpdatePendingIntent(): PendingIntent {
+        val intent = Intent(this, DriverForegroundService::class.java).apply {
+            action = ACTION_LOCATION_UPDATE
+        }
 
-    // Return immutable flag only where supported.
+        val flags = PendingIntent.FLAG_UPDATE_CURRENT or
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                PendingIntent.FLAG_MUTABLE
+            } else {
+                0
+            }
+
+        return PendingIntent.getService(
+            this,
+            LOCATION_PENDING_INTENT_REQUEST_CODE,
+            intent,
+            flags
+        )
+    }
+
     private fun immutableFlag(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             PendingIntent.FLAG_IMMUTABLE
@@ -677,8 +666,35 @@ class DriverForegroundService : Service() {
         }
     }
 
+    private fun saveRuntimeState(token: String, driverId: String) {
+        prefs.edit()
+            .putString(PREF_TOKEN, token)
+            .putString(PREF_DRIVER_ID, driverId)
+            .apply()
+    }
+
+    private fun restoreRuntimeStateIfNeeded() {
+        if (!currentToken.isNullOrBlank() && !currentDriverId.isNullOrBlank()) {
+            return
+        }
+
+        currentToken = currentToken ?: prefs.getString(PREF_TOKEN, null)
+        currentDriverId = currentDriverId ?: prefs.getString(PREF_DRIVER_ID, null)
+    }
+
+    private fun clearRuntimeState() {
+        prefs.edit()
+            .remove(PREF_TOKEN)
+            .remove(PREF_DRIVER_ID)
+            .apply()
+    }
+
     companion object {
         private const val TAG = "DriverService"
+
+        private const val PREFS_NAME = "driver_background_service_prefs"
+        private const val PREF_TOKEN = "pref_token"
+        private const val PREF_DRIVER_ID = "pref_driver_id"
 
         const val CHANNEL_ID = "driver_background_service_v2"
         const val OFFERS_CHANNEL_ID = "driver_offers_channel_v3"
@@ -687,6 +703,9 @@ class DriverForegroundService : Service() {
 
         const val ACTION_START = "driver_background_service.action.START"
         const val ACTION_STOP = "driver_background_service.action.STOP"
+        const val ACTION_LOCATION_UPDATE = "driver_background_service.action.LOCATION_UPDATE"
+
+        private const val LOCATION_PENDING_INTENT_REQUEST_CODE = 1002
 
         const val EXTRA_TOKEN = "extra_token"
         const val EXTRA_DRIVER_ID = "extra_driver_id"
@@ -702,9 +721,8 @@ class DriverForegroundService : Service() {
         private const val INITIAL_RETRY_BACKOFF_MS = 15_000L
         private const val MAX_RETRY_BACKOFF_MS = 60_000L
 
-        
-            private const val LOCATION_UPDATE_URL =
-    "https://taxi-backend.laithroom.com/api/admin/drivers/location"
+        private const val LOCATION_UPDATE_URL =
+            "https://taxi-backend.laithroom.com/api/admin/drivers/location"
 
         @Volatile
         var isRunning: Boolean = false

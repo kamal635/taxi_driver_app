@@ -1,4 +1,5 @@
 import 'dart:async' show StreamController, unawaited;
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -174,6 +175,12 @@ class DriverBackgroundServiceBridge {
     await _channel.invokeMethod('emitTestOffer');
   }
 
+  Future<bool> ensureLocationSettings() async {
+    if (!Platform.isAndroid) return true;
+
+    final result = await _channel.invokeMethod<bool>('ensureLocationSettings');
+    return result ?? false;
+  }
   // ---------------------------------------------------------------------------
   // Cleanup
   // ---------------------------------------------------------------------------

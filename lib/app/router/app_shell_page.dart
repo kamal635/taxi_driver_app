@@ -43,6 +43,10 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
   }
 
   void _handleAppResumed() {
+    if (mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    }
+
     unawaited(
       ref
           .read(newOfferControllerProvider.notifier)

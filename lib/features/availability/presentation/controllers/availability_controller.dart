@@ -159,16 +159,28 @@ class AvailabilityController extends Notifier<AvailabilityState> {
   // Online flow
   // ---------------------------------------------------------------------------
 
-  // Full online flow:
-  // permission -> tracking -> server -> runtime -> local state
   Future<void> _goOnline() async {
+    final bridge = ref.read(driverBackgroundServiceBridgeProvider);
     final startTracking = ref.read(startLocationTrackingUseCaseProvider);
     final tracker = ref.read(locationTrackerProvider);
     final setStatus = ref.read(setDriverStatusUseCaseProvider);
     final runtime = ref.read(driverRuntimeControllerProvider);
     final local = ref.read(availabilityLocalDatasourceProvider);
 
-    // Step 1: ensure location is ready.
+    // Step 0: ask Android to resolve location settings first.
+    final locationSettingsReady = await bridge.ensureLocationSettings();
+
+    // User cancelled the native location settings dialog,
+    // or the device could not resolve location settings.
+    if (!locationSettingsReady) {
+      state = state.copyWith(
+        isOnline: false,
+        errorReason: LocationFailureReason.serviceDisabled,
+      );
+      return;
+    }
+
+    // Step 1: ensure location permission/tracking is ready.
     final ready = await startTracking();
 
     if (!ready.isSuccess) {
@@ -223,7 +235,6 @@ class AvailabilityController extends Notifier<AvailabilityState> {
 
     state = state.copyWith(isOnline: true);
   }
-
   // ---------------------------------------------------------------------------
   // Offline flow
   // ---------------------------------------------------------------------------
