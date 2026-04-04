@@ -20,6 +20,7 @@ class AvailabilityController extends Notifier<AvailabilityState> {
   StreamSubscription<DriverBackgroundServiceEvent>? _serviceEventsSub;
 
   bool _autoStopping = false;
+  bool _isReconciling = false;
 
   // ---------------------------------------------------------------------------
   // Build
@@ -75,48 +76,56 @@ class AvailabilityController extends Notifier<AvailabilityState> {
 
   // Reconcile availability when app starts or resumes.
   Future<void> reconcileAvailabilityOnAppStartOrResume() async {
-    final local = ref.read(availabilityLocalDatasourceProvider);
-    final bridge = ref.read(driverBackgroundServiceBridgeProvider);
-    final runtime = ref.read(driverRuntimeControllerProvider);
+    if (_isReconciling) return;
+    _isReconciling = true;
 
-    final requested = await local.getOnlineRequested();
-    final serviceRunning = await bridge.isServiceRunning();
+    try {
+      final local = ref.read(availabilityLocalDatasourceProvider);
+      final bridge = ref.read(driverBackgroundServiceBridgeProvider);
+      final runtime = ref.read(driverRuntimeControllerProvider);
 
-    if (!requested) {
-      state = state.copyWith(
-        isOnline: false,
-        errorReason: null,
-        serverError: null,
-      );
-      return;
-    }
+      final requested = await local.getOnlineRequested();
+      final serviceRunning = await bridge.isServiceRunning();
 
-    if (!serviceRunning) {
-      await _stopTracking();
-
-      try {
-        await runtime.stopOnlineRuntime();
-      } on Exception catch (e, st) {
-        debugPrint('stopOnlineRuntime during reconcile failed: $e\n$st');
+      if (!requested) {
+        state = state.copyWith(
+          isOnline: false,
+          errorReason: null,
+          serverError: null,
+        );
+        return;
       }
 
-      await local.saveOnlineRequested(value: false);
+      if (!serviceRunning) {
+        await _stopTracking();
+
+        try {
+          await runtime.stopOnlineRuntime();
+        } on Exception catch (e, st) {
+          debugPrint('stopOnlineRuntime during reconcile failed: $e\n$st');
+        }
+
+        await local.saveOnlineRequested(value: false);
+
+        state = state.copyWith(
+          isOnline: false,
+          errorReason: null,
+          serverError: null,
+        );
+        return;
+      }
+
+      await ref.read(locationTrackerProvider).start();
+      _subscribeToFailures(ref.read(locationTrackerProvider));
 
       state = state.copyWith(
-        isOnline: false,
+        isOnline: true,
         errorReason: null,
         serverError: null,
       );
-      return;
+    } finally {
+      _isReconciling = false;
     }
-
-    _subscribeToFailures(ref.read(locationTrackerProvider));
-
-    state = state.copyWith(
-      isOnline: true,
-      errorReason: null,
-      serverError: null,
-    );
   }
 
   void clearError() => _clearLocationError();
@@ -235,6 +244,7 @@ class AvailabilityController extends Notifier<AvailabilityState> {
 
     state = state.copyWith(isOnline: true);
   }
+
   // ---------------------------------------------------------------------------
   // Offline flow
   // ---------------------------------------------------------------------------

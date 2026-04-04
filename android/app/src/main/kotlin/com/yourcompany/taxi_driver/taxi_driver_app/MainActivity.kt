@@ -23,7 +23,7 @@ import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-class MainActivity :FlutterFragmentActivity()  {
+class MainActivity : FlutterFragmentActivity() {
 
     private val channelName = "driver_background_service"
     private val notificationPermissionRequestCode = 3001
@@ -151,7 +151,14 @@ class MainActivity :FlutterFragmentActivity()  {
             DriverForegroundService.EXTRA_LAUNCHED_OFFER_ID
         )
 
-        notifyFlutterOfferNotificationOpened(offerId)
+        val payloadJson = intent.getStringExtra(
+            DriverForegroundService.EXTRA_LAUNCHED_OFFER_PAYLOAD
+        )
+
+        notifyFlutterOfferNotificationOpened(
+            offerId = offerId,
+            payloadJson = payloadJson
+        )
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -289,11 +296,17 @@ class MainActivity :FlutterFragmentActivity()  {
             }
         }
 
-        fun notifyFlutterOfferNotificationOpened(offerId: String?) {
+        fun notifyFlutterOfferNotificationOpened(
+            offerId: String?,
+            payloadJson: String?
+        ) {
             mainHandler.post {
                 serviceMethodChannel?.invokeMethod(
                     "offerNotificationOpened",
-                    mapOf("offerId" to offerId)
+                    mapOf(
+                        "offerId" to offerId,
+                        "payloadJson" to payloadJson
+                    )
                 )
             }
         }

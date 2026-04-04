@@ -36,9 +36,11 @@ final class DriverBackgroundOfferEvent {
 final class DriverOfferNotificationOpenEvent {
   const DriverOfferNotificationOpenEvent({
     required this.offerId,
+    required this.payloadJson,
   });
 
   final String? offerId;
+  final String? payloadJson;
 }
 
 class DriverBackgroundServiceBridge {
@@ -94,6 +96,7 @@ class DriverBackgroundServiceBridge {
         _serviceEventsController.add(
           DriverBackgroundServiceEvent(reason: reason),
         );
+        return;
 
       case 'offerReceived':
         final args = Map<Object?, Object?>.from(
@@ -107,6 +110,7 @@ class DriverBackgroundServiceBridge {
             payloadJson: payloadJson,
           ),
         );
+        return;
 
       case 'offerNotificationOpened':
         final args = Map<Object?, Object?>.from(
@@ -114,10 +118,18 @@ class DriverBackgroundServiceBridge {
         );
 
         final offerId = args['offerId']?.toString();
+        final payloadJson = args['payloadJson']?.toString();
 
         _offerNotificationOpenController.add(
-          DriverOfferNotificationOpenEvent(offerId: offerId),
+          DriverOfferNotificationOpenEvent(
+            offerId: offerId,
+            payloadJson: payloadJson,
+          ),
         );
+        return;
+
+      default:
+        return;
     }
   }
 
@@ -181,6 +193,7 @@ class DriverBackgroundServiceBridge {
     final result = await _channel.invokeMethod<bool>('ensureLocationSettings');
     return result ?? false;
   }
+
   // ---------------------------------------------------------------------------
   // Cleanup
   // ---------------------------------------------------------------------------

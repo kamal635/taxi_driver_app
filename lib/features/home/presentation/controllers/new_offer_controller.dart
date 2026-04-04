@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
 import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
-import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
 
 // Provides the pending offer controller fed by native background events.
 final newOfferControllerProvider =
@@ -21,14 +20,8 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
 
   Timer? _expiryTimer;
 
-  bool _isSyncingFromBackend = false;
-
-  // ---------------------------------------------------------------------------
-  // Build
-  // ---------------------------------------------------------------------------
-
   @override
-  FutureOr<NewOfferState> build() async {
+  FutureOr<NewOfferState> build() {
     final bridge = ref.read(driverBackgroundServiceBridgeProvider);
 
     _offerEventsSub ??= bridge.offerEvents.listen(
@@ -49,20 +42,12 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       _cancelExpiryTimer();
     });
 
-    final result = await ref.read(currentAndPendingOfferProvider.future);
-    final pendingOffer = _prepareInitialOffer(result?.pendingOffer);
-
-    return NewOfferState(currentOffer: pendingOffer);
+    return const NewOfferState();
   }
 
   NewOfferState get _currentState =>
       state.asData?.value ?? const NewOfferState();
 
-  // ---------------------------------------------------------------------------
-  // Public API
-  // ---------------------------------------------------------------------------
-
-  // Clear the currently stored pending offer.
   void clearCurrent() {
     _cancelExpiryTimer();
 
@@ -71,32 +56,15 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     );
   }
 
-  // Clear the last visible error message.
   void clearError() {
     state = AsyncData(
       _currentState.copyWith(errorMessage: null),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Native offer events
-  // ---------------------------------------------------------------------------
-
-  // Handle incoming native offer events from the Android background service.
   void _handleNativeOfferEvent(DriverBackgroundOfferEvent event) {
     try {
-      final decoded = jsonDecode(event.payloadJson);
-
-      if (decoded is! Map) {
-        throw const FormatException(
-          'Native offer payload is not a JSON object.',
-        );
-      }
-
-      final json = Map<String, dynamic>.from(decoded);
-      final model = NewOfferModel.fromJson(json);
-      final offer = _mapToEntity(model);
-
+      final offer = _parseOfferFromPayload(event.payloadJson);
       _storeOfferIfActive(offer);
     } on Exception catch (e, st) {
       state = AsyncData(
@@ -107,11 +75,6 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Notification open events
-  // ---------------------------------------------------------------------------
-
-  // Handle app launch/open coming from an offer notification tap.
   void _handleOfferNotificationOpened(
     DriverOfferNotificationOpenEvent event,
   ) {
@@ -119,66 +82,39 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       'Offer notification opened -> offerId=${event.offerId}',
     );
 
-    unawaited(syncPendingOfferFromBackend());
-  }
-
-  // ---------------------------------------------------------------------------
-  // Backend sync
-  // ---------------------------------------------------------------------------
-
-  // Sync the current pending offer from backend state.
-  Future<void> syncPendingOfferFromBackend() async {
-    if (_isSyncingFromBackend) return;
-
-    _isSyncingFromBackend = true;
+    final payloadJson = event.payloadJson;
+    if (payloadJson == null || payloadJson.isEmpty) {
+      debugPrint('Offer notification open ignored: missing payloadJson');
+      return;
+    }
 
     try {
-      final result = await ref.refresh(currentAndPendingOfferProvider.future);
-      final pendingOffer = _prepareInitialOffer(result?.pendingOffer);
-
-      state = AsyncData(
-        _currentState.copyWith(
-          currentOffer: pendingOffer,
-          errorMessage: null,
-        ),
-      );
-
-      debugPrint(
-        'Pending offer synced from backend -> id=${pendingOffer?.offerId}',
-      );
+      final offer = _parseOfferFromPayload(payloadJson);
+      _storeOfferIfActive(offer);
     } on Exception catch (e, st) {
       state = AsyncData(
         _currentState.copyWith(errorMessage: e.toString()),
       );
 
-      debugPrint('Failed to sync pending offer from backend: $e\n$st');
-    } finally {
-      _isSyncingFromBackend = false;
+      debugPrint('Failed to restore offer from notification open: $e\n$st');
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Offer expiry
-  // ---------------------------------------------------------------------------
+  NewOfferEntity _parseOfferFromPayload(String payloadJson) {
+    final decoded = jsonDecode(payloadJson);
 
-  // Prepare the initial pending offer loaded from backend state.
-  NewOfferEntity? _prepareInitialOffer(NewOfferEntity? offer) {
-    _cancelExpiryTimer();
-
-    if (offer == null) return null;
-
-    if (_isExpired(offer)) {
-      debugPrint(
-        'Skipping expired initial pending offer -> id=${offer.offerId}',
+    if (decoded is! Map) {
+      throw const FormatException(
+        'Offer payload is not a JSON object.',
       );
-      return null;
     }
 
-    _scheduleExpiryTimer(offer);
-    return offer;
+    final json = Map<String, dynamic>.from(decoded);
+    final model = NewOfferModel.fromJson(json);
+
+    return _mapToEntity(model);
   }
 
-  // Store a new offer only if it is still active.
   void _storeOfferIfActive(NewOfferEntity offer) {
     _cancelExpiryTimer();
 
@@ -210,7 +146,6 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     );
   }
 
-  // Schedule automatic removal when the offer expires.
   void _scheduleExpiryTimer(NewOfferEntity offer) {
     final remaining = offer.expiresAt.difference(DateTime.now());
 
@@ -243,11 +178,6 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     return !offer.expiresAt.isAfter(DateTime.now());
   }
 
-  // ---------------------------------------------------------------------------
-  // Mapping
-  // ---------------------------------------------------------------------------
-
-  // Map the data model to a presentation-ready domain entity.
   NewOfferEntity _mapToEntity(NewOfferModel model) {
     return NewOfferEntity(
       type: model.type,

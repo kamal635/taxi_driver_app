@@ -10,8 +10,11 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.location.Location as AndroidLocation
 import android.location.LocationManager
 import android.media.AudioAttributes
+import android.media.AudioManager
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -67,12 +70,17 @@ class DriverForegroundService : Service() {
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
     }
 
+    private val lastSentLocationLock = Any()
+    private var lastSentLatitude: Double? = null
+    private var lastSentLongitude: Double? = null
+
     private val locationRequest by lazy {
         LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
             LOCATION_TICK_INTERVAL_MS
         )
             .setMinUpdateIntervalMillis(10_000L)
+            .setMinUpdateDistanceMeters(MIN_LOCATION_UPDATE_DISTANCE_METERS)
             .setWaitForAccurateLocation(false)
             .build()
     }
@@ -130,6 +138,8 @@ class DriverForegroundService : Service() {
         stopLocationUpdates()
         offerSocketManager.stop()
 
+        clearLastSentLocation()
+
         isSendingLocation.set(false)
         isStoppingService.set(false)
         consecutiveSendFailures.set(0)
@@ -159,6 +169,8 @@ class DriverForegroundService : Service() {
             token = currentToken!!,
             driverId = currentDriverId!!
         )
+
+        clearLastSentLocation()
 
         isSendingLocation.set(false)
         isStoppingService.set(false)
@@ -208,6 +220,7 @@ class DriverForegroundService : Service() {
         currentToken = null
         currentDriverId = null
         clearRuntimeState()
+        clearLastSentLocation()
 
         isSendingLocation.set(false)
         consecutiveSendFailures.set(0)
@@ -290,7 +303,7 @@ class DriverForegroundService : Service() {
         val location = result?.lastLocation
 
         if (location == null) {
-            Log.w(
+            Log.d(
                 TAG,
                 "Location update received but location is null. available=${availability?.isLocationAvailable}"
             )
@@ -316,6 +329,10 @@ class DriverForegroundService : Service() {
             return
         }
 
+        if (!shouldSendLocationToBackend(location)) {
+            return
+        }
+
         val now = SystemClock.elapsedRealtime()
         val nextAllowedAt = nextAllowedSendAtMs.get()
 
@@ -333,8 +350,7 @@ class DriverForegroundService : Service() {
         sendLocationToBackend(
             token = token,
             driverId = driverId,
-            latitude = location.latitude,
-            longitude = location.longitude
+            location = location
         )
     }
 
@@ -400,7 +416,8 @@ class DriverForegroundService : Service() {
         val notification = buildOfferNotification(
             title = title,
             body = body,
-            offerId = offerIdForLaunch
+            offerId = offerIdForLaunch,
+            payloadJson = payload.payloadJson
         )
 
         notificationManager.notify(notificationId, notification)
@@ -410,8 +427,7 @@ class DriverForegroundService : Service() {
     private fun sendLocationToBackend(
         token: String,
         driverId: String,
-        latitude: Double,
-        longitude: Double
+        location: AndroidLocation
     ) {
         networkExecutor.execute {
             var connection: HttpURLConnection? = null
@@ -430,8 +446,8 @@ class DriverForegroundService : Service() {
                 }
 
                 val body = JSONObject().apply {
-                    put("lat", latitude)
-                    put("lon", longitude)
+                    put("lat", location.latitude)
+                    put("lon", location.longitude)
                 }
 
                 BufferedWriter(OutputStreamWriter(connection.outputStream)).use { writer ->
@@ -444,6 +460,8 @@ class DriverForegroundService : Service() {
                 if (responseCode in 200..299) {
                     consecutiveSendFailures.set(0)
                     nextAllowedSendAtMs.set(0L)
+
+                    markLocationAsSent(location)
 
                     Log.d(
                         TAG,
@@ -481,6 +499,62 @@ class DriverForegroundService : Service() {
                 connection?.disconnect()
                 isSendingLocation.set(false)
             }
+        }
+    }
+
+    private fun shouldSendLocationToBackend(location: AndroidLocation): Boolean {
+        synchronized(lastSentLocationLock) {
+            if (location.hasAccuracy() &&
+                location.accuracy > MAX_ACCEPTABLE_ACCURACY_METERS
+            ) {
+                Log.d(
+                    TAG,
+                    "Skipping location send: poor accuracy -> ${location.accuracy}m"
+                )
+                return false
+            }
+
+            val lastLat = lastSentLatitude
+            val lastLon = lastSentLongitude
+
+            if (lastLat == null || lastLon == null) {
+                return true
+            }
+
+            val distanceResult = FloatArray(1)
+            AndroidLocation.distanceBetween(
+                lastLat,
+                lastLon,
+                location.latitude,
+                location.longitude,
+                distanceResult
+            )
+
+            val movedDistance = distanceResult[0]
+
+            if (movedDistance < MIN_LOCATION_SEND_DISTANCE_METERS) {
+                Log.d(
+                    TAG,
+                    "Skipping location send: movement too small -> ${movedDistance}m"
+                )
+                return false
+            }
+
+            return true
+        }
+    }
+
+    private fun markLocationAsSent(location: AndroidLocation) {
+        synchronized(lastSentLocationLock) {
+            lastSentLatitude = location.latitude
+            lastSentLongitude = location.longitude
+        }
+    }
+
+    private fun clearLastSentLocation() {
+        synchronized(lastSentLocationLock) {
+            lastSentLatitude = null
+            lastSentLongitude = null
         }
     }
 
@@ -567,7 +641,8 @@ class DriverForegroundService : Service() {
     private fun buildOfferNotification(
         title: String,
         body: String,
-        offerId: String?
+        offerId: String?,
+        payloadJson: String
     ): Notification {
         val launchIntent = packageManager
             .getLaunchIntentForPackage(packageName)
@@ -577,6 +652,8 @@ class DriverForegroundService : Service() {
                 if (!offerId.isNullOrBlank()) {
                     putExtra(EXTRA_LAUNCHED_OFFER_ID, offerId)
                 }
+
+                putExtra(EXTRA_LAUNCHED_OFFER_PAYLOAD, payloadJson)
             }
 
         val pendingIntent = PendingIntent.getActivity(
@@ -616,6 +693,10 @@ class DriverForegroundService : Service() {
             enableVibration(false)
         }
 
+        val soundUri = Uri.parse(
+            "android.resource://$packageName/raw/offer_alert"
+        )
+
         val offersChannel = NotificationChannel(
             OFFERS_CHANNEL_ID,
             "Driver offers",
@@ -624,12 +705,14 @@ class DriverForegroundService : Service() {
             description = "Shows incoming trip offers"
             setShowBadge(true)
             enableVibration(true)
-            vibrationPattern = longArrayOf(0, 300, 200, 300)
+            vibrationPattern = longArrayOf(0, 500, 250, 500, 250, 700)
 
             setSound(
-                Settings.System.DEFAULT_NOTIFICATION_URI,
+                soundUri,
                 AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setLegacyStreamType(AudioManager.STREAM_RING)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
                     .build()
             )
         }
@@ -696,8 +779,8 @@ class DriverForegroundService : Service() {
         private const val PREF_TOKEN = "pref_token"
         private const val PREF_DRIVER_ID = "pref_driver_id"
 
-        const val CHANNEL_ID = "driver_background_service_v2"
-        const val OFFERS_CHANNEL_ID = "driver_offers_channel_v3"
+        const val CHANNEL_ID = "driver_background_service_v3"
+        const val OFFERS_CHANNEL_ID = "driver_offers_channel_v4"
 
         const val NOTIFICATION_ID = 1001
 
@@ -712,6 +795,7 @@ class DriverForegroundService : Service() {
 
         const val EXTRA_LAUNCH_SOURCE = "extra_launch_source"
         const val EXTRA_LAUNCHED_OFFER_ID = "extra_launched_offer_id"
+        const val EXTRA_LAUNCHED_OFFER_PAYLOAD = "extra_launched_offer_payload"
 
         const val LAUNCH_SOURCE_OFFER_NOTIFICATION = "offer_notification"
 
@@ -720,6 +804,9 @@ class DriverForegroundService : Service() {
         private const val LOCATION_TICK_INTERVAL_MS = 15_000L
         private const val INITIAL_RETRY_BACKOFF_MS = 15_000L
         private const val MAX_RETRY_BACKOFF_MS = 60_000L
+        private const val MIN_LOCATION_UPDATE_DISTANCE_METERS = 10f
+        private const val MIN_LOCATION_SEND_DISTANCE_METERS = 15f
+        private const val MAX_ACCEPTABLE_ACCURACY_METERS = 20f
 
         private const val LOCATION_UPDATE_URL =
             "https://taxi-backend.laithroom.com/api/admin/drivers/location"

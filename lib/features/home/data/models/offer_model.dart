@@ -39,14 +39,79 @@ final class NewOfferModel extends BaseOfferModel {
   });
 
   factory NewOfferModel.fromJson(Map<String, dynamic> json) {
+    String requireString(List<String> keys) {
+      for (final key in keys) {
+        final value = json[key];
+        final text = value?.toString().trim();
+
+        if (text != null && text.isNotEmpty) {
+          return text;
+        }
+      }
+
+      throw FormatException('Missing required field: ${keys.join(" / ")}');
+    }
+
+    String? optionalString(List<String> keys) {
+      for (final key in keys) {
+        final value = json[key];
+        final text = value?.toString().trim();
+
+        if (text != null && text.isNotEmpty) {
+          return text;
+        }
+      }
+
+      return null;
+    }
+
+    DateTime requireDateTime(List<String> keys) {
+      final raw = requireString(keys);
+      final parsed = DateTime.tryParse(raw);
+
+      if (parsed == null) {
+        throw FormatException(
+          'Invalid date field: ${keys.join(" / ")} -> $raw',
+        );
+      }
+
+      return parsed;
+    }
+
     return NewOfferModel(
-      type: JsonReader.requireString(json, 'type'),
-      offerId: JsonReader.requireString(json, 'orderId'),
-      pickup: JsonReader.requireString(json, 'pickupText'),
-      dropoff: JsonReader.optionalString(json, 'dropoffText'),
-      price: JsonReader.requireString(json, 'price'),
-      expiresAt: JsonReader.requireDateTime(json, 'expiresAt'),
-      notes: JsonReader.optionalString(json, 'note'),
+      type: requireString([
+        'type',
+        'order_status',
+      ]),
+      offerId: requireString([
+        'orderId',
+        'offerId',
+        'id',
+        'order_id',
+      ]),
+      pickup: requireString([
+        'pickupText',
+        'pickup',
+        'pickup_address',
+        'pickup_text',
+      ]),
+      dropoff: optionalString([
+        'dropoffText',
+        'dropoff',
+        'dropoff_address',
+        'dropoff_text',
+      ]),
+      price: requireString([
+        'price',
+      ]),
+      expiresAt: requireDateTime([
+        'expiresAt',
+        'expires_at',
+      ]),
+      notes: optionalString([
+        'note',
+        'notes',
+      ]),
     );
   }
 
