@@ -34,6 +34,10 @@ class LoginForm extends StatelessWidget {
     return Column(
       children: [
         AppTextField(
+          autofillHints: const [
+            AutofillHints.telephoneNumber,
+            AutofillHints.username,
+          ],
           controller: phoneController,
           labelText: context.l10n.phoneLabel,
           hintText: context.l10n.phoneHint,
@@ -43,6 +47,7 @@ class LoginForm extends StatelessWidget {
         ),
         AppSpacing.h16,
         AppTextField(
+          autofillHints: const [AutofillHints.password],
           controller: passwordController,
           labelText: context.l10n.passwordLabel,
           hintText: context.l10n.passwordHint,
