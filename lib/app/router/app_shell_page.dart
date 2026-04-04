@@ -43,6 +43,10 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
   }
 
   void _handleAppResumed() {
+    if (mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    }
+
     unawaited(
       ref
           .read(newOfferControllerProvider.notifier)
@@ -53,6 +57,12 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
       ref
           .read(accepteOfferControllerProvider.notifier)
           .syncAcceptedOfferFromBackend(),
+    );
+
+    unawaited(
+      ref
+          .read(availabilityProvider.notifier)
+          .reconcileAvailabilityOnAppStartOrResume(),
     );
   }
 

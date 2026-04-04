@@ -41,8 +41,8 @@ class AvailabilityController extends Notifier<AvailabilityState> {
       _serviceEventsSub = null;
     });
 
-    // Restore the last requested online state.
-    unawaited(Future.microtask(_restoreStoredStatus));
+    // Reconcile the real runtime state instead of blindly restoring local UI.
+    unawaited(reconcileAvailabilityOnAppStartOrResume());
 
     return const AvailabilityState(
       isOnline: false,
@@ -73,24 +73,55 @@ class AvailabilityController extends Notifier<AvailabilityState> {
     }
   }
 
+  // Reconcile availability when app starts or resumes.
+  Future<void> reconcileAvailabilityOnAppStartOrResume() async {
+    final local = ref.read(availabilityLocalDatasourceProvider);
+    final bridge = ref.read(driverBackgroundServiceBridgeProvider);
+    final runtime = ref.read(driverRuntimeControllerProvider);
+
+    final requested = await local.getOnlineRequested();
+    final serviceRunning = await bridge.isServiceRunning();
+
+    if (!requested) {
+      state = state.copyWith(
+        isOnline: false,
+        errorReason: null,
+        serverError: null,
+      );
+      return;
+    }
+
+    if (!serviceRunning) {
+      await _stopTracking();
+
+      try {
+        await runtime.stopOnlineRuntime();
+      } on Exception catch (e, st) {
+        debugPrint('stopOnlineRuntime during reconcile failed: $e\n$st');
+      }
+
+      await local.saveOnlineRequested(value: false);
+
+      state = state.copyWith(
+        isOnline: false,
+        errorReason: null,
+        serverError: null,
+      );
+      return;
+    }
+
+    _subscribeToFailures(ref.read(locationTrackerProvider));
+
+    state = state.copyWith(
+      isOnline: true,
+      errorReason: null,
+      serverError: null,
+    );
+  }
+
   void clearError() => _clearLocationError();
 
   void clearServerError() => _clearServerError();
-
-  // ---------------------------------------------------------------------------
-  // Restore
-  // ---------------------------------------------------------------------------
-
-  // Restore the last stored online flag.
-  Future<void> _restoreStoredStatus() async {
-    final storedStatus = await ref
-        .read(availabilityLocalDatasourceProvider)
-        .getOnlineRequested();
-
-    if (storedStatus == state.isOnline) return;
-
-    state = state.copyWith(isOnline: storedStatus);
-  }
 
   // ---------------------------------------------------------------------------
   // Native service events
@@ -128,16 +159,28 @@ class AvailabilityController extends Notifier<AvailabilityState> {
   // Online flow
   // ---------------------------------------------------------------------------
 
-  // Full online flow:
-  // permission -> tracking -> server -> runtime -> local state
   Future<void> _goOnline() async {
+    final bridge = ref.read(driverBackgroundServiceBridgeProvider);
     final startTracking = ref.read(startLocationTrackingUseCaseProvider);
     final tracker = ref.read(locationTrackerProvider);
     final setStatus = ref.read(setDriverStatusUseCaseProvider);
     final runtime = ref.read(driverRuntimeControllerProvider);
     final local = ref.read(availabilityLocalDatasourceProvider);
 
-    // Step 1: ensure location is ready.
+    // Step 0: ask Android to resolve location settings first.
+    final locationSettingsReady = await bridge.ensureLocationSettings();
+
+    // User cancelled the native location settings dialog,
+    // or the device could not resolve location settings.
+    if (!locationSettingsReady) {
+      state = state.copyWith(
+        isOnline: false,
+        errorReason: LocationFailureReason.serviceDisabled,
+      );
+      return;
+    }
+
+    // Step 1: ensure location permission/tracking is ready.
     final ready = await startTracking();
 
     if (!ready.isSuccess) {
@@ -192,7 +235,6 @@ class AvailabilityController extends Notifier<AvailabilityState> {
 
     state = state.copyWith(isOnline: true);
   }
-
   // ---------------------------------------------------------------------------
   // Offline flow
   // ---------------------------------------------------------------------------

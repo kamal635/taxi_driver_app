@@ -9,7 +9,7 @@ final dioProvider = Provider<Dio>((ref) {
   // Main Dio instance used by the app for all API calls
   final dio = Dio(
     BaseOptions(
-      baseUrl: 'https://taxi-dashboard.laithroom.com/',
+      baseUrl: 'https://taxi-backend.laithroom.com',
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
       sendTimeout: const Duration(seconds: 15),

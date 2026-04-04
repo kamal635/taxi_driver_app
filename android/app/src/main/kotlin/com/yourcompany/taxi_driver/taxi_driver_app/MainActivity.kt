@@ -1,29 +1,43 @@
 package com.yourcompany.taxi_driver.taxi_driver_app
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import io.flutter.embedding.android.FlutterActivity
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.Priority
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-class MainActivity : FlutterActivity() {
+class MainActivity :FlutterFragmentActivity()  {
 
     private val channelName = "driver_background_service"
     private val notificationPermissionRequestCode = 3001
 
     private var pendingNotificationPermissionResult: MethodChannel.Result? = null
+    private var pendingLocationSettingsResult: MethodChannel.Result? = null
 
-    // -------------------------------------------------------------------------
-    // Flutter engine
-    // -------------------------------------------------------------------------
+    private val locationSettingsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        val granted = result.resultCode == Activity.RESULT_OK
+        pendingLocationSettingsResult?.success(granted)
+        pendingLocationSettingsResult = null
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -46,6 +60,10 @@ class MainActivity : FlutterActivity() {
                     result.success(
                         NotificationManagerCompat.from(this).areNotificationsEnabled()
                     )
+                }
+
+                "ensureLocationSettings" -> {
+                    ensureLocationSettings(result)
                 }
 
                 "startService" -> {
@@ -120,11 +138,6 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Launch intents
-    // -------------------------------------------------------------------------
-
-    // Notify Flutter if the app was opened from an offer notification.
     private fun notifyFlutterIfLaunchedFromOffer(intent: Intent?) {
         val launchSource = intent?.getStringExtra(
             DriverForegroundService.EXTRA_LAUNCH_SOURCE
@@ -147,19 +160,12 @@ class MainActivity : FlutterActivity() {
         notifyFlutterIfLaunchedFromOffer(intent)
     }
 
-    // -------------------------------------------------------------------------
-    // Notification permission
-    // -------------------------------------------------------------------------
-
-    // Request notification permission on Android 13+.
     private fun ensureNotificationPermission(result: MethodChannel.Result) {
-        // Android 12 and below: no runtime notification permission.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             result.success(true)
             return
         }
 
-        // Already granted.
         if (
             ContextCompat.checkSelfPermission(
                 this,
@@ -170,7 +176,6 @@ class MainActivity : FlutterActivity() {
             return
         }
 
-        // Avoid duplicate requests.
         if (pendingNotificationPermissionResult != null) {
             result.error(
                 "permission_request_in_progress",
@@ -187,6 +192,60 @@ class MainActivity : FlutterActivity() {
             arrayOf(Manifest.permission.POST_NOTIFICATIONS),
             notificationPermissionRequestCode
         )
+    }
+
+    private fun ensureLocationSettings(result: MethodChannel.Result) {
+        if (pendingLocationSettingsResult != null) {
+            result.error(
+                "location_settings_request_in_progress",
+                "Location settings request is already in progress.",
+                null
+            )
+            return
+        }
+
+        val locationRequest = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            15_000L
+        )
+            .setMinUpdateIntervalMillis(10_000L)
+            .setWaitForAccurateLocation(false)
+            .build()
+
+        val settingsRequest = LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest)
+            .setAlwaysShow(true)
+            .build()
+
+        val client = LocationServices.getSettingsClient(this)
+        val task = client.checkLocationSettings(settingsRequest)
+
+        task.addOnSuccessListener {
+            result.success(true)
+        }
+
+        task.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException) {
+                try {
+                    pendingLocationSettingsResult = result
+
+                    val intentSenderRequest = IntentSenderRequest.Builder(
+                        exception.resolution
+                    ).build()
+
+                    locationSettingsLauncher.launch(intentSenderRequest)
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    pendingLocationSettingsResult = null
+                    result.error(
+                        "location_settings_launch_failed",
+                        sendEx.message,
+                        null
+                    )
+                }
+            } else {
+                result.success(false)
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -206,17 +265,12 @@ class MainActivity : FlutterActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    // -------------------------------------------------------------------------
-    // Flutter callbacks
-    // -------------------------------------------------------------------------
-
     companion object {
         private const val TAG = "DriverService"
 
         private var serviceMethodChannel: MethodChannel? = null
         private val mainHandler = Handler(Looper.getMainLooper())
 
-        // Notify Flutter that the background service stopped.
         fun notifyFlutterServiceStopped(reason: String) {
             mainHandler.post {
                 serviceMethodChannel?.invokeMethod(
@@ -226,7 +280,6 @@ class MainActivity : FlutterActivity() {
             }
         }
 
-        // Notify Flutter that a new offer payload was received.
         fun notifyFlutterOfferReceived(payloadJson: String) {
             mainHandler.post {
                 serviceMethodChannel?.invokeMethod(
@@ -236,7 +289,6 @@ class MainActivity : FlutterActivity() {
             }
         }
 
-        // Notify Flutter that the app was opened from an offer notification.
         fun notifyFlutterOfferNotificationOpened(offerId: String?) {
             mainHandler.post {
                 serviceMethodChannel?.invokeMethod(

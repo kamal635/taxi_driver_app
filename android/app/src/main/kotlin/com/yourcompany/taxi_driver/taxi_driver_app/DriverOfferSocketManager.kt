@@ -115,7 +115,7 @@ class DriverOfferSocketManager {
 
     companion object {
         private const val TAG = "DriverOfferRuntime"
-        private const val BASE_URL = "http://10.0.2.2:3000"
+        private const val BASE_URL = "https://taxi-backend.laithroom.com"
         private const val EVENT_NEW_OFFER = "new_offer"
     }
 }
