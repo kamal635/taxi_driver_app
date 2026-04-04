@@ -54,6 +54,12 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
           .read(accepteOfferControllerProvider.notifier)
           .syncAcceptedOfferFromBackend(),
     );
+
+    unawaited(
+      ref
+          .read(availabilityProvider.notifier)
+          .reconcileAvailabilityOnAppStartOrResume(),
+    );
   }
 
   @override

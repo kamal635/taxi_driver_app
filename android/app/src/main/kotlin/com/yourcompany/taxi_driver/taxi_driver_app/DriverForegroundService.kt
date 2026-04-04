@@ -9,6 +9,7 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.location.LocationManager
 import android.media.AudioAttributes
 import android.os.Build
 import android.os.Handler
@@ -62,6 +63,7 @@ class DriverForegroundService : Service() {
     // Periodic location loop.
     private val backgroundTickRunnable = object : Runnable {
         override fun run() {
+             Log.d(TAG, "BACKGROUND_TICK_FIRED -> isLoopRunning=$isLoopRunning")
             if (!isLoopRunning) return
 
             requestCurrentLocation()
@@ -212,6 +214,17 @@ class DriverForegroundService : Service() {
         }
     }
 
+    // Stop the service when location requirements are no longer valid.
+    private fun stopServiceDueToLocationIssue(reason: String) {
+        Log.w(TAG, "Stopping driver background service due to location issue: $reason")
+
+        MainActivity.notifyFlutterServiceStopped(reason)
+
+        serviceHandler.post {
+            handleStop()
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Background loop
     // -------------------------------------------------------------------------
@@ -319,8 +332,16 @@ class DriverForegroundService : Service() {
 
     // Request the current device location once.
     private fun requestCurrentLocation() {
+            Log.d(TAG, "REQUEST_CURRENT_LOCATION_START")
         if (!hasLocationPermission()) {
             Log.w(TAG, "Location permission is missing")
+            stopServiceDueToLocationIssue("location_permission_missing")
+            return
+        }
+
+        if (!isLocationServiceEnabled()) {
+            Log.w(TAG, "Location service is disabled")
+            stopServiceDueToLocationIssue("location_service_disabled")
             return
         }
 
@@ -329,6 +350,17 @@ class DriverForegroundService : Service() {
             .addOnSuccessListener { location ->
                 if (location == null) {
                     Log.w(TAG, "Current location is null")
+
+                    if (!hasLocationPermission()) {
+                        stopServiceDueToLocationIssue("location_permission_missing")
+                        return@addOnSuccessListener
+                    }
+
+                    if (!isLocationServiceEnabled()) {
+                        stopServiceDueToLocationIssue("location_service_disabled")
+                        return@addOnSuccessListener
+                    }
+
                     return@addOnSuccessListener
                 }
 
@@ -371,6 +403,16 @@ class DriverForegroundService : Service() {
             }
             .addOnFailureListener { error ->
                 Log.e(TAG, "Failed to get current location", error)
+
+                if (!hasLocationPermission()) {
+                    stopServiceDueToLocationIssue("location_permission_missing")
+                    return@addOnFailureListener
+                }
+
+                if (!isLocationServiceEnabled()) {
+                    stopServiceDueToLocationIssue("location_service_disabled")
+                    return@addOnFailureListener
+                }
             }
     }
 
@@ -498,6 +540,24 @@ class DriverForegroundService : Service() {
         ) == PackageManager.PERMISSION_GRANTED
 
         return fineGranted || coarseGranted
+    }
+
+    // Check whether the device location service is enabled.
+    private fun isLocationServiceEnabled(): Boolean {
+        val locationManager = getSystemService(LocationManager::class.java)
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            locationManager?.isLocationEnabled == true
+        } else {
+            try {
+                Settings.Secure.getInt(
+                    contentResolver,
+                    Settings.Secure.LOCATION_MODE
+                ) != Settings.Secure.LOCATION_MODE_OFF
+            } catch (_: Exception) {
+                false
+            }
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -642,8 +702,9 @@ class DriverForegroundService : Service() {
         private const val INITIAL_RETRY_BACKOFF_MS = 15_000L
         private const val MAX_RETRY_BACKOFF_MS = 60_000L
 
-        private const val LOCATION_UPDATE_URL =
-            "http://10.0.2.2:3000/api/admin/drivers/location"
+        
+            private const val LOCATION_UPDATE_URL =
+    "https://taxi-backend.laithroom.com/api/admin/drivers/location"
 
         @Volatile
         var isRunning: Boolean = false
