@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/accepted_offer_card.dart';
+import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/home_empty_state.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/new_offer_card.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/offers/accepted_offer_card.dart';
+import 'package:taxi_driver_app/features/home/presentation/widgets/offers/new_offer_card.dart';
 
+/// Resolves which home content should be visible right now.
 class HomeOfferSection extends ConsumerWidget {
   const HomeOfferSection({super.key});
 
@@ -14,16 +16,23 @@ class HomeOfferSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
 
-    final asyncNewOffer = ref.watch(newOfferControllerProvider);
-    final asyncAcceptedOffer = ref.watch(accepteOfferControllerProvider);
+    final pendingOffer = ref.watch(
+      newOfferControllerProvider.select(
+        (state) => state.asData?.value.currentOffer,
+      ),
+    );
+    final acceptedOffer = ref.watch(
+      acceptOfferControllerProvider.select(
+        (state) => state.asData?.value.acceptedOffer,
+      ),
+    );
+    final restoredAcceptedOffer = ref.watch(restoredCurrentOfferProvider);
 
-    final newOffer = asyncNewOffer.value?.currentOffer;
-    final acceptedOffer = asyncAcceptedOffer.value?.offerAcceptedEntity;
-
-    if (newOffer != null) {
+    if (pendingOffer != null) {
       return const NewOfferCard();
     }
-    if (acceptedOffer != null) {
+
+    if (acceptedOffer != null || restoredAcceptedOffer != null) {
       return const AcceptedOfferCard();
     }
 

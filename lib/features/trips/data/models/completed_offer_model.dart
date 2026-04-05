@@ -1,6 +1,7 @@
 import 'package:taxi_driver_app/core/utils/json_reader.dart';
 import 'package:taxi_driver_app/features/trips/domain/entities/completed_offer_entity.dart';
 
+/// Data model for a single completed trip.
 final class CompletedOfferModel {
   CompletedOfferModel({
     required this.offerId,

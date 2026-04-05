@@ -1,45 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 
+/// Formats completed trip time labels for the trips list.
 class CompletedTripTimeFormatter {
   const CompletedTripTimeFormatter._();
 
-  // Format completed trip time for the list item.
   static String format(BuildContext context, DateTime dateTime) {
     final l10n = context.l10n;
-    final local = dateTime.toLocal();
+    final localDateTime = dateTime.toLocal();
     final now = DateTime.now();
 
     final todayStart = DateTime(now.year, now.month, now.day);
-    final tripDayStart = DateTime(local.year, local.month, local.day);
+    final tripDayStart = DateTime(
+      localDateTime.year,
+      localDateTime.month,
+      localDateTime.day,
+    );
 
-    final daysDifference = todayStart.difference(tripDayStart).inDays;
+    final dayDifference = todayStart.difference(tripDayStart).inDays;
 
-    final material = MaterialLocalizations.of(context);
-    final timeText = material.formatTimeOfDay(
-      TimeOfDay.fromDateTime(local),
+    final materialLocalizations = MaterialLocalizations.of(context);
+    final timeText = materialLocalizations.formatTimeOfDay(
+      TimeOfDay.fromDateTime(localDateTime),
       alwaysUse24HourFormat: MediaQuery.of(context).alwaysUse24HourFormat,
     );
 
-    if (daysDifference == 0) {
+    if (dayDifference == 0) {
       return '${l10n.todayLabel} $timeText';
     }
 
-    if (daysDifference == 1) {
+    if (dayDifference == 1) {
       return '${l10n.yesterdayLabel} $timeText';
     }
 
-    if (daysDifference > 1 && daysDifference < 7) {
-      final weekdayText = _weekdayLabel(local.weekday, context);
-      return '$weekdayText $timeText';
+    if (dayDifference > 1 && dayDifference < 7) {
+      final weekdayLabel = _weekdayLabel(
+        weekday: localDateTime.weekday,
+        context: context,
+      );
+      return '$weekdayLabel $timeText';
     }
 
-    final dateText = material.formatShortDate(local);
+    final dateText = materialLocalizations.formatShortDate(localDateTime);
     return '$dateText $timeText';
   }
 
-  // Map weekday to localized label.
-  static String _weekdayLabel(int weekday, BuildContext context) {
+  static String _weekdayLabel({
+    required int weekday,
+    required BuildContext context,
+  }) {
     final l10n = context.l10n;
 
     switch (weekday) {

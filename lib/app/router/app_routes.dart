@@ -1,11 +1,12 @@
 abstract final class AppRoutes {
-  static const login = '/login';
-  static const setupPassword = '/setupPassword';
+  const AppRoutes._();
 
-  static const home = '/home';
-  static const trips = '/trips';
-  static const profile = '/profile';
+  static const String login = '/login';
+  static const String setupPassword = '/setupPassword';
 
-  static const profilePassword = '/profile/password';
-  static const profileVehicles = '/profile/vehicles';
+  static const String home = '/home';
+  static const String trips = '/trips';
+  static const String profile = '/profile';
+
+  static const String profilePassword = '/profile/password';
 }

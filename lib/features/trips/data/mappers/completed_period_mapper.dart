@@ -1,9 +1,10 @@
 import 'package:taxi_driver_app/features/trips/domain/entities/completed_offers_result_entity.dart';
 
+/// Maps backend period values to domain values and vice versa.
 CompletedPeriod completedPeriodFromJson(Object? value) {
-  final v = (value ?? 'all').toString();
+  final rawValue = (value ?? 'all').toString();
 
-  switch (v) {
+  switch (rawValue) {
     case 'all':
       return CompletedPeriod.all;
     case 'month':
@@ -13,7 +14,7 @@ CompletedPeriod completedPeriodFromJson(Object? value) {
     case 'day':
       return CompletedPeriod.day;
     default:
-      return CompletedPeriod.all; // fallback
+      return CompletedPeriod.all;
   }
 }
 

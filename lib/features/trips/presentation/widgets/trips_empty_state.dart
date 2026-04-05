@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
+import 'package:taxi_driver_app/features/trips/presentation/widgets/trips_card_surface.dart';
 
 class TripsEmptyState extends StatelessWidget {
   const TripsEmptyState({
@@ -18,14 +19,7 @@ class TripsEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: AppColors.border),
-      ),
+    return TripsCardSurface(
       child: Column(
         children: [
           Container(

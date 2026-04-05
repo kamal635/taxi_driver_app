@@ -23,89 +23,36 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
-  // Controllers for text inputs
-  late final TextEditingController _phoneController;
-  late final TextEditingController _passwordController;
+  late final TextEditingController _phoneTextController;
+  late final TextEditingController _passwordTextController;
 
-  // UI state: password visibility
-  bool _obscurePassword = true;
+  bool _isPasswordObscured = true;
 
   @override
   void initState() {
     super.initState();
-    // Initialize controllers once
-    _phoneController = TextEditingController();
-    _passwordController = TextEditingController();
+    _phoneTextController = TextEditingController();
+    _passwordTextController = TextEditingController();
   }
 
   @override
   void dispose() {
-    // Always dispose controllers to avoid memory leaks
-    _phoneController.dispose();
-    _passwordController.dispose();
+    _phoneTextController.dispose();
+    _passwordTextController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final authSession = ref.read(authSessionProvider);
-
-    ref.listen(authControllerProvider, (prev, next) async {
-      await next.whenOrNull(
-        error: (err, _) {
-          final msg = failureToUserMessage(
-            err,
-            l10n: context.l10n,
-            context: FailureContext.authLogin,
-          );
-          context.showAppSnack(msg, type: AppSnackType.error);
-        },
-        data: (result) async {
-          if (result == null) return;
-
-          switch (result) {
-            case AuthSignedIn(:final authSessionEntity):
-              await authSession.saveAfterLogin(
-                driverName: authSessionEntity.driverName,
-                driverPhone: authSessionEntity.driverPhone,
-                driverId: authSessionEntity.driverId,
-                token: authSessionEntity.accessToken,
-                refreshToken: authSessionEntity.refreshToken,
-                mustChangePassword: false,
-              );
-              if (context.mounted) context.go(AppRoutes.home);
-              return;
-
-            case AuthSetupRequired(:final authSessionEntity):
-              await authSession.saveAfterLogin(
-                driverName: authSessionEntity.driverName,
-                driverPhone: authSessionEntity.driverPhone,
-                driverId: authSessionEntity.driverId,
-                token: authSessionEntity.accessToken,
-                refreshToken: authSessionEntity.refreshToken,
-                mustChangePassword: true,
-              );
-              if (context.mounted) {
-                context.go(
-                  AppRoutes.setupPassword,
-                  extra: authSessionEntity,
-                );
-              }
-              return;
-          }
-        },
-      );
-    });
-
-    // Current auth state
     final authState = ref.watch(authControllerProvider);
     final isLoading = authState.isLoading;
+
+    _listenToAuthState();
 
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        // Background gradient
         decoration: const BoxDecoration(
           gradient: RadialGradient(
             center: Alignment.topCenter,
@@ -119,39 +66,111 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             child: Column(
               children: [
                 const LoginHeader(),
-
-                // The main form
                 LoginForm(
-                  phoneController: _phoneController,
-                  passwordController: _passwordController,
-                  obscurePassword: _obscurePassword,
-                  onTogglePasswordVisibility: () {
-                    // Toggle visibility
-                    setState(() => _obscurePassword = !_obscurePassword);
-                  },
+                  phoneController: _phoneTextController,
+                  passwordController: _passwordTextController,
+                  obscurePassword: _isPasswordObscured,
+                  onTogglePasswordVisibility: _togglePasswordVisibility,
                   isLoading: isLoading,
-
-                  // Submit handler
-                  onSubmit: isLoading
-                      ? null
-                      : () async {
-                          TextInput.finishAutofillContext();
-                          await ref
-                              .read(authControllerProvider.notifier)
-                              .signIn(
-                                phone: _phoneController.text.trim(),
-                                password: _passwordController.text,
-                                // fcmToken: ... later
-                              );
-                        },
+                  onSubmit: isLoading ? null : _submitSignIn,
                 ),
-
                 const LoginFooter(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  /// Listens to auth state changes and reacts with UI side effects.
+  void _listenToAuthState() {
+
+    ref.listen(authControllerProvider, (previous, next) async {
+      await next.whenOrNull(
+        error: (error, _) {
+          final message = failureToUserMessage(
+            error,
+            l10n: context.l10n,
+            context: FailureContext.authLogin,
+          );
+
+          context.showAppSnack(message, type: AppSnackType.error);
+        },
+        data: (result) async {
+          if (result == null) {
+            return;
+          }
+
+          switch (result) {
+            case AuthSignedIn(:final authSession):
+              await _saveSignedInSession(authSession);
+              return;
+
+            case AuthSetupRequired(:final authSession):
+              await _saveSetupRequiredSession(authSession);
+              return;
+          }
+        },
+      );
+    });
+  }
+
+  void _togglePasswordVisibility() {
+    setState(() => _isPasswordObscured = !_isPasswordObscured);
+  }
+
+  /// Submits the current form values to the auth controller.
+  Future<void> _submitSignIn() async {
+    TextInput.finishAutofillContext();
+    FocusScope.of(context).unfocus();
+
+    await ref.read(authControllerProvider.notifier).signIn(
+      phone: _phoneTextController.text.trim(),
+      password: _passwordTextController.text,
+      // fcmToken: Add later when push notifications are wired.
+    );
+  }
+
+
+  Future<void> _saveSignedInSession(AuthSessionEntity session) async {
+    final authSessionStore = ref.read(authSessionProvider);
+
+    await authSessionStore.saveAfterLogin(
+      driverName: session.driverName,
+      driverPhone: session.driverPhone,
+      driverId: session.driverId,
+      token: session.accessToken,
+      refreshToken: session.refreshToken,
+      mustChangePassword: false,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    context.go(AppRoutes.home);
+  }
+
+  Future<void> _saveSetupRequiredSession(AuthSessionEntity session) async {
+    final authSessionStore = ref.read(authSessionProvider);
+
+    await authSessionStore.saveAfterLogin(
+      driverName: session.driverName,
+      driverPhone: session.driverPhone,
+      driverId: session.driverId,
+      token: session.accessToken,
+      refreshToken: session.refreshToken,
+      mustChangePassword: true,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    context.go(
+      AppRoutes.setupPassword,
+      extra: session,
     );
   }
 }

@@ -19,25 +19,14 @@ class TripsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = context.l10n;
-    final tripsState = ref.watch(completedOffersControllerProvider);
+    _listenForErrors(context, ref);
 
+    final tripsState = ref.watch(completedOffersControllerProvider);
     final result = tripsState.result;
     final offers = result?.offers ?? const <CompletedOfferEntity>[];
 
     final isInitialLoading = tripsState.isLoading && result == null;
     final isRefreshing = tripsState.isRefreshing;
-
-    // Show snackbar only when a new error appears.
-    ref.listen<Object?>(
-      completedOffersControllerProvider.select((state) => state.error),
-      (previous, next) {
-        if (next == null || identical(previous, next)) return;
-
-        final message = failureToUserMessage(next, l10n: l10n);
-        context.showAppSnack(message, type: AppSnackType.error);
-      },
-    );
 
     return RefreshIndicator(
       onRefresh: () {
@@ -49,17 +38,13 @@ class TripsPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// summary card
             TripsSummaryCard(
-              title: l10n.tripsSummaryTitle,
-              earningsLabel: l10n.tripsSummaryEarningsLabel,
+              title: context.l10n.tripsSummaryTitle,
+              earningsLabel: context.l10n.tripsSummaryEarningsLabel,
               earningsText:
                   'SYP ${formatOrderPrice(result?.totalProfits ?? "0")}',
             ),
-
             AppSpacing.h12,
-
-            /// drop down filtter
             TripsFilterDropdown(
               value: result?.period ?? CompletedPeriod.all,
               enabled: !tripsState.isLoading && !tripsState.isRefreshing,
@@ -71,28 +56,33 @@ class TripsPage extends ConsumerWidget {
                     .changePeriod(value);
               },
             ),
-
             AppSpacing.h18,
-
-            /// trip title and total trips
             TripsSectionHeader(
-              title: l10n.tripsRecentTitle,
-              subtitle: l10n.tripsTotalTrips(result?.count ?? 0),
+              title: context.l10n.tripsRecentTitle,
+              subtitle: context.l10n.tripsTotalTrips(result?.count ?? 0),
             ),
-
             AppSpacing.h12,
-
-            /// List of trips
             TripsContentSection(
               offers: offers,
               isInitialLoading: isInitialLoading,
               isRefreshing: isRefreshing,
             ),
-
             AppSpacing.h12,
           ],
         ),
       ),
+    );
+  }
+
+  void _listenForErrors(BuildContext context, WidgetRef ref) {
+    ref.listen<Object?>(
+      completedOffersControllerProvider.select((state) => state.error),
+      (previous, next) {
+        if (next == null || identical(previous, next)) return;
+
+        final message = failureToUserMessage(next, l10n: context.l10n);
+        context.showAppSnack(message, type: AppSnackType.error);
+      },
     );
   }
 }

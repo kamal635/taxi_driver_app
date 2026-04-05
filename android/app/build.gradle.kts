@@ -19,12 +19,12 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.yourcompany.taxi_driver.taxi_driver_app"
-        minSdk = 24
-        targetSdk = 35
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
-    }
+    applicationId = "com.yourcompany.taxi_driver.taxi_driver_app"
+    minSdk = flutter.minSdkVersion
+    targetSdk = 35
+    versionCode = flutter.versionCode
+    versionName = flutter.versionName
+}
 
     buildTypes {
         release {

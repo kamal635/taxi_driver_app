@@ -1,30 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
+import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
 
-// Provides the runtime coordinator for driver online mode.
-final driverRuntimeControllerProvider = Provider<DriverRuntimeController>(
-  DriverRuntimeController.new,
-);
-
+/// Coordinates services that must run while the driver is online.
 class DriverRuntimeController {
-  DriverRuntimeController(this.ref);
+  DriverRuntimeController(this._ref);
 
-  final Ref ref;
+  final Ref _ref;
 
-  // ---------------------------------------------------------------------------
-  // Start
-  // ---------------------------------------------------------------------------
-
-  // Start the full online runtime.
-  // Flow:
-  // 1) Read auth session
-  // 2) Request notification permission
-  // 3) Start native foreground service
-  // 4) Verify service state
+  /// Starts the complete runtime required for online mode.
   Future<void> startOnlineRuntime() async {
-    final bridge = ref.read(driverBackgroundServiceBridgeProvider);
-    final session = ref.read(authSessionProvider);
+    final bridge = _ref.read(driverBackgroundServiceBridgeProvider);
+    final session = _ref.read(authSessionProvider);
 
     final token = session.token;
     final driverId = session.driverId;
@@ -54,10 +42,13 @@ class DriverRuntimeController {
     final isRunning = await _waitForServiceRunning(bridge);
 
     if (!isRunning) {
-      throw StateError(
-        'Background service did not start successfully.',
-      );
+      throw StateError('Background service did not start successfully.');
     }
+  }
+
+  /// Stops the complete runtime required for online mode.
+  Future<void> stopOnlineRuntime() async {
+    await _ref.read(driverBackgroundServiceBridgeProvider).stopService();
   }
 
   Future<bool> _waitForServiceRunning(
@@ -69,22 +60,13 @@ class DriverRuntimeController {
     for (var i = 0; i < maxAttempts; i++) {
       final isRunning = await bridge.isServiceRunning();
 
-      if (isRunning) return true;
+      if (isRunning) {
+        return true;
+      }
 
       await Future<void>.delayed(delay);
     }
 
     return false;
-  }
-  // ---------------------------------------------------------------------------
-  // Stop
-  // ---------------------------------------------------------------------------
-
-  // Stop the full online runtime.
-  // Flow:
-  // 1) Stop native foreground service
-  Future<void> stopOnlineRuntime() async {
-    // Stop the native Android foreground service.
-    await ref.read(driverBackgroundServiceBridgeProvider).stopService();
   }
 }

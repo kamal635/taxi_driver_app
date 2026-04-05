@@ -49,6 +49,6 @@ final class OfferAcceptedEntity extends OfferEntity {
 
   final String customerPhone;
 
-  /// Server authority: when Done becomes allowed.
+  /// Server authority: when completing the offer becomes allowed.
   final DateTime cooldownUntil;
 }

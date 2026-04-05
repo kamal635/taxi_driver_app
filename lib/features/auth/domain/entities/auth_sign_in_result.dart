@@ -1,3 +1,4 @@
+/// Domain entity representing the authenticated driver session.
 class AuthSessionEntity {
   const AuthSessionEntity({
     required this.accessToken,
@@ -14,17 +15,21 @@ class AuthSessionEntity {
   final String driverPhone;
 }
 
+/// Base result for sign-in attempts.
 sealed class AuthSignInResult {
   const AuthSignInResult();
 }
 
+/// Returned when sign-in succeeds and the driver can enter the app directly.
 final class AuthSignedIn extends AuthSignInResult {
-  const AuthSignedIn(this.authSessionEntity);
+  const AuthSignedIn(this.authSession);
 
-  final AuthSessionEntity authSessionEntity;
+  final AuthSessionEntity authSession;
 }
 
+/// Returned when sign-in succeeds but the driver must set a password first.
 final class AuthSetupRequired extends AuthSignInResult {
-  const AuthSetupRequired(this.authSessionEntity);
-  final AuthSessionEntity authSessionEntity;
+  const AuthSetupRequired(this.authSession);
+
+  final AuthSessionEntity authSession;
 }

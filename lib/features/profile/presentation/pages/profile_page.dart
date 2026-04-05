@@ -21,56 +21,28 @@ class ProfilePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    _listenToSignOutState(context, ref);
+
     final l10n = context.l10n;
     final authSession = ref.watch(authSessionProvider);
+    final displayName = _safeDisplayValue(authSession.driverName);
+    final phoneNumber = _safeDisplayValue(authSession.driverPhone);
 
-    ref.listen(signOutControllerProvider, (prev, next) async {
-      await next.whenOrNull(
-        error: (err, _) {
-          final msg = failureToUserMessage(
-            err,
-            l10n: context.l10n,
-          );
-          context.showAppSnack(msg, type: AppSnackType.error);
-        },
-        data: (done) async {
-          if (!done) return;
-          if (prev?.value ?? false) return;
-
-          if (context.mounted) {
-            context.go(AppRoutes.login);
-          }
-        },
-      );
-    });
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 90.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AppSpacing.h8,
-
-          /// profile header with avatar, name, phone
           ProfileHeaderCard(
-            name: authSession.driverName?.trim().isNotEmpty ?? false
-                ? authSession.driverName!
-                : '—',
-            phone: authSession.driverPhone?.trim().isNotEmpty ?? false
-                ? authSession.driverPhone!
-                : '—',
-
-            placeholderImage: authSession.driverName?.trim().isNotEmpty ?? false
-                ? authSession.driverName!
-                : '—',
+            name: displayName,
+            phone: phoneNumber,
+            avatarSeed: displayName,
           ),
-
           AppSpacing.h18,
-
-          /// account section: change password, my vehicles
           ProfileSection(
-            sectionTitle: l10n.profileSectionAccount,
-            items: [
-              /// change password
+            title: l10n.profileSectionAccount,
+            children: [
               ProfileSectionItem(
                 title: l10n.profileChangePasswordTitle,
                 subtitle: l10n.profileChangePasswordSubtitle,
@@ -81,38 +53,23 @@ class ProfilePage extends ConsumerWidget {
               ),
             ],
           ),
-
           AppSpacing.h18,
-
-          /// account section: sign out
           ProfileSection(
-            sectionTitle: l10n.profileSectionSignOut,
-            items: [
+            title: l10n.profileSectionSignOut,
+            children: [
               ProfileSectionItem(
-                isSignOut: true,
+                isDestructive: true,
                 title: l10n.profileSignOutTitle,
                 subtitle: l10n.profileSignOutSubtitle,
                 icon: AppIcons.signOut,
                 onPressed: () async {
-                  final confirmed = await showAppConfirmDialog(
+                  final confirmed = await _showSignOutConfirmation(
                     context: context,
-                    title: l10n.signOutConfirmTitle,
-                    message: l10n.signOutConfirmMessage,
-                    confirmLabel: l10n.actionConfirm,
-                    cancelLabel: l10n.actionCancel,
-                    barrierDismissible: true,
-                    icon: Icons.logout_rounded,
-                    iconColor: Colors.red,
-                    backgroundColorIcon: Colors.red.withValues(alpha: 0.10),
                   );
 
-                  if (!context.mounted) return;
+                  if (!context.mounted || !confirmed) return;
 
-                  if (confirmed) {
-                    await ref
-                        .read(signOutControllerProvider.notifier)
-                        .signOut();
-                  }
+                  await ref.read(signOutControllerProvider.notifier).signOut();
                 },
               ),
             ],
@@ -120,5 +77,50 @@ class ProfilePage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _listenToSignOutState(BuildContext context, WidgetRef ref) {
+    ref.listen(signOutControllerProvider, (previous, next) async {
+      await next.whenOrNull(
+        error: (error, _) {
+          final message = failureToUserMessage(
+            error,
+            l10n: context.l10n,
+          );
+          context.showAppSnack(message, type: AppSnackType.error);
+        },
+        data: (didSignOut) async {
+          if (!didSignOut) return;
+          if (previous?.value ?? false) return;
+
+          if (context.mounted) {
+            context.go(AppRoutes.login);
+          }
+        },
+      );
+    });
+  }
+
+  Future<bool> _showSignOutConfirmation({
+    required BuildContext context,
+  }) async {
+    final l10n = context.l10n;
+
+    return showAppConfirmDialog(
+      context: context,
+      title: l10n.signOutConfirmTitle,
+      message: l10n.signOutConfirmMessage,
+      confirmLabel: l10n.actionConfirm,
+      cancelLabel: l10n.actionCancel,
+      barrierDismissible: true,
+      icon: Icons.logout_rounded,
+      iconColor: Colors.red,
+      backgroundColorIcon: Colors.red.withValues(alpha: 0.10),
+    );
+  }
+
+  String _safeDisplayValue(String? value) {
+    final trimmed = value?.trim();
+    return (trimmed != null && trimmed.isNotEmpty) ? trimmed : '—';
   }
 }

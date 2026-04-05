@@ -11,61 +11,29 @@ import 'package:taxi_driver_app/core/avatar/avatar_controller.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 
+/// Displays the current avatar and lets the user change or remove it.
 class AvatarImageEditor extends ConsumerWidget {
-  const AvatarImageEditor({required this.placeholderImage, super.key});
+  const AvatarImageEditor({
+    required this.placeholderSeed,
+    super.key,
+  });
 
-  final String placeholderImage;
+  final String placeholderSeed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final avatarAsync = ref.watch(avatarControllerProvider);
-    final avatarPath = avatarAsync.value;
-
-    final text = placeholderImage.trim();
-    final initial = text.isNotEmpty ? text[0] : '—';
-
+    final avatarState = ref.watch(avatarControllerProvider);
+    final avatarPath = avatarState.value;
     final hasAvatar = avatarPath != null && avatarPath.isNotEmpty;
-    final isBusy = avatarAsync.isLoading;
+    final isBusy = avatarState.isLoading;
+    final fallbackInitial = _buildFallbackInitial(placeholderSeed);
 
     return Stack(
       alignment: Alignment.bottomLeft,
       children: [
-        Container(
-          width: 92.r,
-          height: 92.r,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.55),
-              width: 3,
-            ),
-            color: AppColors.bgBase,
-          ),
-          alignment: Alignment.center,
-          child: hasAvatar
-              ? ClipOval(
-                  child: Image.file(
-                    File(avatarPath),
-                    width: 92.r,
-                    height: 92.r,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) {
-                      // If file is missing/corrupted -> fallback to initial
-                      return Text(
-                        initial,
-                        style: AppTypography.titleSm.copyWith(
-                          fontWeight: FontWeight.w900,
-                        ),
-                      );
-                    },
-                  ),
-                )
-              : Text(
-                  initial,
-                  style: AppTypography.titleSm.copyWith(
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
+        _AvatarPreview(
+          avatarPath: avatarPath,
+          fallbackInitial: fallbackInitial,
         ),
         Positioned(
           left: 2.w,
@@ -74,7 +42,11 @@ class AvatarImageEditor extends ConsumerWidget {
             borderRadius: BorderRadius.circular(999),
             onTap: isBusy
                 ? null
-                : () => _showAvatarActions(context, ref, hasAvatar),
+                : () => _showAvatarActions(
+                      context: context,
+                      ref: ref,
+                      hasAvatar: hasAvatar,
+                    ),
             child: Container(
               width: 34.r,
               height: 34.r,
@@ -100,11 +72,16 @@ class AvatarImageEditor extends ConsumerWidget {
     );
   }
 
-  Future<void> _showAvatarActions(
-    BuildContext context,
-    WidgetRef ref,
-    bool hasAvatar,
-  ) async {
+  String _buildFallbackInitial(String value) {
+    final trimmed = value.trim();
+    return trimmed.isNotEmpty ? trimmed[0] : '—';
+  }
+
+  Future<void> _showAvatarActions({
+    required BuildContext context,
+    required WidgetRef ref,
+    required bool hasAvatar,
+  }) async {
     final l10n = context.l10n;
 
     await showModalBottomSheet<void>(
@@ -120,7 +97,7 @@ class AvatarImageEditor extends ConsumerWidget {
                 title: Text(l10n.profileAvatarChangePhoto),
                 onTap: () async {
                   context.pop();
-                  await _showPickSource(context, ref);
+                  await _showPickSource(context: context, ref: ref);
                 },
               ),
               ListTile(
@@ -149,7 +126,10 @@ class AvatarImageEditor extends ConsumerWidget {
     );
   }
 
-  Future<void> _showPickSource(BuildContext context, WidgetRef ref) async {
+  Future<void> _showPickSource({
+    required BuildContext context,
+    required WidgetRef ref,
+  }) async {
     final l10n = context.l10n;
 
     final source = await showModalBottomSheet<ImageSource>(
@@ -181,5 +161,63 @@ class AvatarImageEditor extends ConsumerWidget {
     await ref
         .read(avatarControllerProvider.notifier)
         .pickAndSaveAvatar(source: source);
+  }
+}
+
+class _AvatarPreview extends StatelessWidget {
+  const _AvatarPreview({
+    required this.avatarPath,
+    required this.fallbackInitial,
+  });
+
+  final String? avatarPath;
+  final String fallbackInitial;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasAvatar = avatarPath != null && avatarPath!.isNotEmpty;
+
+    return Container(
+      width: 92.r,
+      height: 92.r,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.55),
+          width: 3,
+        ),
+        color: AppColors.bgBase,
+      ),
+      child: hasAvatar
+          ? ClipOval(
+              child: Image.file(
+                File(avatarPath!),
+                width: 92.r,
+                height: 92.r,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => _AvatarFallbackText(
+                  initial: fallbackInitial,
+                ),
+              ),
+            )
+          : _AvatarFallbackText(initial: fallbackInitial),
+    );
+  }
+}
+
+class _AvatarFallbackText extends StatelessWidget {
+  const _AvatarFallbackText({required this.initial});
+
+  final String initial;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      initial,
+      style: AppTypography.titleSm.copyWith(
+        fontWeight: FontWeight.w900,
+      ),
+    );
   }
 }

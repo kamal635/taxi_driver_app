@@ -34,7 +34,7 @@ class AppSignOutService {
 
     // 3) Clear accepted offer state.
     try {
-      _ref.read(accepteOfferControllerProvider.notifier).clear();
+      _ref.read(acceptOfferControllerProvider.notifier).clear();
     } on Exception catch (_) {
       // ignore
     }

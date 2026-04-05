@@ -1,22 +1,24 @@
 import 'dart:async' show FutureOr, StreamSubscription, Timer, unawaited;
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
+import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
 import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
+import 'package:taxi_driver_app/features/home/presentation/state/new_offer_state.dart';
 
-// Provides the pending offer controller fed by native background events.
 final newOfferControllerProvider =
     AsyncNotifierProvider<NewOfferController, NewOfferState>(
       NewOfferController.new,
     );
 
+/// Stores the currently active pending offer received from background events.
 final class NewOfferController extends AsyncNotifier<NewOfferState> {
-  StreamSubscription<DriverBackgroundOfferEvent>? _offerEventsSub;
+  StreamSubscription<DriverBackgroundOfferEvent>? _offerEventsSubscription;
   StreamSubscription<DriverOfferNotificationOpenEvent>?
-  _offerNotificationOpensSub;
+  _offerNotificationOpenSubscription;
 
   Timer? _expiryTimer;
 
@@ -24,20 +26,20 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
   FutureOr<NewOfferState> build() {
     final bridge = ref.read(driverBackgroundServiceBridgeProvider);
 
-    _offerEventsSub ??= bridge.offerEvents.listen(
+    _offerEventsSubscription ??= bridge.offerEvents.listen(
       _handleNativeOfferEvent,
     );
 
-    _offerNotificationOpensSub ??= bridge.offerNotificationOpens.listen(
+    _offerNotificationOpenSubscription ??= bridge.offerNotificationOpens.listen(
       _handleOfferNotificationOpened,
     );
 
     ref.onDispose(() {
-      unawaited(_offerEventsSub?.cancel());
-      _offerEventsSub = null;
+      unawaited(_offerEventsSubscription?.cancel());
+      _offerEventsSubscription = null;
 
-      unawaited(_offerNotificationOpensSub?.cancel());
-      _offerNotificationOpensSub = null;
+      unawaited(_offerNotificationOpenSubscription?.cancel());
+      _offerNotificationOpenSubscription = null;
 
       _cancelExpiryTimer();
     });
@@ -66,21 +68,21 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     try {
       final offer = _parseOfferFromPayload(event.payloadJson);
       _storeOfferIfActive(offer);
-    } on Exception catch (e, st) {
+    } on Exception catch (error, stackTrace) {
       state = AsyncData(
-        _currentState.copyWith(errorMessage: e.toString()),
+        _currentState.copyWith(errorMessage: error.toString()),
       );
 
-      debugPrint('Failed to parse native background offer: $e\n$st');
+      debugPrint(
+        'Failed to parse native background offer: $error\n$stackTrace',
+      );
     }
   }
 
   void _handleOfferNotificationOpened(
     DriverOfferNotificationOpenEvent event,
   ) {
-    debugPrint(
-      'Offer notification opened -> offerId=${event.offerId}',
-    );
+    debugPrint('Offer notification opened -> offerId=${event.offerId}');
 
     final payloadJson = event.payloadJson;
     if (payloadJson == null || payloadJson.isEmpty) {
@@ -91,12 +93,15 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     try {
       final offer = _parseOfferFromPayload(payloadJson);
       _storeOfferIfActive(offer);
-    } on Exception catch (e, st) {
+    } on Exception catch (error, stackTrace) {
       state = AsyncData(
-        _currentState.copyWith(errorMessage: e.toString()),
+        _currentState.copyWith(errorMessage: error.toString()),
       );
 
-      debugPrint('Failed to restore offer from notification open: $e\n$st');
+      debugPrint(
+        'Failed to restore offer from notification open: '
+        '$error\n$stackTrace',
+      );
     }
   }
 
@@ -104,15 +109,13 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     final decoded = jsonDecode(payloadJson);
 
     if (decoded is! Map) {
-      throw const FormatException(
-        'Offer payload is not a JSON object.',
-      );
+      throw const FormatException('Offer payload is not a JSON object.');
     }
 
     final json = Map<String, dynamic>.from(decoded);
     final model = NewOfferModel.fromJson(json);
 
-    return _mapToEntity(model);
+    return model.toEntity();
   }
 
   void _storeOfferIfActive(NewOfferEntity offer) {
@@ -156,16 +159,11 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
 
     _expiryTimer = Timer(remaining, () {
       final currentOffer = state.asData?.value.currentOffer;
-
       if (currentOffer?.offerId != offer.offerId) return;
 
-      state = AsyncData(
-        _currentState.copyWith(currentOffer: null),
-      );
+      state = AsyncData(_currentState.copyWith(currentOffer: null));
 
-      debugPrint(
-        'Pending offer expired locally -> id=${offer.offerId}',
-      );
+      debugPrint('Pending offer expired locally -> id=${offer.offerId}');
     });
   }
 
@@ -176,44 +174,5 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
 
   bool _isExpired(NewOfferEntity offer) {
     return !offer.expiresAt.isAfter(DateTime.now());
-  }
-
-  NewOfferEntity _mapToEntity(NewOfferModel model) {
-    return NewOfferEntity(
-      type: model.type,
-      offerId: model.offerId,
-      pickup: model.pickup,
-      price: model.price,
-      expiresAt: model.expiresAt,
-      dropoff: model.dropoff,
-      notes: model.notes,
-    );
-  }
-}
-
-@immutable
-final class NewOfferState {
-  const NewOfferState({
-    this.currentOffer,
-    this.errorMessage,
-  });
-
-  final NewOfferEntity? currentOffer;
-  final String? errorMessage;
-
-  static const Object _unset = Object();
-
-  NewOfferState copyWith({
-    Object? currentOffer = _unset,
-    Object? errorMessage = _unset,
-  }) {
-    return NewOfferState(
-      currentOffer: identical(currentOffer, _unset)
-          ? this.currentOffer
-          : currentOffer as NewOfferEntity?,
-      errorMessage: identical(errorMessage, _unset)
-          ? this.errorMessage
-          : errorMessage as String?,
-    );
   }
 }

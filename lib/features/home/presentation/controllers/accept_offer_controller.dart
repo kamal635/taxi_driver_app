@@ -1,96 +1,67 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/errors/failure.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/accepte_offer.dart';
+import 'package:taxi_driver_app/features/home/domain/usecases/accept_offer_use_case.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
+import 'package:taxi_driver_app/features/home/presentation/helpers/pending_offer_guard.dart';
+import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
+import 'package:taxi_driver_app/features/home/presentation/state/accept_offer_state.dart';
 
-// Provides the accepted offer controller.
-final accepteOfferControllerProvider =
-    AsyncNotifierProvider<AccepteOfferController, AccepteOfferState>(
-      AccepteOfferController.new,
+final acceptOfferControllerProvider =
+    AsyncNotifierProvider<AcceptOfferController, AcceptOfferState>(
+      AcceptOfferController.new,
     );
 
-final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
-  late final AcceptOfferUseCase _accepteOfferUsecase;
+/// Handles accepting the current pending offer.
+final class AcceptOfferController extends AsyncNotifier<AcceptOfferState> {
+  late final AcceptOfferUseCase _acceptOfferUseCase;
 
   @override
-  FutureOr<AccepteOfferState> build() {
-    _accepteOfferUsecase = ref.read(accepteOfferUsecaseProvider);
-
-    return const AccepteOfferState();
+  FutureOr<AcceptOfferState> build() {
+    _acceptOfferUseCase = ref.read(acceptOfferUseCaseProvider);
+    return const AcceptOfferState();
   }
 
-  Future<void> accepte({required String offerId}) async {
-    final alreadyAccepted = state.value?.offerAcceptedEntity != null;
+  Future<void> accept({required String offerId}) async {
+    final alreadyAccepted = state.value?.acceptedOffer != null;
     if (state.isLoading || alreadyAccepted) return;
 
-    final activeOffer = _readActivePendingOffer(expectedOfferId: offerId);
+    final activeOffer = readActivePendingOffer(
+      ref: ref,
+      expectedOfferId: offerId,
+      onError: (error, stackTrace) {
+        state = AsyncError(error, stackTrace);
+      },
+    );
+
     if (activeOffer == null) return;
 
     state = const AsyncLoading();
 
     try {
-      final result = await _accepteOfferUsecase(offerId: offerId);
+      final acceptedOffer = await _acceptOfferUseCase(offerId: offerId);
 
       ref.read(newOfferControllerProvider.notifier).clearCurrent();
-
       unawaited(_setOfflineBestEffort());
 
       state = AsyncData(
-        AccepteOfferState(
-          offerAcceptedEntity: result,
-          doneEndsAt: result.cooldownUntil,
+        AcceptOfferState(
+          acceptedOffer: acceptedOffer,
+          doneEndsAt: acceptedOffer.cooldownUntil,
         ),
       );
-    } on Failure catch (f, st) {
-      state = AsyncError(f, st);
-    } on Exception catch (e, st) {
-      state = AsyncError(e, st);
+    } on Failure catch (failure, stackTrace) {
+      state = AsyncError(failure, stackTrace);
+    } on Exception catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
     }
   }
 
   void clear() {
-    state = const AsyncData(AccepteOfferState());
-  }
-
-  NewOfferEntity? _readActivePendingOffer({
-    required String expectedOfferId,
-  }) {
-    final pendingOfferState = ref.read(newOfferControllerProvider);
-    final pendingOffer = pendingOfferState.asData?.value.currentOffer;
-
-    if (pendingOffer == null) {
-      state = AsyncError(
-        StateError('This offer is no longer available.'),
-        StackTrace.current,
-      );
-      return null;
-    }
-
-    if (pendingOffer.offerId != expectedOfferId) {
-      state = AsyncError(
-        StateError('This offer is no longer the active pending offer.'),
-        StackTrace.current,
-      );
-      return null;
-    }
-
-    if (!pendingOffer.expiresAt.isAfter(DateTime.now())) {
-      ref.read(newOfferControllerProvider.notifier).clearCurrent();
-
-      state = AsyncError(
-        StateError('This offer has expired.'),
-        StackTrace.current,
-      );
-      return null;
-    }
-
-    return pendingOffer;
+    state = const AsyncData(AcceptOfferState());
   }
 
   Future<void> _setOfflineBestEffort() async {
@@ -98,19 +69,8 @@ final class AccepteOfferController extends AsyncNotifier<AccepteOfferState> {
       await ref
           .read(availabilityProvider.notifier)
           .requestSetOnline(value: false);
-    } on Exception catch (e) {
-      debugPrint('Failed to set availability offline: $e');
+    } on Exception catch (error) {
+      debugPrint('Failed to set availability offline: $error');
     }
   }
-}
-
-@immutable
-final class AccepteOfferState {
-  const AccepteOfferState({
-    this.offerAcceptedEntity,
-    this.doneEndsAt,
-  });
-
-  final OfferAcceptedEntity? offerAcceptedEntity;
-  final DateTime? doneEndsAt;
 }
