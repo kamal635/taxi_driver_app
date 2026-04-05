@@ -1,45 +1,37 @@
-import 'package:taxi_driver_app/features/home/data/datasources/remote/offer_remote_datasource.dart';
+import 'package:taxi_driver_app/features/home/data/datasources/remote/offer_remote_data_source.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/complete_offer_result_entity.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
-import 'package:taxi_driver_app/features/home/domain/repositories/offer_repo.dart';
+import 'package:taxi_driver_app/features/home/domain/repositories/offer_repository.dart';
 
+/// Repository implementation that maps remote models into domain entities.
 final class OfferRepositoryImpl implements OfferRepository {
-  OfferRepositoryImpl({required this.remote});
+  OfferRepositoryImpl({required this.remoteDataSource});
 
-  final OfferRemoteDatasource remote;
+  final OfferRemoteDataSource remoteDataSource;
 
-  ///  2- accepte Offer
   @override
-  Future<OfferAcceptedEntity> accepteOffer({required String offerId}) async {
-    final data = await remote.accepteOffer(offerId: offerId);
-
-    return data.toEntity();
+  Future<OfferAcceptedEntity> acceptOffer({required String offerId}) async {
+    final model = await remoteDataSource.acceptOffer(offerId: offerId);
+    return model.toEntity();
   }
 
-  ///  3- decline Offer
   @override
-  Future<void> declineOffer({required String offerId}) async {
-    await remote.declineOffer(offerId: offerId);
+  Future<void> declineOffer({required String offerId}) {
+    return remoteDataSource.declineOffer(offerId: offerId);
   }
 
-  ///  4- get Current And Pending Offer
   @override
   Future<CurrentAndPendingOfferEntity?> getCurrentAndPendingOffer() async {
-    final res = await remote.getCurrentAndPendingOffer();
-
-    return CurrentAndPendingOfferEntity(
-      currentOffer: res?.currentOffer?.toEntity(),
-      pendingOffer: res?.pendingOffer?.toEntity(),
-    );
+    final model = await remoteDataSource.getCurrentAndPendingOffer();
+    return model?.toEntity();
   }
 
-  ///  5- decline Offer
   @override
   Future<CompleteOfferResultEntity> completeOffer({
     required String offerId,
   }) async {
-    final res = await remote.completeOffer(offerId: offerId);
-    return res.toEntity();
+    final model = await remoteDataSource.completeOffer(offerId: offerId);
+    return model.toEntity();
   }
 }

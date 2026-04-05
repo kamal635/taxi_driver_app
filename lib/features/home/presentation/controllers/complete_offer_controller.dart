@@ -2,39 +2,24 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/complete_offer_usecase.dart';
+import 'package:taxi_driver_app/features/home/domain/usecases/complete_offer_use_case.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
-
-//-------------------------------------------
-//      - Complete Order Controller Provider -
-//-------------------------------------------
+import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
 
 final completeOfferControllerProvider =
     AsyncNotifierProvider<CompleteOfferController, void>(
       CompleteOfferController.new,
     );
 
-//-------------------------------------------
-//           - Complete Order Controller -
-//-------------------------------------------
-
+/// Completes the current accepted offer.
 final class CompleteOfferController extends AsyncNotifier<void> {
-  late final CompleteOfferUseCase _completeOrderUseCase;
-
-  //-------------------------------------------
-  //                - Build -
-  //-------------------------------------------
+  late final CompleteOfferUseCase _completeOfferUseCase;
 
   @override
   FutureOr<void> build() {
-    _completeOrderUseCase = ref.read(completeOfferUseCaseProvider);
+    _completeOfferUseCase = ref.read(completeOfferUseCaseProvider);
   }
-
-  //-------------------------------------------
-  //            - Complete Order -
-  //-------------------------------------------
 
   Future<void> complete({required String offerId}) async {
     if (state.isLoading) return;
@@ -42,24 +27,17 @@ final class CompleteOfferController extends AsyncNotifier<void> {
     state = const AsyncLoading();
 
     try {
-      // Complete order on the server.
-      await _completeOrderUseCase(offerId: offerId);
+      await _completeOfferUseCase(offerId: offerId);
 
-      // Clear accepted/current order after success.
-      ref.read(accepteOfferControllerProvider.notifier).clear();
-
-      // Clear restored current order after success.
+      ref.read(acceptOfferControllerProvider.notifier).clear();
       ref.read(restoredCurrentOfferProvider.notifier).state = null;
-
-      // Clear pending/new offer after success.
       ref.read(newOfferControllerProvider.notifier).clearCurrent();
 
-      // Finish in a clean idle state.
       state = const AsyncData(null);
-    } on Failure catch (f, st) {
-      state = AsyncError(f, st);
-    } on Exception catch (e, st) {
-      state = AsyncError(e, st);
+    } on Failure catch (failure, stackTrace) {
+      state = AsyncError(failure, stackTrace);
+    } on Exception catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
     }
   }
 }

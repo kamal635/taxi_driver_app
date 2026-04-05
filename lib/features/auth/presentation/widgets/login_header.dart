@@ -7,20 +7,19 @@ import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 class LoginHeader extends StatelessWidget {
   const LoginHeader({super.key});
 
+  static const _logoAssetPath = 'assets/images/logo_taxi_driver.png';
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         AppSpacing.h18,
         Image.asset(
-          'assets/images/logo_taxi_driver.png',
+          _logoAssetPath,
           height: 112.r,
           width: 112.r,
         ),
-
         AppSpacing.h14,
-
-        /// Brand name text
         Text(
           context.l10n.brandName,
           textAlign: TextAlign.center,
@@ -28,10 +27,7 @@ class LoginHeader extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: AppTypography.titleLg,
         ),
-
         AppSpacing.h10,
-
-        /// Subtitle text below the brand name
         Text(
           context.l10n.brandSubtitle,
           textAlign: TextAlign.center,
@@ -39,7 +35,6 @@ class LoginHeader extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: AppTypography.subtitleMd,
         ),
-
         AppSpacing.h24,
       ],
     );

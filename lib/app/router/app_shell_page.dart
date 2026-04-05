@@ -1,27 +1,18 @@
 import 'dart:async' show unawaited;
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taxi_driver_app/app/router/bottom_nav.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
+import 'package:taxi_driver_app/app/router/app_routes.dart';
+import 'package:taxi_driver_app/app/router/widgets/app_top_bar.dart';
+import 'package:taxi_driver_app/app/router/widgets/bottom_nav.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/avatar/avatar_controller.dart';
-import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
-import 'package:taxi_driver_app/core/location/location_providers.dart';
-import 'package:taxi_driver_app/core/location/location_result.dart';
-import 'package:taxi_driver_app/core/session/session_providers.dart';
-import 'package:taxi_driver_app/core/widgets/pill_switch.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/restore_current_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
+import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
 
 class AppShellPage extends ConsumerStatefulWidget {
   const AppShellPage({
@@ -37,36 +28,42 @@ class AppShellPage extends ConsumerStatefulWidget {
 
 class _AppShellPageState extends ConsumerState<AppShellPage> {
   AppLifecycleListener? _appLifecycleListener;
-  ProviderSubscription<AsyncValue<CurrentAndPendingOfferEntity>>? _restoreSub;
+  ProviderSubscription<AsyncValue<CurrentAndPendingOfferEntity>>?
+  _restoreSubscription;
 
   @override
   void initState() {
     super.initState();
+    _setupLifecycleListener();
+    _setupRestoreSubscription();
+    _bootstrapCurrentOfferRestore();
+  }
 
-    _appLifecycleListener = AppLifecycleListener(
-      onResume: _handleAppResumed,
-    );
+  void _setupLifecycleListener() {
+    _appLifecycleListener = AppLifecycleListener(onResume: _handleAppResumed);
+  }
 
-    _restoreSub = ref.listenManual<AsyncValue<CurrentAndPendingOfferEntity>>(
-      restoreCurrentControllerProvider,
-      (previous, next) {
-        final data = next.asData?.value;
-        if (data == null) return;
+  void _setupRestoreSubscription() {
+    _restoreSubscription = ref
+        .listenManual<AsyncValue<CurrentAndPendingOfferEntity>>(
+          restoreCurrentControllerProvider,
+          (previous, next) {
+            final data = next.asData?.value;
+            if (data == null) return;
 
-        ref.read(restoredCurrentOfferProvider.notifier).state =
-            data.currentOffer;
-      },
-    );
+            ref.read(restoredCurrentOfferProvider.notifier).state =
+                data.currentOffer;
+          },
+        );
+  }
 
+  void _bootstrapCurrentOfferRestore() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final didBootstrap = ref.read(hasBootstrappedCurrentRestoreProvider);
       if (didBootstrap) return;
 
       ref.read(hasBootstrappedCurrentRestoreProvider.notifier).state = true;
-
-      unawaited(
-        ref.read(restoreCurrentControllerProvider.notifier).restore(),
-      );
+      unawaited(ref.read(restoreCurrentControllerProvider.notifier).restore());
     });
   }
 
@@ -82,9 +79,19 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
     );
   }
 
+  String _pageTitle(BuildContext context) {
+    final l10n = context.l10n;
+
+    return switch (widget.navigationShell.currentIndex) {
+      0 => l10n.navHome,
+      1 => l10n.navTrips,
+      _ => l10n.navProfile,
+    };
+  }
+
   @override
   void dispose() {
-    _restoreSub?.close();
+    _restoreSubscription?.close();
     _appLifecycleListener?.dispose();
     _appLifecycleListener = null;
     super.dispose();
@@ -93,12 +100,6 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-
-    final pageTitle = switch (widget.navigationShell.currentIndex) {
-      0 => l10n.navHome,
-      1 => l10n.navTrips,
-      _ => l10n.navProfile,
-    };
 
     return Scaffold(
       extendBody: true,
@@ -112,20 +113,14 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
                 children: [
                   AppSpacing.h8,
                   AppTopBar(
-                    title: pageTitle,
-                    avatarText: 'A',
-                    onBellPressed: () {},
-                    onAvatarPressed: () {
-                      context.go('/profile');
-                    },
+                    title: _pageTitle(context),
+                    onAvatarPressed: () => context.go(AppRoutes.profile),
                   ),
                   AppSpacing.h8,
                 ],
               ),
             ),
-            Expanded(
-              child: widget.navigationShell,
-            ),
+            Expanded(child: widget.navigationShell),
           ],
         ),
       ),
@@ -136,223 +131,6 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
         tripsLabel: l10n.navTrips,
         profileLabel: l10n.navProfile,
       ),
-    );
-  }
-}
-
-class AppTopBar extends ConsumerStatefulWidget {
-  const AppTopBar({
-    required this.title,
-    required this.avatarText,
-    required this.onBellPressed,
-    required this.onAvatarPressed,
-    super.key,
-  });
-
-  final String title;
-  final String avatarText;
-  final VoidCallback onBellPressed;
-  final VoidCallback onAvatarPressed;
-
-  @override
-  ConsumerState<AppTopBar> createState() => _AppTopBarState();
-}
-
-class _AppTopBarState extends ConsumerState<AppTopBar> {
-  ProviderSubscription<LocationFailureReason?>? _errorSub;
-  ProviderSubscription<Object?>? _serverErrorSub;
-
-  Future<void> _handleOnlineChanged(bool value) async {
-    final restoredCurrentOffer = ref.read(restoredCurrentOfferProvider);
-    final acceptedOffer = ref
-        .read(accepteOfferControllerProvider)
-        .value
-        ?.offerAcceptedEntity;
-
-    final hasActiveTrip = restoredCurrentOffer != null || acceptedOffer != null;
-
-    if (value && hasActiveTrip) {
-      context.showAppSnack(
-        'You have an active trip. Complete it first.',
-        type: AppSnackType.error,
-      );
-      return;
-    }
-
-    await ref
-        .read(availabilityProvider.notifier)
-        .requestSetOnline(value: value);
-
-    if (!mounted) return;
-
-    if (!value) {
-      ref
-              .read(hasRequestedRestoreForCurrentOnlineSessionProvider.notifier)
-              .state =
-          false;
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _serverErrorSub = ref.listenManual<Object?>(
-      availabilityProvider.select((s) => s.serverError),
-      (previous, next) {
-        if (next == null || identical(previous, next)) return;
-
-        final msg = failureToUserMessage(next, l10n: context.l10n);
-        context.showAppSnack(msg, type: AppSnackType.error);
-
-        ref.read(availabilityProvider.notifier).clearServerError();
-      },
-    );
-
-    _errorSub = ref.listenManual<LocationFailureReason?>(
-      availabilityProvider.select((s) => s.errorReason),
-      (previous, next) {
-        if (next == null || next == previous) return;
-
-        final l10n = context.l10n;
-
-        final message = switch (next) {
-          LocationFailureReason.serviceDisabled => l10n.locationServiceDisabled,
-          LocationFailureReason.permissionDenied =>
-            l10n.locationPermissionRequired,
-          LocationFailureReason.permissionDeniedForever =>
-            l10n.locationPermissionDeniedForever,
-          LocationFailureReason.unableToDetermine =>
-            l10n.locationPermissionUnableToDetermine,
-          LocationFailureReason.networkError => l10n.locationNetworkError,
-        };
-
-        final actionLabel = switch (next) {
-          LocationFailureReason.serviceDisabled ||
-          LocationFailureReason.permissionDeniedForever => l10n.actionSettings,
-          _ => null,
-        };
-
-        final locationService = ref.read(locationServiceProvider);
-
-        final onAction = switch (next) {
-          LocationFailureReason.serviceDisabled => () => unawaited(
-            locationService.openLocationSettings(),
-          ),
-          LocationFailureReason.permissionDeniedForever => () => unawaited(
-            locationService.openAppSettings(),
-          ),
-          _ => null,
-        };
-
-        context.showAppSnack(
-          message,
-          type: AppSnackType.error,
-          actionLabel: actionLabel,
-          onAction: onAction,
-        );
-
-        ref.read(availabilityProvider.notifier).clearError();
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _errorSub?.close();
-    _serverErrorSub?.close();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-
-    final (:isOnline, :isBusy) = ref.watch(
-      availabilityProvider.select(
-        (s) => (isOnline: s.isOnline, isBusy: s.isBusy),
-      ),
-    );
-
-    final restoredCurrentOffer = ref.watch(restoredCurrentOfferProvider);
-    final acceptedOffer = ref
-        .watch(accepteOfferControllerProvider)
-        .value
-        ?.offerAcceptedEntity;
-
-    final hasActiveTrip = restoredCurrentOffer != null || acceptedOffer != null;
-
-    final avatarAsync = ref.watch(avatarControllerProvider);
-    final avatarPath = avatarAsync.value;
-
-    final session = ref.watch(authSessionProvider);
-    final name = session.driverName?.trim() ?? '';
-    final initial = name.isNotEmpty ? name[0] : '—';
-
-    final hasAvatar = avatarPath != null && avatarPath.isNotEmpty;
-
-    return Column(
-      children: [
-        Row(
-          children: [
-            AppSpacing.w10,
-            PillSwitch(
-              value: isOnline,
-              onChanged: isBusy || hasActiveTrip
-                  ? null
-                  : (v) {
-                      unawaited(_handleOnlineChanged(v));
-                    },
-              offLabel: l10n.offline,
-              onLabel: l10n.online,
-              uppercase: false,
-            ),
-            Expanded(
-              child: Text(
-                widget.title,
-                textAlign: TextAlign.center,
-                style: AppTypography.titleSm,
-              ),
-            ),
-            AppSpacing.w12,
-            GestureDetector(
-              onTap: avatarAsync.isLoading ? null : widget.onAvatarPressed,
-              child: Container(
-                width: 38.r,
-                height: 38.r,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.primary,
-                    width: 2,
-                  ),
-                  color: AppColors.white,
-                ),
-                alignment: Alignment.center,
-                child: hasAvatar
-                    ? ClipOval(
-                        child: Image.file(
-                          File(avatarPath),
-                          width: 38.r,
-                          height: 38.r,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) {
-                            return Text(
-                              initial,
-                              style: AppTypography.labelMd,
-                            );
-                          },
-                        ),
-                      )
-                    : Text(
-                        initial,
-                        style: AppTypography.labelMd,
-                      ),
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

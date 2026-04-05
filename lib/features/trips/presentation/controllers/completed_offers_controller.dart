@@ -1,30 +1,33 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/errors/failure.dart';
 import 'package:taxi_driver_app/features/trips/domain/entities/completed_offers_result_entity.dart';
-import 'package:taxi_driver_app/features/trips/domain/usecases/get_completed_offers_usecase.dart';
-import 'package:taxi_driver_app/features/trips/presentation/controllers/setup_providers.dart';
+import 'package:taxi_driver_app/features/trips/domain/usecases/get_completed_offers_use_case.dart';
+import 'package:taxi_driver_app/features/trips/presentation/providers/trips_providers.dart';
+import 'package:taxi_driver_app/features/trips/presentation/state/completed_offers_state.dart';
 
 final completedOffersControllerProvider =
     NotifierProvider<CompletedOffersController, CompletedOffersState>(
       CompletedOffersController.new,
     );
 
+/// Handles loading and filter changes for the trips screen.
 final class CompletedOffersController extends Notifier<CompletedOffersState> {
-  late final GetCompletedOffersUseCase _getCompletedOffers;
+  late final GetCompletedOffersUseCase _getCompletedOffersUseCase;
 
   @override
   CompletedOffersState build() {
-    _getCompletedOffers = ref.read(completedOffersUseCaseProvider);
+    _getCompletedOffersUseCase = ref.read(getCompletedOffersUseCaseProvider);
 
     unawaited(Future.microtask(loadInitial));
 
-    return const CompletedOffersState(isLoading: true);
+    return const CompletedOffersState(
+      isLoading: true,
+    );
   }
 
-  // Load first screen state.
+  /// Loads the initial screen state once.
   Future<void> loadInitial() async {
     if (state.result != null) return;
 
@@ -34,31 +37,13 @@ final class CompletedOffersController extends Notifier<CompletedOffersState> {
       error: null,
     );
 
-    try {
-      final data = await _fetchOffers(period: CompletedPeriod.all);
-
-      state = state.copyWith(
-        result: data,
-        isLoading: false,
-        isRefreshing: false,
-        error: null,
-      );
-    } on Failure catch (error) {
-      state = state.copyWith(
-        isLoading: false,
-        isRefreshing: false,
-        error: error,
-      );
-    } on Exception catch (error) {
-      state = state.copyWith(
-        isLoading: false,
-        isRefreshing: false,
-        error: error,
-      );
-    }
+    await _loadPeriod(
+      period: CompletedPeriod.all,
+      hasVisibleData: false,
+    );
   }
 
-  // Change selected filter and keep old data visible.
+  /// Changes the selected filter while preserving current visible data.
   Future<void> changePeriod(CompletedPeriod period) async {
     final currentPeriod = state.result?.period;
 
@@ -66,11 +51,31 @@ final class CompletedOffersController extends Notifier<CompletedOffersState> {
       return;
     }
 
-    final hasData = state.result != null;
+    await _loadPeriod(
+      period: period,
+      hasVisibleData: state.result != null,
+    );
+  }
 
+  /// Refreshes the current period.
+  Future<void> refresh() async {
+    if (state.isLoading || state.isRefreshing) return;
+
+    final period = state.result?.period ?? CompletedPeriod.all;
+
+    await _loadPeriod(
+      period: period,
+      hasVisibleData: state.result != null,
+    );
+  }
+
+  Future<void> _loadPeriod({
+    required CompletedPeriod period,
+    required bool hasVisibleData,
+  }) async {
     state = state.copyWith(
-      isLoading: !hasData,
-      isRefreshing: hasData,
+      isLoading: !hasVisibleData,
+      isRefreshing: hasVisibleData,
       error: null,
     );
 
@@ -98,49 +103,9 @@ final class CompletedOffersController extends Notifier<CompletedOffersState> {
     }
   }
 
-  // Reload current filter.
-  Future<void> refresh() async {
-    final period = state.result?.period ?? CompletedPeriod.all;
-    await changePeriod(period);
-  }
-
-  // Fetch data from domain layer.
-  Future<CompletedOffersResultEntity?> _fetchOffers({
+  Future<CompletedOffersResultEntity> _fetchOffers({
     required CompletedPeriod period,
   }) {
-    return _getCompletedOffers(period: period);
-  }
-}
-
-@immutable
-final class CompletedOffersState {
-  const CompletedOffersState({
-    this.result,
-    this.isLoading = false,
-    this.isRefreshing = false,
-    this.error,
-  });
-
-  final CompletedOffersResultEntity? result;
-  final bool isLoading;
-  final bool isRefreshing;
-  final Object? error;
-
-  static const Object _unset = Object();
-
-  CompletedOffersState copyWith({
-    Object? result = _unset,
-    bool? isLoading,
-    bool? isRefreshing,
-    Object? error = _unset,
-  }) {
-    return CompletedOffersState(
-      result: identical(result, _unset)
-          ? this.result
-          : result as CompletedOffersResultEntity?,
-      isLoading: isLoading ?? this.isLoading,
-      isRefreshing: isRefreshing ?? this.isRefreshing,
-      error: identical(error, _unset) ? this.error : error,
-    );
+    return _getCompletedOffersUseCase(period: period);
   }
 }

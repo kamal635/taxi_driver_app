@@ -1,9 +1,9 @@
 import 'package:taxi_driver_app/core/utils/json_reader.dart';
+import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
 
-//-------------------------------------------
-//    - Current And Pending Offer Model -
-//-------------------------------------------
+/// Combined payload that may contain the active current offer and/or a pending
+/// incoming offer.
 final class CurrentAndPendingOfferModel {
   const CurrentAndPendingOfferModel({
     required this.currentOffer,
@@ -22,26 +22,31 @@ final class CurrentAndPendingOfferModel {
       throw const FormatException('Invalid pendingOffer');
     }
 
-    final current = currentRaw as Map<String, dynamic>?;
-    final pending = pendingRaw as Map<String, dynamic>?;
+    final currentJson = currentRaw as Map<String, dynamic>?;
+    final pendingJson = pendingRaw as Map<String, dynamic>?;
 
     return CurrentAndPendingOfferModel(
-      currentOffer: current == null
+      currentOffer: currentJson == null
           ? null
-          : CurrentOfferModel.fromJson(current),
-      pendingOffer: pending == null
+          : CurrentOfferModel.fromJson(currentJson),
+      pendingOffer: pendingJson == null
           ? null
-          : PendingOfferModel.fromJson(pending),
+          : PendingOfferModel.fromJson(pendingJson),
     );
   }
 
   final CurrentOfferModel? currentOffer;
   final PendingOfferModel? pendingOffer;
+
+  CurrentAndPendingOfferEntity toEntity() {
+    return CurrentAndPendingOfferEntity(
+      currentOffer: currentOffer?.toEntity(),
+      pendingOffer: pendingOffer?.toEntity(),
+    );
+  }
 }
 
-//-------------------------------------------
-//        - Current Offer Model -
-//-------------------------------------------
+/// Data model for the currently accepted offer.
 final class CurrentOfferModel {
   const CurrentOfferModel({
     required this.offerId,
@@ -76,7 +81,6 @@ final class CurrentOfferModel {
   final String type;
   final DateTime cooldownUntil;
 
-  /// Map "currentOrder" to the same domain entity used by the Accepted card.
   OfferAcceptedEntity toEntity() {
     return OfferAcceptedEntity(
       offerId: offerId,
@@ -91,9 +95,7 @@ final class CurrentOfferModel {
   }
 }
 
-//-------------------------------------------
-//        - Pending Offer Model -
-//-------------------------------------------
+/// Data model for an incoming pending offer.
 final class PendingOfferModel {
   const PendingOfferModel({
     required this.offerId,
@@ -125,8 +127,6 @@ final class PendingOfferModel {
   final String type;
   final DateTime expiresAt;
 
-  /// Map "PendingOfferModel" to the same domain entity
-  /// used by the NewOfferEntity.
   NewOfferEntity toEntity() {
     return NewOfferEntity(
       offerId: offerId,

@@ -4,45 +4,41 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/location/location_result.dart';
 import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
-import 'package:taxi_driver_app/features/availability/data/datasources/local/availability_local_datasource.dart';
-import 'package:taxi_driver_app/features/availability/domain/entity/driver_status.dart';
+import 'package:taxi_driver_app/features/availability/domain/entities/driver_status.dart';
 import 'package:taxi_driver_app/features/availability/domain/repositories/location_tracker.dart';
-import 'package:taxi_driver_app/features/availability/presentation/controllers/driver_runtime_controller.dart';
-import 'package:taxi_driver_app/features/availability/presentation/providers/availability_tracking_providers.dart';
+import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
+import 'package:taxi_driver_app/features/availability/presentation/state/availability_state.dart';
 
 final availabilityProvider =
     NotifierProvider<AvailabilityController, AvailabilityState>(
       AvailabilityController.new,
     );
 
+/// Orchestrates the driver online/offline flow without changing domain logic.
 class AvailabilityController extends Notifier<AvailabilityState> {
-  StreamSubscription<LocationFailureReason>? _failuresSub;
-  StreamSubscription<DriverBackgroundServiceEvent>? _serviceEventsSub;
+  StreamSubscription<LocationFailureReason>? _locationFailuresSubscription;
+  StreamSubscription<DriverBackgroundServiceEvent>? _serviceEventsSubscription;
 
-  bool _autoStopping = false;
+  bool _isAutoStopping = false;
   bool _isReconciling = false;
-
-  // ---------------------------------------------------------------------------
-  // Build
-  // ---------------------------------------------------------------------------
 
   @override
   AvailabilityState build() {
-    final bridge = ref.read(driverBackgroundServiceBridgeProvider);
+    final serviceBridge = ref.read(driverBackgroundServiceBridgeProvider);
 
-    _serviceEventsSub ??= bridge.serviceEvents.listen(
+    _serviceEventsSubscription ??= serviceBridge.serviceEvents.listen(
       _handleNativeServiceEvent,
     );
 
     ref.onDispose(() {
-      unawaited(_failuresSub?.cancel());
-      unawaited(_serviceEventsSub?.cancel());
+      unawaited(_locationFailuresSubscription?.cancel());
+      unawaited(_serviceEventsSubscription?.cancel());
 
-      _failuresSub = null;
-      _serviceEventsSub = null;
+      _locationFailuresSubscription = null;
+      _serviceEventsSubscription = null;
     });
 
-    // Reconcile the real runtime state instead of blindly restoring local UI.
+    // Reconcile runtime state instead of blindly restoring local UI state.
     unawaited(reconcileAvailabilityOnAppStartOrResume());
 
     return const AvailabilityState(
@@ -51,11 +47,7 @@ class AvailabilityController extends Notifier<AvailabilityState> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Public API
-  // ---------------------------------------------------------------------------
-
-  // Main entry point for online/offline toggle.
+  /// Main entry point for the online/offline toggle.
   Future<void> requestSetOnline({required bool value}) async {
     if (state.isBusy) return;
 
@@ -74,53 +66,57 @@ class AvailabilityController extends Notifier<AvailabilityState> {
     }
   }
 
-  // Reconcile availability when app starts or resumes.
+  /// Reconciles availability after app launch or resume.
   Future<void> reconcileAvailabilityOnAppStartOrResume() async {
     if (_isReconciling) return;
     _isReconciling = true;
 
     try {
-      final local = ref.read(availabilityLocalDatasourceProvider);
-      final bridge = ref.read(driverBackgroundServiceBridgeProvider);
-      final runtime = ref.read(driverRuntimeControllerProvider);
+      final localDataSource = ref.read(availabilityLocalDataSourceProvider);
+      final serviceBridge = ref.read(driverBackgroundServiceBridgeProvider);
+      final runtimeController = ref.read(driverRuntimeControllerProvider);
+      final locationTracker = ref.read(locationTrackerProvider);
 
-      final requested = await local.getOnlineRequested();
-      final serviceRunning = await bridge.isServiceRunning();
+      final onlineRequested = await localDataSource.getOnlineRequested();
+      final isServiceRunning = await serviceBridge.isServiceRunning();
 
-      if (!requested) {
+      if (!onlineRequested) {
         state = state.copyWith(
           isOnline: false,
-          errorReason: null,
+          locationError: null,
           serverError: null,
         );
         return;
       }
 
-      if (!serviceRunning) {
+      if (!isServiceRunning) {
         await _stopTracking();
 
         try {
-          await runtime.stopOnlineRuntime();
-        } on Exception catch (e, st) {
-          debugPrint('stopOnlineRuntime during reconcile failed: $e\n$st');
+          await runtimeController.stopOnlineRuntime();
+        } on Exception catch (error, stackTrace) {
+          debugPrint(
+            'stopOnlineRuntime during reconcile failed: '
+            '$error\n$stackTrace',
+          );
         }
 
-        await local.saveOnlineRequested(value: false);
+        await localDataSource.saveOnlineRequested(value: false);
 
         state = state.copyWith(
           isOnline: false,
-          errorReason: null,
+          locationError: null,
           serverError: null,
         );
         return;
       }
 
-      await ref.read(locationTrackerProvider).start();
-      _subscribeToFailures(ref.read(locationTrackerProvider));
+      await locationTracker.start();
+      _subscribeToLocationFailures(locationTracker);
 
       state = state.copyWith(
         isOnline: true,
-        errorReason: null,
+        locationError: null,
         serverError: null,
       );
     } finally {
@@ -128,23 +124,17 @@ class AvailabilityController extends Notifier<AvailabilityState> {
     }
   }
 
-  void clearError() => _clearLocationError();
+  void clearLocationError() => _clearLocationError();
 
   void clearServerError() => _clearServerError();
 
-  // ---------------------------------------------------------------------------
-  // Native service events
-  // ---------------------------------------------------------------------------
-
-  // Handle stop events coming from the native Android service.
   void _handleNativeServiceEvent(DriverBackgroundServiceEvent event) {
-    if (!state.isOnline) return;
-    if (_autoStopping) return;
+    if (!state.isOnline || _isAutoStopping) return;
 
-    _autoStopping = true;
+    _isAutoStopping = true;
 
-    final runtime = ref.read(driverRuntimeControllerProvider);
-    final local = ref.read(availabilityLocalDatasourceProvider);
+    final runtimeController = ref.read(driverRuntimeControllerProvider);
+    final localDataSource = ref.read(availabilityLocalDataSourceProvider);
 
     state = state.copyWith(
       isOnline: false,
@@ -156,248 +146,175 @@ class AvailabilityController extends Notifier<AvailabilityState> {
     unawaited(
       Future.wait([
         _stopTracking(),
-        runtime.stopOnlineRuntime(),
-        local.saveOnlineRequested(value: false),
+        runtimeController.stopOnlineRuntime(),
+        localDataSource.saveOnlineRequested(value: false),
       ]).whenComplete(() {
-        _autoStopping = false;
+        _isAutoStopping = false;
       }),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Online flow
-  // ---------------------------------------------------------------------------
-
   Future<void> _goOnline() async {
-    final bridge = ref.read(driverBackgroundServiceBridgeProvider);
+    final serviceBridge = ref.read(driverBackgroundServiceBridgeProvider);
     final startTracking = ref.read(startLocationTrackingUseCaseProvider);
-    final tracker = ref.read(locationTrackerProvider);
-    final setStatus = ref.read(setDriverStatusUseCaseProvider);
-    final runtime = ref.read(driverRuntimeControllerProvider);
-    final local = ref.read(availabilityLocalDatasourceProvider);
+    final locationTracker = ref.read(locationTrackerProvider);
+    final setDriverStatus = ref.read(setDriverStatusUseCaseProvider);
+    final runtimeController = ref.read(driverRuntimeControllerProvider);
+    final localDataSource = ref.read(availabilityLocalDataSourceProvider);
 
-    // Step 0: ask Android to resolve location settings first.
-    final locationSettingsReady = await bridge.ensureLocationSettings();
+    final locationSettingsReady = await serviceBridge.ensureLocationSettings();
 
-    // User cancelled the native location settings dialog,
-    // or the device could not resolve location settings.
     if (!locationSettingsReady) {
       state = state.copyWith(
         isOnline: false,
-        errorReason: LocationFailureReason.serviceDisabled,
+        locationError: LocationFailureReason.serviceDisabled,
       );
       return;
     }
 
-    // Step 1: ensure location permission/tracking is ready.
-    final ready = await startTracking();
+    final locationReadyResult = await startTracking();
 
-    if (!ready.isSuccess) {
+    if (!locationReadyResult.isSuccess) {
       state = state.copyWith(
         isOnline: false,
-        errorReason: ready.reason ?? LocationFailureReason.unableToDetermine,
+        locationError:
+            locationReadyResult.reason ??
+            LocationFailureReason.unableToDetermine,
       );
       return;
     }
 
-    // Step 2: mark driver online on server.
     try {
-      await setStatus(status: DriverStatus.online);
-    } on Exception catch (e, st) {
-      debugPrint('setStatus ONLINE failed: $e\n$st');
+      await setDriverStatus(status: DriverStatus.online);
+    } on Exception catch (error, stackTrace) {
+      debugPrint('setStatus ONLINE failed: $error\n$stackTrace');
 
       await _stopTracking();
 
       state = state.copyWith(
         isOnline: false,
-        serverError: e,
+        serverError: error,
       );
       return;
     }
 
-    // Step 3: start runtime services.
     try {
-      await runtime.startOnlineRuntime();
-    } on Exception catch (e, st) {
-      debugPrint('startOnlineRuntime failed: $e\n$st');
+      await runtimeController.startOnlineRuntime();
+    } on Exception catch (error, stackTrace) {
+      debugPrint('startOnlineRuntime failed: $error\n$stackTrace');
 
       await _stopTracking();
 
       try {
-        await setStatus(status: DriverStatus.offline);
-      } on Exception catch (inner, innerSt) {
-        debugPrint('rollback OFFLINE failed: $inner\n$innerSt');
+        await setDriverStatus(status: DriverStatus.offline);
+      } on Exception catch (innerError, innerStackTrace) {
+        debugPrint('rollback OFFLINE failed: $innerError\n$innerStackTrace');
       }
 
       state = state.copyWith(
         isOnline: false,
-        serverError: e,
+        serverError: error,
       );
       return;
     }
 
-    // Step 4: listen for tracking failures.
-    _subscribeToFailures(tracker);
+    _subscribeToLocationFailures(locationTracker);
 
-    // Step 5: persist final state.
-    await local.saveOnlineRequested(value: true);
+    await localDataSource.saveOnlineRequested(value: true);
 
     state = state.copyWith(isOnline: true);
   }
 
-  // ---------------------------------------------------------------------------
-  // Offline flow
-  // ---------------------------------------------------------------------------
-
-  // Full offline flow:
-  // runtime -> tracking -> server -> local state
   Future<void> _goOffline() async {
-    final setStatus = ref.read(setDriverStatusUseCaseProvider);
-    final runtime = ref.read(driverRuntimeControllerProvider);
-    final local = ref.read(availabilityLocalDatasourceProvider);
+    final setDriverStatus = ref.read(setDriverStatusUseCaseProvider);
+    final runtimeController = ref.read(driverRuntimeControllerProvider);
+    final localDataSource = ref.read(availabilityLocalDataSourceProvider);
 
-    // Update UI first.
     state = state.copyWith(isOnline: false);
 
-    // Stop runtime services.
     try {
-      await runtime.stopOnlineRuntime();
-    } on Exception catch (e, st) {
-      debugPrint('stopOnlineRuntime failed: $e\n$st');
+      await runtimeController.stopOnlineRuntime();
+    } on Exception catch (error, stackTrace) {
+      debugPrint('stopOnlineRuntime failed: $error\n$stackTrace');
     }
 
-    // Stop location tracking.
     await _stopTracking();
 
-    // Mark driver offline on server.
     try {
-      await setStatus(status: DriverStatus.offline);
-    } on Exception catch (e, st) {
-      debugPrint('setStatus OFFLINE failed: $e\n$st');
-      state = state.copyWith(serverError: e);
+      await setDriverStatus(status: DriverStatus.offline);
+    } on Exception catch (error, stackTrace) {
+      debugPrint('setStatus OFFLINE failed: $error\n$stackTrace');
+      state = state.copyWith(serverError: error);
     }
 
-    // Persist final offline state.
-    await local.saveOnlineRequested(value: false);
+    await localDataSource.saveOnlineRequested(value: false);
   }
 
-  // ---------------------------------------------------------------------------
-  // Failure subscriptions
-  // ---------------------------------------------------------------------------
+  void _subscribeToLocationFailures(LocationTracker tracker) {
+    if (_locationFailuresSubscription != null) return;
 
-  // Start listening to tracking/runtime failures.
-  void _subscribeToFailures(LocationTracker tracker) {
-    if (_failuresSub != null) return;
-
-    _failuresSub = tracker.failures.listen((reason) {
+    _locationFailuresSubscription = tracker.failures.listen((reason) {
       if (!state.isOnline) return;
       _forceOffline(reason);
     });
   }
 
-  // Force offline after a runtime failure.
   void _forceOffline(LocationFailureReason reason) {
-    if (_autoStopping) return;
-    _autoStopping = true;
+    if (_isAutoStopping) return;
+    _isAutoStopping = true;
 
-    final runtime = ref.read(driverRuntimeControllerProvider);
-    final local = ref.read(availabilityLocalDatasourceProvider);
+    final runtimeController = ref.read(driverRuntimeControllerProvider);
+    final localDataSource = ref.read(availabilityLocalDataSourceProvider);
 
-    // Update UI immediately.
     state = state.copyWith(
       isOnline: false,
-      errorReason: reason,
+      locationError: reason,
     );
 
     unawaited(
       Future.wait([
         _stopTracking(),
-        runtime.stopOnlineRuntime(),
-        local.saveOnlineRequested(value: false),
+        runtimeController.stopOnlineRuntime(),
+        localDataSource.saveOnlineRequested(value: false),
       ]).whenComplete(() async {
         try {
           await ref.read(setDriverStatusUseCaseProvider)(
             status: DriverStatus.offline,
           );
-        } on Exception catch (e, st) {
-          debugPrint('setStatus OFFLINE (force) failed: $e\n$st');
-          state = state.copyWith(serverError: e);
+        } on Exception catch (error, stackTrace) {
+          debugPrint(
+            'setStatus OFFLINE (force) failed: $error\n$stackTrace',
+          );
+          state = state.copyWith(serverError: error);
         } finally {
-          _autoStopping = false;
+          _isAutoStopping = false;
         }
       }),
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Tracking cleanup
-  // ---------------------------------------------------------------------------
-
-  // Stop active tracking resources.
   Future<void> _stopTracking() async {
-    await _failuresSub?.cancel();
-    _failuresSub = null;
+    await _locationFailuresSubscription?.cancel();
+    _locationFailuresSubscription = null;
 
     final stopTracking = ref.read(stopLocationTrackingUseCaseProvider);
 
     try {
       await stopTracking();
-    } on Exception catch (e, st) {
-      debugPrint('stopUseCase failed: $e\n$st');
+    } on Exception catch (error, stackTrace) {
+      debugPrint('stopUseCase failed: $error\n$stackTrace');
     }
   }
-
-  // ---------------------------------------------------------------------------
-  // State helpers
-  // ---------------------------------------------------------------------------
 
   void _setBusy(bool value) {
     state = state.copyWith(isBusy: value);
   }
 
   void _clearLocationError() {
-    state = state.copyWith(errorReason: null);
+    state = state.copyWith(locationError: null);
   }
 
   void _clearServerError() {
     state = state.copyWith(serverError: null);
-  }
-}
-
-final class AvailabilityState {
-  const AvailabilityState({
-    required this.isBusy,
-    required this.isOnline,
-    this.errorReason,
-    this.serverError,
-  });
-
-  final bool isOnline;
-  final bool isBusy;
-
-  /// Location-related error for UI actions.
-  final LocationFailureReason? errorReason;
-
-  /// Server/API error while updating availability.
-  final Object? serverError;
-
-  static const Object _unset = Object();
-
-  AvailabilityState copyWith({
-    bool? isOnline,
-    bool? isBusy,
-    Object? errorReason = _unset,
-    Object? serverError = _unset,
-  }) {
-    return AvailabilityState(
-      isOnline: isOnline ?? this.isOnline,
-      isBusy: isBusy ?? this.isBusy,
-      errorReason: identical(errorReason, _unset)
-          ? this.errorReason
-          : errorReason as LocationFailureReason?,
-      serverError: identical(serverError, _unset)
-          ? this.serverError
-          : serverError,
-    );
   }
 }

@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/features/account_security/domain/usecases/set_password_usecase.dart';
+import 'package:taxi_driver_app/features/account_security/domain/usecases/set_password_use_case.dart';
 import 'package:taxi_driver_app/features/account_security/presentation/providers/account_security_providers.dart';
 
 final setupPasswordControllerProvider =
@@ -8,28 +10,32 @@ final setupPasswordControllerProvider =
       SetupPasswordController.new,
     );
 
+/// Controls the set-password submission state for the UI.
 class SetupPasswordController extends AsyncNotifier<String?> {
-  late final SetPasswordUseCase _setPassword;
+  late final SetPasswordUseCase _setPasswordUseCase;
 
   @override
-  Future<String?> build() async {
-    _setPassword = ref.read(setPasswordUseCaseProvider);
+  FutureOr<String?> build() {
+    _setPasswordUseCase = ref.read(setPasswordUseCaseProvider);
     return null;
   }
 
-  Future<void> submit({
-    required String newPassword,
-  }) async {
+  /// Submits the new password and updates the async UI state.
+  Future<void> submit({required String newPassword}) async {
     state = const AsyncLoading();
+
     try {
-      final msg = await _setPassword(newPassword: newPassword);
-      state = AsyncData(msg);
-    } on Failure catch (f, st) {
-      state = AsyncError(f, st);
-    } on Exception catch (e, st) {
-      state = AsyncError(e, st);
+      final message = await _setPasswordUseCase(newPassword: newPassword);
+      state = AsyncData(message);
+    } on Failure catch (failure, stackTrace) {
+      state = AsyncError(failure, stackTrace);
+    } on Exception catch (exception, stackTrace) {
+      state = AsyncError(exception, stackTrace);
     }
   }
 
-  void reset() => state = const AsyncData(null);
+  /// Clears the current result and returns the controller to the idle state.
+  void reset() {
+    state = const AsyncData(null);
+  }
 }

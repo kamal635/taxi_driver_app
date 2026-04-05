@@ -1,22 +1,29 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/networking/api_client.dart';
 import 'package:taxi_driver_app/features/auth/data/models/sign_in_response_model.dart';
 
-final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
-  return AuthRemoteDataSource(ref.read(apiClientProvider));
-});
+/// Contract for remote authentication operations.
+abstract interface class AuthRemoteDataSource {
+  /// Sends the sign-in request to the backend and returns the parsed response.
+  Future<SignInResponseModel> signIn({
+    required String phone,
+    required String password,
+    String? fcmToken,
+  });
+}
 
-class AuthRemoteDataSource {
-  AuthRemoteDataSource(this._api);
+/// API-based implementation of [AuthRemoteDataSource].
+class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+  AuthRemoteDataSourceImpl(this._apiClient);
 
-  final ApiClient _api;
+  final ApiClient _apiClient;
 
+  @override
   Future<SignInResponseModel> signIn({
     required String phone,
     required String password,
     String? fcmToken,
   }) async {
-    final data = await _api.postJson(
+    final response = await _apiClient.postJson(
       '/api/auth/login',
       body: {
         'phone': phone,
@@ -25,6 +32,6 @@ class AuthRemoteDataSource {
       },
     );
 
-    return SignInResponseModel.fromJson(data);
+    return SignInResponseModel.fromJson(response);
   }
 }

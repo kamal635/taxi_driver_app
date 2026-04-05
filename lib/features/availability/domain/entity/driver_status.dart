@@ -1,1 +1,0 @@
-enum DriverStatus { online, offline }

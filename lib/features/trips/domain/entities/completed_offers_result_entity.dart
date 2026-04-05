@@ -1,7 +1,14 @@
 import 'package:taxi_driver_app/features/trips/domain/entities/completed_offer_entity.dart';
 
-enum CompletedPeriod { all, day, week, month }
+/// Available filters for completed trips.
+enum CompletedPeriod {
+  all,
+  day,
+  week,
+  month,
+}
 
+/// Domain entity for the completed trips screen payload.
 final class CompletedOffersResultEntity {
   CompletedOffersResultEntity({
     required this.type,

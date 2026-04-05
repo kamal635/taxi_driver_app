@@ -1,9 +1,12 @@
 abstract final class RouteNames {
-  static const login = 'login';
-  static const setupPassword = 'setupPassword';
-  static const home = 'home';
-  static const trips = 'trips';
-  static const profile = 'profile';
-  static const profilePassword = 'profilePassword';
-  static const profileVehicles = 'profileVehicles';
+  const RouteNames._();
+
+  static const String login = 'login';
+  static const String setupPassword = 'setupPassword';
+
+  static const String home = 'home';
+  static const String trips = 'trips';
+  static const String profile = 'profile';
+
+  static const String profilePassword = 'profilePassword';
 }

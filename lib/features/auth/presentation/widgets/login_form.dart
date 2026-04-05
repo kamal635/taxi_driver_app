@@ -6,6 +6,7 @@ import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/widgets/app_button.dart';
 import 'package:taxi_driver_app/core/widgets/app_text_field.dart';
 
+/// Login form widget that delegates submission and UI state to the parent page.
 class LoginForm extends StatelessWidget {
   const LoginForm({
     required this.phoneController,
@@ -17,16 +18,11 @@ class LoginForm extends StatelessWidget {
     super.key,
   });
 
-  final TextEditingController phoneController; // (phone)
+  final TextEditingController phoneController;
   final TextEditingController passwordController;
-
   final bool obscurePassword;
   final VoidCallback onTogglePasswordVisibility;
-
-  /// When true, disable submit and (optionally) show loading in the button.
   final bool isLoading;
-
-  /// Trigger sign-in from the parent (LoginPage).
   final VoidCallback? onSubmit;
 
   @override
@@ -61,21 +57,12 @@ class LoginForm extends StatelessWidget {
           ),
         ),
         AppSpacing.h24,
-
         AppButton(
           label: context.l10n.signIn,
           onPressed: isLoading ? null : onSubmit,
           isLoading: isLoading,
         ),
-
         AppSpacing.h12,
-
-        // AppTextButton(
-        //   label: context.l10n.forgotPassword,
-        //   onPressed: () {
-        //     // later
-        //   },
-        // ),
       ],
     );
   }

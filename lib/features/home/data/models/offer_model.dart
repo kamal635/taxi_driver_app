@@ -1,12 +1,8 @@
-import 'package:taxi_driver_app/core/utils/json_reader.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
 
-//-------------------------------------------
-//           - Base Offer Model -
-//-------------------------------------------
-
-sealed class BaseOfferModel {
-  const BaseOfferModel({
+/// Base structure shared by parsed offer models.
+sealed class OfferModel {
+  const OfferModel({
     required this.type,
     required this.offerId,
     required this.pickup,
@@ -23,11 +19,8 @@ sealed class BaseOfferModel {
   final String price;
 }
 
-//-------------------------------------------
-//            - New Offer Model -
-//-------------------------------------------
-
-final class NewOfferModel extends BaseOfferModel {
+/// Data model for a newly received pending offer.
+final class NewOfferModel extends OfferModel {
   const NewOfferModel({
     required super.type,
     required super.offerId,
@@ -79,16 +72,8 @@ final class NewOfferModel extends BaseOfferModel {
     }
 
     return NewOfferModel(
-      type: requireString([
-        'type',
-        'order_status',
-      ]),
-      offerId: requireString([
-        'orderId',
-        'offerId',
-        'id',
-        'order_id',
-      ]),
+      type: requireString(['type', 'order_status']),
+      offerId: requireString(['orderId', 'offerId', 'id', 'order_id']),
       pickup: requireString([
         'pickupText',
         'pickup',
@@ -101,39 +86,30 @@ final class NewOfferModel extends BaseOfferModel {
         'dropoff_address',
         'dropoff_text',
       ]),
-      price: requireString([
-        'price',
-      ]),
-      expiresAt: requireDateTime([
-        'expiresAt',
-        'expires_at',
-      ]),
-      notes: optionalString([
-        'note',
-        'notes',
-      ]),
+      price: requireString(['price']),
+      expiresAt: requireDateTime(['expiresAt', 'expires_at']),
+      notes: optionalString(['note', 'notes']),
     );
   }
 
   final DateTime expiresAt;
 
-  NewOfferEntity toEntity() => NewOfferEntity(
-    type: type,
-    offerId: offerId,
-    pickup: pickup,
-    dropoff: dropoff,
-    price: price,
-    expiresAt: expiresAt,
-    notes: notes,
-  );
+  NewOfferEntity toEntity() {
+    return NewOfferEntity(
+      type: type,
+      offerId: offerId,
+      pickup: pickup,
+      dropoff: dropoff,
+      price: price,
+      expiresAt: expiresAt,
+      notes: notes,
+    );
+  }
 }
 
-//-------------------------------------------
-//            - Accepted Offer Model -
-//-------------------------------------------
-
-final class AccepteOfferdModel extends BaseOfferModel {
-  const AccepteOfferdModel({
+/// Data model returned after accepting an offer.
+final class AcceptedOfferModel extends OfferModel {
+  const AcceptedOfferModel({
     required super.type,
     required super.offerId,
     required super.pickup,
@@ -144,30 +120,54 @@ final class AccepteOfferdModel extends BaseOfferModel {
     super.notes,
   });
 
-  factory AccepteOfferdModel.fromJson(Map<String, dynamic> json) {
-    return AccepteOfferdModel(
-      type: JsonReader.requireString(json, 'type'),
-      offerId: JsonReader.requireString(json, 'orderId'),
-      pickup: JsonReader.requireString(json, 'pickupText'),
-      dropoff: JsonReader.optionalString(json, 'dropoffText'),
-      price: JsonReader.requireString(json, 'price'),
-      customerPhone: JsonReader.requireString(json, 'customerPhone'),
-      notes: JsonReader.optionalString(json, 'note'),
-      cooldownUntil: JsonReader.requireDateTime(json, 'cooldownUntil'),
+  factory AcceptedOfferModel.fromJson(Map<String, dynamic> json) {
+    String requireString(String key) {
+      final value = json[key]?.toString().trim();
+      if (value == null || value.isEmpty) {
+        throw FormatException('Missing required field: $key');
+      }
+      return value;
+    }
+
+    String? optionalString(String key) {
+      final value = json[key]?.toString().trim();
+      return value == null || value.isEmpty ? null : value;
+    }
+
+    final cooldownRaw = requireString('cooldownUntil');
+    final cooldownUntil = DateTime.tryParse(cooldownRaw);
+
+    if (cooldownUntil == null) {
+      throw FormatException(
+        'Invalid date field: cooldownUntil -> $cooldownRaw',
+      );
+    }
+
+    return AcceptedOfferModel(
+      type: requireString('type'),
+      offerId: requireString('orderId'),
+      pickup: requireString('pickupText'),
+      dropoff: optionalString('dropoffText'),
+      price: requireString('price'),
+      customerPhone: requireString('customerPhone'),
+      notes: optionalString('note'),
+      cooldownUntil: cooldownUntil,
     );
   }
 
   final String customerPhone;
   final DateTime cooldownUntil;
 
-  OfferAcceptedEntity toEntity() => OfferAcceptedEntity(
-    type: type,
-    offerId: offerId,
-    pickup: pickup,
-    dropoff: dropoff,
-    price: price,
-    customerPhone: customerPhone,
-    notes: notes,
-    cooldownUntil: cooldownUntil,
-  );
+  OfferAcceptedEntity toEntity() {
+    return OfferAcceptedEntity(
+      type: type,
+      offerId: offerId,
+      pickup: pickup,
+      dropoff: dropoff,
+      price: price,
+      customerPhone: customerPhone,
+      notes: notes,
+      cooldownUntil: cooldownUntil,
+    );
+  }
 }

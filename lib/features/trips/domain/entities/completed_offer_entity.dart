@@ -1,3 +1,4 @@
+/// Domain entity representing one completed trip.
 final class CompletedOfferEntity {
   CompletedOfferEntity({
     required this.offerId,

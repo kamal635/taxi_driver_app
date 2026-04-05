@@ -1,5 +1,6 @@
 import 'package:taxi_driver_app/features/home/domain/entities/complete_offer_result_entity.dart';
 
+/// Data model returned after completing an offer.
 final class CompleteOfferResponseModel {
   const CompleteOfferResponseModel({
     required this.type,

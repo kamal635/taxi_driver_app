@@ -2,14 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/get_current_and_pending_offer_usecase.dart';
-import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
+import 'package:taxi_driver_app/features/home/domain/usecases/get_current_and_pending_offer_use_case.dart';
+import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
 
-final AsyncNotifierProvider<
-  RestoreCurrentController,
-  CurrentAndPendingOfferEntity
->
-restoreCurrentControllerProvider =
+final restoreCurrentControllerProvider =
     AsyncNotifierProvider<
       RestoreCurrentController,
       CurrentAndPendingOfferEntity
@@ -17,33 +13,28 @@ restoreCurrentControllerProvider =
       RestoreCurrentController.new,
     );
 
+/// Restores the current/pending offer snapshot from the backend.
 final class RestoreCurrentController
     extends AsyncNotifier<CurrentAndPendingOfferEntity> {
-  late final GetCurrentAndPendingOfferUsecase _getCurrentAndPendingOfferUsecase;
+  late final GetCurrentAndPendingOfferUseCase _getCurrentAndPendingOfferUseCase;
 
   @override
   FutureOr<CurrentAndPendingOfferEntity> build() {
-    _getCurrentAndPendingOfferUsecase = ref.read(
+    _getCurrentAndPendingOfferUseCase = ref.read(
       getCurrentAndPendingOfferUseCaseProvider,
     );
 
-    return const CurrentAndPendingOfferEntity(
-      currentOffer: null,
-      pendingOffer: null,
-    );
+    return const CurrentAndPendingOfferEntity.empty();
   }
 
   Future<void> restore() async {
-    state = const AsyncValue.loading();
+    if (state.isLoading) return;
 
-    final result = await _getCurrentAndPendingOfferUsecase();
+    state = const AsyncLoading();
 
-    state = AsyncValue.data(
-      result ??
-          const CurrentAndPendingOfferEntity(
-            currentOffer: null,
-            pendingOffer: null,
-          ),
-    );
+    state = await AsyncValue.guard(() async {
+      final result = await _getCurrentAndPendingOfferUseCase();
+      return result ?? const CurrentAndPendingOfferEntity.empty();
+    });
   }
 }

@@ -4,6 +4,7 @@ import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 
+/// Empty state shown when there is no pending or active offer.
 class HomeEmptyState extends StatelessWidget {
   const HomeEmptyState({
     required this.icon,
@@ -21,7 +22,6 @@ class HomeEmptyState extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        /// Icon
         Container(
           width: 160.r,
           height: 160.r,
@@ -33,7 +33,6 @@ class HomeEmptyState extends StatelessWidget {
               width: 1.2,
             ),
           ),
-
           child: Icon(
             icon,
             size: 40.r,
@@ -41,16 +40,12 @@ class HomeEmptyState extends StatelessWidget {
           ),
         ),
         AppSpacing.h18,
-
-        /// Title
         Text(
           title,
           textAlign: TextAlign.center,
           style: AppTypography.titleSm,
         ),
         AppSpacing.h10,
-
-        /// Subtitle
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 22.w),
           child: Text(

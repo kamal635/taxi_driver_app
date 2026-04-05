@@ -5,22 +5,31 @@ import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
 
+/// A tappable profile action row.
 class ProfileSectionItem extends StatelessWidget {
   const ProfileSectionItem({
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.onPressed,
-    this.isSignOut = false,
+    this.isDestructive = false,
     super.key,
   });
+
   final String title;
   final String subtitle;
   final IconData icon;
   final VoidCallback onPressed;
-  final bool isSignOut;
+  final bool isDestructive;
+
   @override
   Widget build(BuildContext context) {
+    final accentColor = isDestructive ? AppColors.error : AppColors.textPrimary;
+    final iconBackgroundColor =
+        isDestructive ? AppColors.errorBg : AppColors.bgWarm;
+    final subtitleColor =
+        isDestructive ? AppColors.error : AppColors.textSecondary;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
       child: InkWell(
@@ -31,14 +40,14 @@ class ProfileSectionItem extends StatelessWidget {
               width: 42.r,
               height: 42.r,
               decoration: BoxDecoration(
-                color: isSignOut ? AppColors.errorBg : AppColors.bgWarm,
+                color: iconBackgroundColor,
                 borderRadius: BorderRadius.circular(14.r),
                 border: Border.all(color: AppColors.border),
               ),
               child: Icon(
                 icon,
                 size: 22.r,
-                color: isSignOut ? AppColors.error : AppColors.textPrimary,
+                color: accentColor,
               ),
             ),
             AppSpacing.w12,
@@ -50,24 +59,19 @@ class ProfileSectionItem extends StatelessWidget {
                     title,
                     style: AppTypography.labelMd.copyWith(
                       fontWeight: FontWeight.w900,
-                      color: isSignOut
-                          ? AppColors.error
-                          : AppColors.textPrimary,
+                      color: accentColor,
                     ),
                   ),
                   AppSpacing.h6,
                   Text(
                     subtitle,
                     style: AppTypography.subtitleSm.copyWith(
-                      color: isSignOut
-                          ? AppColors.error
-                          : AppColors.textSecondary,
+                      color: subtitleColor,
                     ),
                   ),
                 ],
               ),
             ),
-
             Icon(
               AppIcons.arrowf,
               size: 14.r,
