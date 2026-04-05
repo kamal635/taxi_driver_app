@@ -18,6 +18,10 @@ import 'package:taxi_driver_app/core/location/location_result.dart';
 import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/core/widgets/pill_switch.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
+import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/restore_current_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
 
 class AppShellPage extends ConsumerStatefulWidget {
   const AppShellPage({
@@ -33,6 +37,7 @@ class AppShellPage extends ConsumerStatefulWidget {
 
 class _AppShellPageState extends ConsumerState<AppShellPage> {
   AppLifecycleListener? _appLifecycleListener;
+  ProviderSubscription<AsyncValue<CurrentAndPendingOfferEntity>>? _restoreSub;
 
   @override
   void initState() {
@@ -41,6 +46,28 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
     _appLifecycleListener = AppLifecycleListener(
       onResume: _handleAppResumed,
     );
+
+    _restoreSub = ref.listenManual<AsyncValue<CurrentAndPendingOfferEntity>>(
+      restoreCurrentControllerProvider,
+      (previous, next) {
+        final data = next.asData?.value;
+        if (data == null) return;
+
+        ref.read(restoredCurrentOfferProvider.notifier).state =
+            data.currentOffer;
+      },
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final didBootstrap = ref.read(hasBootstrappedCurrentRestoreProvider);
+      if (didBootstrap) return;
+
+      ref.read(hasBootstrappedCurrentRestoreProvider.notifier).state = true;
+
+      unawaited(
+        ref.read(restoreCurrentControllerProvider.notifier).restore(),
+      );
+    });
   }
 
   void _handleAppResumed() {
@@ -57,6 +84,7 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
 
   @override
   void dispose() {
+    _restoreSub?.close();
     _appLifecycleListener?.dispose();
     _appLifecycleListener = null;
     super.dispose();
@@ -133,6 +161,37 @@ class AppTopBar extends ConsumerStatefulWidget {
 class _AppTopBarState extends ConsumerState<AppTopBar> {
   ProviderSubscription<LocationFailureReason?>? _errorSub;
   ProviderSubscription<Object?>? _serverErrorSub;
+
+  Future<void> _handleOnlineChanged(bool value) async {
+    final restoredCurrentOffer = ref.read(restoredCurrentOfferProvider);
+    final acceptedOffer = ref
+        .read(accepteOfferControllerProvider)
+        .value
+        ?.offerAcceptedEntity;
+
+    final hasActiveTrip = restoredCurrentOffer != null || acceptedOffer != null;
+
+    if (value && hasActiveTrip) {
+      context.showAppSnack(
+        'You have an active trip. Complete it first.',
+        type: AppSnackType.error,
+      );
+      return;
+    }
+
+    await ref
+        .read(availabilityProvider.notifier)
+        .requestSetOnline(value: value);
+
+    if (!mounted) return;
+
+    if (!value) {
+      ref
+              .read(hasRequestedRestoreForCurrentOnlineSessionProvider.notifier)
+              .state =
+          false;
+    }
+  }
 
   @override
   void initState() {
@@ -215,6 +274,14 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
       ),
     );
 
+    final restoredCurrentOffer = ref.watch(restoredCurrentOfferProvider);
+    final acceptedOffer = ref
+        .watch(accepteOfferControllerProvider)
+        .value
+        ?.offerAcceptedEntity;
+
+    final hasActiveTrip = restoredCurrentOffer != null || acceptedOffer != null;
+
     final avatarAsync = ref.watch(avatarControllerProvider);
     final avatarPath = avatarAsync.value;
 
@@ -231,14 +298,10 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
             AppSpacing.w10,
             PillSwitch(
               value: isOnline,
-              onChanged: isBusy
+              onChanged: isBusy || hasActiveTrip
                   ? null
                   : (v) {
-                      unawaited(
-                        ref
-                            .read(availabilityProvider.notifier)
-                            .requestSetOnline(value: v),
-                      );
+                      unawaited(_handleOnlineChanged(v));
                     },
               offLabel: l10n.offline,
               onLabel: l10n.online,

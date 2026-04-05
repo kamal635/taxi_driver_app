@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
+import 'package:taxi_driver_app/features/home/presentation/providers/setup_providers.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/accepted_offer_card.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/home_empty_state.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/new_offer_card.dart';
@@ -16,9 +17,11 @@ class HomeOfferSection extends ConsumerWidget {
 
     final asyncNewOffer = ref.watch(newOfferControllerProvider);
     final asyncAcceptedOffer = ref.watch(accepteOfferControllerProvider);
+    final restoredAcceptedOffer = ref.watch(restoredCurrentOfferProvider);
 
     final newOffer = asyncNewOffer.value?.currentOffer;
-    final acceptedOffer = asyncAcceptedOffer.value?.offerAcceptedEntity;
+    final acceptedOffer =
+        asyncAcceptedOffer.value?.offerAcceptedEntity ?? restoredAcceptedOffer;
 
     if (newOffer != null) {
       return const NewOfferCard();

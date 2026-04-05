@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:taxi_driver_app/core/networking/api_client.dart';
 import 'package:taxi_driver_app/features/home/data/datasources/remote/offer_remote_datasource.dart';
 import 'package:taxi_driver_app/features/home/data/repositories/offer_repository_impl.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
+import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
 import 'package:taxi_driver_app/features/home/domain/repositories/offer_repo.dart';
 import 'package:taxi_driver_app/features/home/domain/usecases/accepte_offer.dart';
 import 'package:taxi_driver_app/features/home/domain/usecases/complete_offer_usecase.dart';
@@ -60,11 +61,6 @@ final getCurrentAndPendingOfferUseCaseProvider =
       return GetCurrentAndPendingOfferUsecase(repo: repo);
     });
 
-final FutureProvider<CurrentAndPendingOfferEntity?>
-currentAndPendingOfferProvider = FutureProvider((ref) async {
-  final useCase = ref.read(getCurrentAndPendingOfferUseCaseProvider);
-  return useCase();
-});
 //-------------------------------------------
 //        - Complete Order Use Case -
 //-------------------------------------------
@@ -73,3 +69,14 @@ final completeOfferUseCaseProvider = Provider<CompleteOfferUseCase>((ref) {
   final repo = ref.read(offerRepositoryProvider);
   return CompleteOfferUseCase(repo: repo);
 });
+
+final restoredCurrentOfferProvider = StateProvider<OfferAcceptedEntity?>(
+  (ref) => null,
+);
+final hasRequestedRestoreForCurrentOnlineSessionProvider = StateProvider<bool>(
+  (ref) => false,
+);
+
+final hasBootstrappedCurrentRestoreProvider = StateProvider<bool>(
+  (ref) => false,
+);

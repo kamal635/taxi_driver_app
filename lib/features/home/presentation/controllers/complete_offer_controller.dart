@@ -48,6 +48,9 @@ final class CompleteOfferController extends AsyncNotifier<void> {
       // Clear accepted/current order after success.
       ref.read(accepteOfferControllerProvider.notifier).clear();
 
+      // Clear restored current order after success.
+      ref.read(restoredCurrentOfferProvider.notifier).state = null;
+
       // Clear pending/new offer after success.
       ref.read(newOfferControllerProvider.notifier).clearCurrent();
 
