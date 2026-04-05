@@ -31,6 +31,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.BufferedWriter
@@ -73,6 +74,8 @@ class DriverForegroundService : Service() {
     private val lastSentLocationLock = Any()
     private var lastSentLatitude: Double? = null
     private var lastSentLongitude: Double? = null
+
+    private var currentLocationCts: CancellationTokenSource? = null
 
     private val locationRequest by lazy {
         LocationRequest.Builder(
@@ -135,6 +138,9 @@ class DriverForegroundService : Service() {
     override fun onDestroy() {
         Log.d(TAG, "Service onDestroy")
 
+        currentLocationCts?.cancel()
+        currentLocationCts = null
+
         stopLocationUpdates()
         offerSocketManager.stop()
 
@@ -196,6 +202,7 @@ class DriverForegroundService : Service() {
 
         Log.d(TAG, "Service moved to foreground")
 
+        requestCurrentLocationOnce()
         startLocationUpdates()
 
         offerSocketManager.stop()
@@ -213,6 +220,9 @@ class DriverForegroundService : Service() {
         }
 
         Log.d(TAG, "handleStop")
+
+        currentLocationCts?.cancel()
+        currentLocationCts = null
 
         stopLocationUpdates()
         offerSocketManager.stop()
@@ -245,6 +255,66 @@ class DriverForegroundService : Service() {
 
         serviceHandler.post {
             handleStop()
+        }
+    }
+
+    private fun requestCurrentLocationOnce() {
+        if (!hasLocationPermission()) {
+            Log.w(TAG, "Cannot get current location: permission missing")
+            stopServiceDueToLocationIssue("location_permission_missing")
+            return
+        }
+
+        if (!isLocationServiceEnabled()) {
+            Log.w(TAG, "Cannot get current location: location service disabled")
+            stopServiceDueToLocationIssue("location_service_disabled")
+            return
+        }
+
+        val token = currentToken
+        val driverId = currentDriverId
+
+        if (token.isNullOrBlank() || driverId.isNullOrBlank()) {
+            Log.w(TAG, "Skipping current location request: token or driverId is missing")
+            return
+        }
+
+        currentLocationCts?.cancel()
+        currentLocationCts = CancellationTokenSource()
+
+        try {
+            fusedLocationClient
+                .getCurrentLocation(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    currentLocationCts!!.token
+                )
+                .addOnSuccessListener { location ->
+                    currentLocationCts = null
+
+                    if (location == null) {
+                        Log.w(TAG, "Current location returned null")
+                        return@addOnSuccessListener
+                    }
+
+                    Log.d(
+                        TAG,
+                        "Current location acquired -> lat=${location.latitude}, lon=${location.longitude}"
+                    )
+
+                    trySendLocationToBackend(
+                        token = token,
+                        driverId = driverId,
+                        location = location
+                    )
+                }
+                .addOnFailureListener { error ->
+                    currentLocationCts = null
+                    Log.e(TAG, "Failed to get current location", error)
+                }
+        } catch (error: SecurityException) {
+            currentLocationCts = null
+            Log.e(TAG, "SecurityException while getting current location", error)
+            stopServiceDueToLocationIssue("location_permission_missing")
         }
     }
 
@@ -329,6 +399,18 @@ class DriverForegroundService : Service() {
             return
         }
 
+        trySendLocationToBackend(
+            token = token,
+            driverId = driverId,
+            location = location
+        )
+    }
+
+    private fun trySendLocationToBackend(
+        token: String,
+        driverId: String,
+        location: AndroidLocation
+    ) {
         if (!shouldSendLocationToBackend(location)) {
             return
         }
@@ -504,16 +586,6 @@ class DriverForegroundService : Service() {
 
     private fun shouldSendLocationToBackend(location: AndroidLocation): Boolean {
         synchronized(lastSentLocationLock) {
-            if (location.hasAccuracy() &&
-                location.accuracy > MAX_ACCEPTABLE_ACCURACY_METERS
-            ) {
-                Log.d(
-                    TAG,
-                    "Skipping location send: poor accuracy -> ${location.accuracy}m"
-                )
-                return false
-            }
-
             val lastLat = lastSentLatitude
             val lastLon = lastSentLongitude
 
@@ -806,7 +878,6 @@ class DriverForegroundService : Service() {
         private const val MAX_RETRY_BACKOFF_MS = 60_000L
         private const val MIN_LOCATION_UPDATE_DISTANCE_METERS = 10f
         private const val MIN_LOCATION_SEND_DISTANCE_METERS = 15f
-        private const val MAX_ACCEPTABLE_ACCURACY_METERS = 20f
 
         private const val LOCATION_UPDATE_URL =
             "https://taxi-backend.laithroom.com/api/admin/drivers/location"

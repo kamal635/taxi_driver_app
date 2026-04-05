@@ -136,6 +136,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ? null
                       : () async {
                           TextInput.finishAutofillContext();
+                          FocusScope.of(context).unfocus();
+
                           await ref
                               .read(authControllerProvider.notifier)
                               .signIn(
