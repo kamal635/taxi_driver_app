@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
     applicationId = "com.yourcompany.taxi_driver.taxi_driver_app"
-    minSdk = 21
+    minSdk = flutter.minSdkVersion
     targetSdk = 35
     versionCode = flutter.versionCode
     versionName = flutter.versionName
