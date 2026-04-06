@@ -61,22 +61,34 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Column(
-              children: [
-                const LoginHeader(),
-                LoginForm(
-                  phoneController: _phoneTextController,
-                  passwordController: _passwordTextController,
-                  obscurePassword: _isPasswordObscured,
-                  onTogglePasswordVisibility: _togglePasswordVisibility,
-                  isLoading: isLoading,
-                  onSubmit: isLoading ? null : _submitSignIn,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        const LoginHeader(),
+                        LoginForm(
+                          phoneController: _phoneTextController,
+                          passwordController: _passwordTextController,
+                          obscurePassword: _isPasswordObscured,
+                          onTogglePasswordVisibility: _togglePasswordVisibility,
+                          isLoading: isLoading,
+                          onSubmit: isLoading ? null : _submitSignIn,
+                        ),
+                        const Spacer(),
+                        const LoginFooter(),
+                      ],
+                    ),
+                  ),
                 ),
-                const LoginFooter(),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),

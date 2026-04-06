@@ -481,4 +481,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get timeRemaining => 'الوقت المتبقي للبدء';
+
+  @override
+  String get contactSupportLabel => 'تحتاج مساعدة؟';
+
+  @override
+  String get contactSupportAction => 'اضغط هنا';
+
+  @override
+  String get contactSupportContact => 'للتواصل مع الدعم.';
 }

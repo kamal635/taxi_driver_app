@@ -38,7 +38,6 @@ class AvailabilityController extends Notifier<AvailabilityState> {
       _serviceEventsSubscription = null;
     });
 
-    // Reconcile runtime state instead of blindly restoring local UI state.
     unawaited(reconcileAvailabilityOnAppStartOrResume());
 
     return const AvailabilityState(
@@ -64,6 +63,37 @@ class AvailabilityController extends Notifier<AvailabilityState> {
     } finally {
       _setBusy(false);
     }
+  }
+
+  /// Used after accepting an offer.
+  ///
+  /// Stops the local online runtime and updates local UI state only.
+  /// Does NOT send OFFLINE status to the backend because
+  ///  the driver is now Busy.
+  Future<void> stopRuntimeLocallyAfterAccept() async {
+    final runtimeController = ref.read(driverRuntimeControllerProvider);
+    final localDataSource = ref.read(availabilityLocalDataSourceProvider);
+
+    _clearLocationError();
+    _clearServerError();
+
+    state = state.copyWith(
+      isOnline: false,
+      isBusy: false,
+      locationError: null,
+      serverError: null,
+    );
+
+    try {
+      await runtimeController.stopOnlineRuntime();
+    } on Exception catch (error, stackTrace) {
+      debugPrint(
+        'stopOnlineRuntime after accept failed: $error\n$stackTrace',
+      );
+    }
+
+    await _stopTracking();
+    await localDataSource.saveOnlineRequested(value: false);
   }
 
   /// Reconciles availability after app launch or resume.

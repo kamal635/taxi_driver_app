@@ -200,5 +200,8 @@
   "tapToCall": "Tap to call customer",
   "totalFare": "TOTAL FARE",
   "tripNotes": "TRIP NOTES",
-  "timeRemaining": "Time remaining to start"
+  "timeRemaining": "Time remaining to start",
+  "contactSupportLabel": "Need help?",
+  "contactSupportAction": "Tap here",
+  "contactSupportContact":  "Contact support."
 }

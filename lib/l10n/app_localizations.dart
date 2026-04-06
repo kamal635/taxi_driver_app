@@ -1003,6 +1003,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Time remaining to start'**
   String get timeRemaining;
+
+  /// No description provided for @contactSupportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Need help?'**
+  String get contactSupportLabel;
+
+  /// No description provided for @contactSupportAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap here'**
+  String get contactSupportAction;
+
+  /// No description provided for @contactSupportContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact support.'**
+  String get contactSupportContact;
 }
 
 class _AppLocalizationsDelegate

@@ -7,10 +7,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.graphics.Color
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.graphics.Color
 import android.location.Location as AndroidLocation
 import android.location.LocationManager
 import android.os.Build
@@ -96,7 +96,7 @@ class DriverForegroundService : Service() {
         flags: Int,
         startId: Int
     ): Int {
-        Log.d(TAG, "Service onStartCommand -> action=${intent?.action}")
+        Log.d(TAG, "Service onStartCommand -> action=")
 
         return when (intent?.action) {
             ACTION_START -> {
@@ -138,9 +138,118 @@ class DriverForegroundService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         Log.d(TAG, "Service onTaskRemoved")
+
+        if (!isStoppingService.compareAndSet(false, true)) {
+            Log.d(TAG, "onTaskRemoved ignored: service is already stopping")
+            super.onTaskRemoved(rootIntent)
+            return
+        }
+
+        restoreRuntimeStateIfNeeded()
+        val token = currentToken
+
+        // نوقف كل ما يخص الرن تايم المحلي لكن نحافظ مؤقتًا على التوكن
+        // حتى نستطيع إرسال offline إلى الباك قبل تنظيف الـ prefs.
+        stopActiveRuntimePreservingAuth()
+
+        if (token.isNullOrBlank()) {
+            Log.w(TAG, "Task removed -> token missing, stopping locally only")
+        } else {
+            val offlineSent = sendDriverStatusOfflineBlocking(token)
+
+            if (offlineSent) {
+                Log.d(TAG, "Task removed -> offline status sent successfully")
+            } else {
+                Log.e(TAG, "Task removed -> offline status was not sent successfully")
+            }
+        }
+
         MainActivity.notifyFlutterServiceStopped("task_removed")
-        handleStop()
+        finishLocalStopAfterTaskRemoval()
+
         super.onTaskRemoved(rootIntent)
+    }
+
+    private fun sendDriverStatusOfflineBlocking(token: String): Boolean {
+        val result = AtomicBoolean(false)
+
+        val worker = Thread {
+            result.set(sendDriverStatusOfflineToBackend(token))
+        }.apply {
+            name = "driver-task-removed-offline"
+        }
+
+        worker.start()
+
+        return try {
+            worker.join(TASK_REMOVED_OFFLINE_WAIT_MS)
+
+            if (worker.isAlive) {
+                Log.e(TAG, "Task removed -> offline request timed out")
+                worker.interrupt()
+                false
+            } else {
+                result.get()
+            }
+        } catch (error: InterruptedException) {
+            Log.e(TAG, "Task removed -> join interrupted", error)
+            Thread.currentThread().interrupt()
+            false
+        }
+    }
+
+    private fun sendDriverStatusOfflineToBackend(token: String): Boolean {
+        var connection: HttpURLConnection? = null
+
+        return try {
+            val url = URL(DRIVER_STATUS_UPDATE_URL)
+            connection = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "PUT"
+                connectTimeout = 5_000
+                readTimeout = 5_000
+                doInput = true
+                doOutput = true
+                useCaches = false
+                instanceFollowRedirects = false
+                setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+                setRequestProperty("Accept", "application/json")
+                setRequestProperty("Authorization", "Bearer $token")
+                setRequestProperty("Connection", "close")
+            }
+
+            val body = JSONObject().apply {
+                put("status", "OFFLINE")
+            }
+
+            BufferedWriter(OutputStreamWriter(connection.outputStream, "UTF-8")).use { writer ->
+                writer.write(body.toString())
+                writer.flush()
+            }
+
+            val responseCode = connection.responseCode
+
+            if (responseCode in 200..299) {
+                Log.d(TAG, "Driver status set to offline after task removal -> code=$responseCode")
+                true
+            } else {
+                val errorBody = try {
+                    connection.errorStream?.bufferedReader()?.use { it.readText() }
+                } catch (_: Exception) {
+                    null
+                }
+
+                Log.e(
+                    TAG,
+                    "Failed to set driver offline after task removal -> code=$responseCode, body=$errorBody"
+                )
+                false
+            }
+        } catch (error: Exception) {
+            Log.e(TAG, "Failed to send offline status after task removal", error)
+            false
+        } finally {
+            connection?.disconnect()
+        }
     }
 
     override fun onDestroy() {
@@ -231,7 +340,32 @@ class DriverForegroundService : Service() {
         }
 
         Log.d(TAG, "handleStop")
+        performFullLocalStop()
+    }
 
+    private fun performFullLocalStop() {
+        stopActiveRuntimePreservingAuth()
+
+        currentToken = null
+        currentDriverId = null
+
+        clearRuntimeState()
+
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+
+    private fun finishLocalStopAfterTaskRemoval() {
+        currentToken = null
+        currentDriverId = null
+
+        clearRuntimeState()
+
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+
+    private fun stopActiveRuntimePreservingAuth() {
         currentLocationCts?.cancel()
         currentLocationCts = null
 
@@ -239,18 +373,11 @@ class DriverForegroundService : Service() {
         offerSocketManager.stop()
         offerAlertManager.stopAlerting(cancelNotification = true)
 
-        currentToken = null
-        currentDriverId = null
-
-        clearRuntimeState()
         clearLastSentLocation()
 
         isSendingLocation.set(false)
         consecutiveSendFailures.set(0)
         nextAllowedSendAtMs.set(0L)
-
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        stopSelf()
     }
 
     private fun handleStopOfferAlert(intent: Intent?) {
@@ -808,11 +935,14 @@ class DriverForegroundService : Service() {
 
         const val OFFER_NOTIFICATION_ID = 1101
 
+        private const val DRIVER_STATUS_UPDATE_URL =
+            "https://taxi-backend.laithroom.com/api/admin/drivers/status"
         private const val LOCATION_TICK_INTERVAL_MS = 15_000L
         private const val INITIAL_RETRY_BACKOFF_MS = 15_000L
         private const val MAX_RETRY_BACKOFF_MS = 60_000L
         private const val MIN_LOCATION_UPDATE_DISTANCE_METERS = 10f
         private const val MIN_LOCATION_SEND_DISTANCE_METERS = 15f
+        private const val TASK_REMOVED_OFFLINE_WAIT_MS = 8_000L
 
         private const val LOCATION_UPDATE_URL =
             "https://taxi-backend.laithroom.com/api/admin/drivers/location"
