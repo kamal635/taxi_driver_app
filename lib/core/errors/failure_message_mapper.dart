@@ -25,9 +25,10 @@ String failureToUserMessage(
     ValidationFailure() => l10n.errorValidation,
     NotFoundFailure() => l10n.errorNotFound,
     ForbiddenFailure() => l10n.errorForbidden,
-    UnauthorizedFailure() => context == FailureContext.authLogin
-        ? l10n.errorInvalidCredentials
-        : l10n.errorSessionExpired,
+    UnauthorizedFailure() =>
+      context == FailureContext.authLogin
+          ? l10n.errorInvalidCredentials
+          : l10n.errorSessionExpired,
     ServerFailure() => l10n.errorServer,
     ParsingFailure() => l10n.errorBadResponse,
     UnknownFailure() => l10n.errorUnexpected,

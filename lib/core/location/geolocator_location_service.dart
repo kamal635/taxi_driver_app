@@ -30,8 +30,8 @@ final class GeolocatorLocationService implements LocationService {
 
   LocationReadyResult _resultFromPermission(LocationPermission permission) {
     return switch (permission) {
-      LocationPermission.always || LocationPermission.whileInUse =>
-        LocationReadyResult.success(),
+      LocationPermission.always ||
+      LocationPermission.whileInUse => LocationReadyResult.success(),
       LocationPermission.denied => _failure(
         LocationFailureReason.permissionDenied,
       ),

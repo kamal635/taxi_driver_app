@@ -7,8 +7,8 @@ final class StartLocationTrackingUseCase {
   StartLocationTrackingUseCase({
     required LocationTracker tracker,
     required LocationService locationService,
-  })  : _tracker = tracker,
-        _locationService = locationService;
+  }) : _tracker = tracker,
+       _locationService = locationService;
 
   final LocationTracker _tracker;
   final LocationService _locationService;

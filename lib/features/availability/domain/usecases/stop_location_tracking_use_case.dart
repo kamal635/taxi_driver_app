@@ -3,7 +3,7 @@ import 'package:taxi_driver_app/features/availability/domain/repositories/locati
 /// Stops runtime location tracking.
 final class StopLocationTrackingUseCase {
   StopLocationTrackingUseCase({required LocationTracker tracker})
-      : _tracker = tracker;
+    : _tracker = tracker;
 
   final LocationTracker _tracker;
 

@@ -43,10 +43,10 @@ class AvatarImageEditor extends ConsumerWidget {
             onTap: isBusy
                 ? null
                 : () => _showAvatarActions(
-                      context: context,
-                      ref: ref,
-                      hasAvatar: hasAvatar,
-                    ),
+                    context: context,
+                    ref: ref,
+                    hasAvatar: hasAvatar,
+                  ),
             child: Container(
               width: 34.r,
               height: 34.r,
