@@ -1,4 +1,4 @@
-import 'dart:async' show unawaited;
+import 'dart:async' show StreamSubscription, unawaited;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,9 +9,11 @@ import 'package:taxi_driver_app/app/router/widgets/app_top_bar.dart';
 import 'package:taxi_driver_app/app/router/widgets/bottom_nav.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
+import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
 import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
+import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/restore_current_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
 
@@ -31,13 +33,17 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
   AppLifecycleListener? _appLifecycleListener;
   ProviderSubscription<AsyncValue<CurrentAndPendingOfferEntity>>?
   _restoreSubscription;
+  StreamSubscription<DriverOfferNotificationOpenEvent>?
+  _offerNotificationOpenSubscription;
 
   @override
   void initState() {
     super.initState();
     _setupLifecycleListener();
     _setupRestoreSubscription();
+    _setupOfferNotificationListener();
     _bootstrapCurrentOfferRestore();
+    _consumePendingOfferNotificationOpen();
   }
 
   void _setupLifecycleListener() {
@@ -68,14 +74,42 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
     });
   }
 
+  void _setupOfferNotificationListener() {
+    final bridge = ref.read(driverBackgroundServiceBridgeProvider);
+
+    _offerNotificationOpenSubscription = bridge.offerNotificationOpens.listen(
+      _handleOfferNotificationOpen,
+    );
+  }
+
+  void _consumePendingOfferNotificationOpen() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final event = await ref
+          .read(driverBackgroundServiceBridgeProvider)
+          .consumePendingOfferNotificationOpen();
+
+      if (!mounted || event == null) return;
+      _handleOfferNotificationOpen(event);
+    });
+  }
+
+  void _handleOfferNotificationOpen(DriverOfferNotificationOpenEvent event) {
+    final payloadJson = event.payloadJson;
+
+    if (payloadJson != null && payloadJson.isNotEmpty) {
+      ref
+          .read(newOfferControllerProvider.notifier)
+          .restoreFromNotificationPayload(payloadJson);
+    }
+
+    if (!mounted) return;
+    context.go(AppRoutes.home);
+  }
+
   void _handleAppResumed() {
     if (mounted) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
     }
-
-    unawaited(
-      ref.read(driverBackgroundServiceBridgeProvider).stopOfferAlert(),
-    );
 
     unawaited(
       ref
@@ -97,6 +131,8 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
   @override
   void dispose() {
     _restoreSubscription?.close();
+    unawaited(_offerNotificationOpenSubscription?.cancel());
+    _offerNotificationOpenSubscription = null;
     _appLifecycleListener?.dispose();
     _appLifecycleListener = null;
     super.dispose();

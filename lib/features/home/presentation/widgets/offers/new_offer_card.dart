@@ -7,7 +7,6 @@ import 'package:taxi_driver_app/features/home/presentation/controllers/decline_o
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/offers/offer_card.dart';
 
-/// Card for a newly received pending offer.
 class NewOfferCard extends ConsumerWidget {
   const NewOfferCard({super.key});
 
@@ -40,14 +39,12 @@ class NewOfferCard extends ConsumerWidget {
       isDeclineLoading: isDeclineLoading,
       onAccept: () async {
         await ref.read(driverBackgroundServiceBridgeProvider).stopOfferAlert();
-
         await ref
             .read(acceptOfferControllerProvider.notifier)
             .accept(offerId: pendingOffer.offerId);
       },
       onDecline: () async {
         await ref.read(driverBackgroundServiceBridgeProvider).stopOfferAlert();
-
         await ref
             .read(declineOfferControllerProvider.notifier)
             .decline(offerId: pendingOffer.offerId);

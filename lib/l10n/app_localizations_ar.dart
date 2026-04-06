@@ -87,6 +87,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'لن تستقبل طلبات جديدة حتى تقوم بتفعيل التوفر مرة أخرى.';
 
   @override
+  String get availabilityActiveTripOnlineBlocked =>
+      'لا يمكنك تفعيل وضع الأونلاين الآن لأن لديك رحلة نشطة. أنهِ الرحلة الحالية أولاً.';
+
+  @override
   String get homeEmptyTitle => 'بانتظار الطلبات الجديدة...';
 
   @override

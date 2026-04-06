@@ -14,7 +14,6 @@ final newOfferControllerProvider =
       NewOfferController.new,
     );
 
-/// Stores the currently active pending offer received from background events.
 final class NewOfferController extends AsyncNotifier<NewOfferState> {
   StreamSubscription<DriverBackgroundOfferEvent>? _offerEventsSubscription;
   StreamSubscription<DriverOfferNotificationOpenEvent>?
@@ -65,6 +64,22 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     );
   }
 
+  void restoreFromNotificationPayload(String payloadJson) {
+    try {
+      final offer = _parseOfferFromPayload(payloadJson);
+      _storeOfferIfActive(offer);
+    } on Exception catch (error, stackTrace) {
+      state = AsyncData(
+        _currentState.copyWith(errorMessage: error.toString()),
+      );
+
+      debugPrint(
+        'Failed to restore offer from notification payload: '
+        '$error\n$stackTrace',
+      );
+    }
+  }
+
   void _handleNativeOfferEvent(DriverBackgroundOfferEvent event) {
     try {
       final offer = _parseOfferFromPayload(event.payloadJson);
@@ -85,27 +100,13 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
   ) {
     debugPrint('Offer notification opened -> offerId=${event.offerId}');
 
-    _stopNativeOfferAlert();
-
     final payloadJson = event.payloadJson;
     if (payloadJson == null || payloadJson.isEmpty) {
       debugPrint('Offer notification open ignored: missing payloadJson');
       return;
     }
 
-    try {
-      final offer = _parseOfferFromPayload(payloadJson);
-      _storeOfferIfActive(offer);
-    } on Exception catch (error, stackTrace) {
-      state = AsyncData(
-        _currentState.copyWith(errorMessage: error.toString()),
-      );
-
-      debugPrint(
-        'Failed to restore offer from notification open: '
-        '$error\n$stackTrace',
-      );
-    }
+    restoreFromNotificationPayload(payloadJson);
   }
 
   NewOfferEntity _parseOfferFromPayload(String payloadJson) {

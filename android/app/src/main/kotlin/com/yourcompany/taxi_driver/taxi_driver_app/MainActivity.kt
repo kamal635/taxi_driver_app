@@ -52,20 +52,11 @@ class MainActivity : FlutterFragmentActivity() {
 
         channel.setMethodCallHandler { call, result ->
             when (call.method) {
-                "ensureNotificationPermission" -> {
-                    ensureNotificationPermission(result)
-                }
-
+                "ensureNotificationPermission" -> ensureNotificationPermission(result)
                 "areNotificationsEnabled" -> {
-                    result.success(
-                        NotificationManagerCompat.from(this).areNotificationsEnabled()
-                    )
+                    result.success(NotificationManagerCompat.from(this).areNotificationsEnabled())
                 }
-
-                "ensureLocationSettings" -> {
-                    ensureLocationSettings(result)
-                }
-
+                "ensureLocationSettings" -> ensureLocationSettings(result)
                 "startService" -> {
                     Log.d(TAG, "MainActivity -> startService called")
 
@@ -95,7 +86,6 @@ class MainActivity : FlutterFragmentActivity() {
 
                     result.success(true)
                 }
-
                 "stopService" -> {
                     Log.d(TAG, "MainActivity -> stopService called")
 
@@ -112,20 +102,29 @@ class MainActivity : FlutterFragmentActivity() {
                     startService(intent)
                     result.success(true)
                 }
-
                 "stopOfferAlert" -> {
                     val cancelNotification = call.argument<Boolean>("cancelNotification") ?: true
-                    DriverForegroundService.requestStopOfferAlert(
-                        context = this,
-                        cancelNotification = cancelNotification
-                    )
+
+                    if (!DriverForegroundService.isRunning) {
+                        result.success(true)
+                        return@setMethodCallHandler
+                    }
+
+                    val intent = Intent(this, DriverForegroundService::class.java).apply {
+                        action = DriverForegroundService.ACTION_STOP_OFFER_ALERT
+                        putExtra(
+                            DriverForegroundService.EXTRA_CANCEL_OFFER_NOTIFICATION,
+                            cancelNotification
+                        )
+                    }
+
+                    startService(intent)
                     result.success(true)
                 }
-
-                "isServiceRunning" -> {
-                    result.success(DriverForegroundService.isRunning)
+                "consumePendingOfferNotificationOpen" -> {
+                    result.success(consumePendingOfferNotificationOpen())
                 }
-
+                "isServiceRunning" -> result.success(DriverForegroundService.isRunning)
                 "emitTestOffer" -> {
                     Log.d(TAG, "MainActivity -> emitTestOffer called")
 
@@ -141,7 +140,6 @@ class MainActivity : FlutterFragmentActivity() {
 
                     result.success(true)
                 }
-
                 else -> result.notImplemented()
             }
         }
@@ -156,11 +154,6 @@ class MainActivity : FlutterFragmentActivity() {
             return
         }
 
-        DriverForegroundService.requestStopOfferAlert(
-            context = this,
-            cancelNotification = true
-        )
-
         val offerId = intent.getStringExtra(
             DriverForegroundService.EXTRA_LAUNCHED_OFFER_ID
         )
@@ -169,10 +162,21 @@ class MainActivity : FlutterFragmentActivity() {
             DriverForegroundService.EXTRA_LAUNCHED_OFFER_PAYLOAD
         )
 
+        pendingOfferNotificationOpen = mapOf(
+            "offerId" to offerId,
+            "payloadJson" to payloadJson
+        )
+
         notifyFlutterOfferNotificationOpened(
             offerId = offerId,
             payloadJson = payloadJson
         )
+    }
+
+    private fun consumePendingOfferNotificationOpen(): Map<String, String?>? {
+        val pending = pendingOfferNotificationOpen
+        pendingOfferNotificationOpen = null
+        return pending
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -290,6 +294,7 @@ class MainActivity : FlutterFragmentActivity() {
         private const val TAG = "DriverService"
 
         private var serviceMethodChannel: MethodChannel? = null
+        private var pendingOfferNotificationOpen: Map<String, String?>? = null
         private val mainHandler = Handler(Looper.getMainLooper())
 
         fun notifyFlutterServiceStopped(reason: String) {

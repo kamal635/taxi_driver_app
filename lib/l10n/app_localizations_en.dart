@@ -87,6 +87,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'You will stop receiving ride requests until you turn it on again.';
 
   @override
+  String get availabilityActiveTripOnlineBlocked =>
+      'You can\'t go online right now because you have an active trip. Finish the current trip first.';
+
+  @override
   String get homeEmptyTitle => 'Waiting for new requests...';
 
   @override

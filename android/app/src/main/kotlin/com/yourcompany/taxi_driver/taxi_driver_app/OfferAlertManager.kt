@@ -4,11 +4,11 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.os.Handler
-import android.os.Looper
-import android.os.SystemClock
+import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -19,14 +19,8 @@ class OfferAlertManager(
     private val context: Context
 ) {
 
-    private val mainHandler = Handler(Looper.getMainLooper())
-
     private var mediaPlayer: MediaPlayer? = null
     private var activeOfferKey: String? = null
-
-    private val stopSoundRunnable = Runnable {
-        stopSoundOnly()
-    }
 
     fun showOfferAlert(payloadJson: String) {
         val summary = parseOfferSummary(payloadJson)
@@ -40,9 +34,7 @@ class OfferAlertManager(
         }
 
         val notification = buildOfferNotification(
-            title = summary.title,
-            body = summary.body,
-            offerId = summary.offerId,
+            summary = summary,
             payloadJson = payloadJson
         )
 
@@ -54,13 +46,10 @@ class OfferAlertManager(
             Log.e(TAG, "Failed to show offer notification", error)
         }
 
-        if (isSameActiveOffer) {
-            Log.d(TAG, "Offer alert updated without replaying sound -> offerKey=$offerKey")
-            return
+        if (!isSameActiveOffer) {
+            activeOfferKey = offerKey
+            startSoundPlaybackOnce()
         }
-
-        activeOfferKey = offerKey
-        startSoundPlayback()
 
         Log.d(TAG, "Offer alert shown -> offerKey=$offerKey")
     }
@@ -78,24 +67,29 @@ class OfferAlertManager(
     }
 
     private fun stopSoundOnly() {
-        mainHandler.removeCallbacks(stopSoundRunnable)
+        val player = mediaPlayer ?: return
 
-        mediaPlayer?.run {
-            try {
-                if (isPlaying) {
-                    stop()
-                }
-            } catch (_: IllegalStateException) {
+        try {
+            if (player.isPlaying) {
+                player.stop()
             }
+        } catch (_: IllegalStateException) {
+        }
 
-            reset()
-            release()
+        try {
+            player.reset()
+        } catch (_: IllegalStateException) {
+        }
+
+        try {
+            player.release()
+        } catch (_: IllegalStateException) {
         }
 
         mediaPlayer = null
     }
 
-    private fun startSoundPlayback() {
+    private fun startSoundPlaybackOnce() {
         stopSoundOnly()
 
         try {
@@ -108,7 +102,7 @@ class OfferAlertManager(
             val player = MediaPlayer().apply {
                 setAudioAttributes(
                     AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .build()
                 )
@@ -121,18 +115,8 @@ class OfferAlertManager(
 
                 isLooping = false
 
-                setOnCompletionListener { mp ->
-                    try {
-                        mp.reset()
-                    } catch (_: Exception) {
-                    }
-                    try {
-                        mp.release()
-                    } catch (_: Exception) {
-                    }
-                    if (mediaPlayer === mp) {
-                        mediaPlayer = null
-                    }
+                setOnCompletionListener {
+                    stopSoundOnly()
                 }
 
                 setOnErrorListener { mp, what, extra ->
@@ -155,8 +139,6 @@ class OfferAlertManager(
 
             assetFileDescriptor.close()
             mediaPlayer = player
-
-            mainHandler.postDelayed(stopSoundRunnable, MAX_SOUND_PLAYBACK_MS)
         } catch (error: Exception) {
             Log.e(TAG, "Failed to start offer sound playback", error)
             mediaPlayer = null
@@ -164,9 +146,7 @@ class OfferAlertManager(
     }
 
     private fun buildOfferNotification(
-        title: String,
-        body: String,
-        offerId: String?,
+        summary: OfferSummary,
         payloadJson: String
     ): Notification {
         val launchIntent = Intent(context, MainActivity::class.java).apply {
@@ -176,8 +156,8 @@ class OfferAlertManager(
                 DriverForegroundService.LAUNCH_SOURCE_OFFER_NOTIFICATION
             )
 
-            if (!offerId.isNullOrBlank()) {
-                putExtra(DriverForegroundService.EXTRA_LAUNCHED_OFFER_ID, offerId)
+            if (!summary.offerId.isNullOrBlank()) {
+                putExtra(DriverForegroundService.EXTRA_LAUNCHED_OFFER_ID, summary.offerId)
             }
 
             putExtra(DriverForegroundService.EXTRA_LAUNCHED_OFFER_PAYLOAD, payloadJson)
@@ -202,26 +182,44 @@ class OfferAlertManager(
         )
 
         return NotificationCompat.Builder(context, DriverForegroundService.OFFERS_CHANNEL_ID)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(android.R.drawable.ic_dialog_map)
+            .setLargeIcon(loadAppLargeIcon())
+            .setContentTitle(summary.title)
+            .setContentText(summary.previewText)
+            .setSubText("بوابة السائق")
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(summary.bigText)
+                    .setSummaryText("اضغط لفتح العرض الآن")
+            )
             .setContentIntent(contentPendingIntent)
             .setDeleteIntent(dismissPendingIntent)
+            .addAction(
+                android.R.drawable.ic_menu_view,
+                "فتح العرض",
+                contentPendingIntent
+            )
             .setAutoCancel(true)
             .setOnlyAlertOnce(false)
-            .setCategory(NotificationCompat.CATEGORY_CALL)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setVibrate(longArrayOf(0, 300, 200, 300))
+            .setColor(0xFF0EA5E9.toInt())
+            .setShowWhen(true)
             .setWhen(System.currentTimeMillis())
+            .setTicker("عرض جديد متاح الآن")
+            .setDefaults(NotificationCompat.DEFAULT_LIGHTS)
+            .setVibrate(longArrayOf(0, 250, 150, 250))
+            .setFullScreenIntent(contentPendingIntent, false)
             .build()
     }
 
     private fun parseOfferSummary(payloadJson: String): OfferSummary {
-        var title = "عرض رحلة جديد"
-        var body = "وصلك عرض جديد."
         var offerId: String? = null
+        var pickup = ""
+        var dropoff = ""
+        var price = ""
+        var notes = ""
 
         try {
             val json = JSONObject(payloadJson)
@@ -230,37 +228,78 @@ class OfferAlertManager(
                 .ifBlank { json.optString("id") }
                 .ifBlank { null }
 
-            val pickup = json.optString("pickup")
+            pickup = json.optString("pickup")
                 .ifBlank { json.optString("pickup_address") }
 
-            val price = json.optString("price")
+            dropoff = json.optString("dropoff")
+                .ifBlank { json.optString("dropoff_address") }
 
-            body = buildString {
-                if (pickup.isNotBlank()) {
-                    append("نقطة الانطلاق: ")
-                    append(pickup)
-                } else {
-                    append("وصلك عرض جديد.")
-                }
+            price = json.optString("price")
+                .ifBlank { json.optString("fare") }
 
-                if (price.isNotBlank()) {
-                    append(" • السعر: ")
-                    append(price)
-                }
-            }
+            notes = json.optString("notes")
         } catch (error: JSONException) {
             Log.e(TAG, "Failed to parse offer payload", error)
         }
 
+        val previewText = buildString {
+            if (pickup.isNotBlank()) {
+                append("الانطلاق: ")
+                append(pickup)
+            } else {
+                append("وصلك عرض رحلة جديد")
+            }
+
+            if (price.isNotBlank()) {
+                append(" • الأجرة: ")
+                append(price)
+            }
+        }
+
+        val bigText = buildString {
+            if (pickup.isNotBlank()) {
+                append("نقطة الانطلاق: ")
+                append(pickup)
+            } else {
+                append("وصلك عرض رحلة جديد")
+            }
+
+            if (dropoff.isNotBlank()) {
+                append("\nالوجهة: ")
+                append(dropoff)
+            }
+
+            if (price.isNotBlank()) {
+                append("\nالأجرة: ")
+                append(price)
+            }
+
+            if (notes.isNotBlank()) {
+                append("\nملاحظات: ")
+                append(notes)
+            }
+        }
+
         return OfferSummary(
-            title = title,
-            body = body,
+            title = "عرض رحلة جديد",
+            previewText = previewText,
+            bigText = bigText,
             offerId = offerId
         )
     }
 
+    private fun loadAppLargeIcon(): Bitmap? {
+        val iconRes = context.applicationInfo.icon
+        if (iconRes == 0) return null
+        return try {
+            BitmapFactory.decodeResource(context.resources, iconRes)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     private fun immutableFlag(): Int {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             PendingIntent.FLAG_IMMUTABLE
         } else {
             0
@@ -269,12 +308,12 @@ class OfferAlertManager(
 
     private data class OfferSummary(
         val title: String,
-        val body: String,
+        val previewText: String,
+        val bigText: String,
         val offerId: String?
     )
 
     companion object {
         private const val TAG = "OfferAlertManager"
-        private const val MAX_SOUND_PLAYBACK_MS = 4_000L
     }
 }

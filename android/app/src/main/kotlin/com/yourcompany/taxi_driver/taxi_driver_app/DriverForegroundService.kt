@@ -6,8 +6,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
@@ -650,7 +650,6 @@ class DriverForegroundService : Service() {
     // -------------------------------------------------------------------------
     // Offers / Notifications
     // -------------------------------------------------------------------------
-
     private fun buildServiceNotification(): Notification {
         val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
 
@@ -662,14 +661,14 @@ class DriverForegroundService : Service() {
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("وضع السائق يعمل الآن")
-            .setContentText("التطبيق يعمل في الخلفية لتتبع الموقع واستقبال العروض.")
+            .setContentTitle("وضع السائق يعمل")
+            .setContentText("التطبيق يرسل الموقع ويستقبل العروض في الخلفية")
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
     }
@@ -691,10 +690,10 @@ class DriverForegroundService : Service() {
 
         val serviceChannel = NotificationChannel(
             CHANNEL_ID,
-            "خدمة السائق في الخلفية",
-            NotificationManager.IMPORTANCE_DEFAULT
+            "تشغيل السائق في الخلفية",
+            NotificationManager.IMPORTANCE_LOW
         ).apply {
-            description = "تحافظ على عمل وضع السائق في الخلفية"
+            description = "يبقي وضع السائق نشطًا أثناء العمل"
             setShowBadge(false)
             enableVibration(false)
             setSound(null, null)
@@ -702,25 +701,21 @@ class DriverForegroundService : Service() {
 
         val offersChannel = NotificationChannel(
             OFFERS_CHANNEL_ID,
-            "عروض السائق",
+            "عروض الرحلات",
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "تعرض عروض الرحلات الجديدة"
+            description = "تنبيه عند وصول عرض رحلة جديد"
             setShowBadge(true)
             enableVibration(true)
-            vibrationPattern = longArrayOf(0, 500, 250, 500, 250, 700)
+            vibrationPattern = longArrayOf(0, 250, 150, 250)
+            enableLights(true)
+            lightColor = Color.parseColor("#0EA5E9")
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             setSound(null, null)
         }
 
         manager.createNotificationChannel(serviceChannel)
         manager.createNotificationChannel(offersChannel)
-
-        val createdChannel = manager.getNotificationChannel(OFFERS_CHANNEL_ID)
-        Log.d(
-            TAG,
-            "Offers channel ready -> id=${createdChannel?.id}, importance=${createdChannel?.importance}, sound=${createdChannel?.sound}"
-        )
     }
 
     // -------------------------------------------------------------------------
@@ -785,11 +780,10 @@ class DriverForegroundService : Service() {
         private const val PREF_TOKEN = "pref_token"
         private const val PREF_DRIVER_ID = "pref_driver_id"
 
-        const val CHANNEL_ID = "driver_background_service_v3"
-        const val OFFERS_CHANNEL_ID = "driver_offers_channel_v14"
+        const val CHANNEL_ID = "driver_background_service_v4"
+        const val OFFERS_CHANNEL_ID = "driver_offers_channel_v15"
 
         const val NOTIFICATION_ID = 1001
-        const val OFFER_NOTIFICATION_ID = 2001
 
         const val ACTION_START = "driver_background_service.action.START"
         const val ACTION_STOP = "driver_background_service.action.STOP"
@@ -804,13 +798,15 @@ class DriverForegroundService : Service() {
 
         const val EXTRA_TOKEN = "extra_token"
         const val EXTRA_DRIVER_ID = "extra_driver_id"
-        const val EXTRA_CANCEL_OFFER_NOTIFICATION = "extra_cancel_offer_notification"
 
         const val EXTRA_LAUNCH_SOURCE = "extra_launch_source"
         const val EXTRA_LAUNCHED_OFFER_ID = "extra_launched_offer_id"
         const val EXTRA_LAUNCHED_OFFER_PAYLOAD = "extra_launched_offer_payload"
 
         const val LAUNCH_SOURCE_OFFER_NOTIFICATION = "offer_notification"
+        const val EXTRA_CANCEL_OFFER_NOTIFICATION = "extra_cancel_offer_notification"
+
+        const val OFFER_NOTIFICATION_ID = 1101
 
         private const val LOCATION_TICK_INTERVAL_MS = 15_000L
         private const val INITIAL_RETRY_BACKOFF_MS = 15_000L
@@ -823,25 +819,5 @@ class DriverForegroundService : Service() {
 
         @Volatile
         var isRunning: Boolean = false
-
-        fun requestStopOfferAlert(
-            context: Context,
-            cancelNotification: Boolean = true
-        ) {
-            if (!isRunning) {
-                return
-            }
-
-            val intent = Intent(context, DriverForegroundService::class.java).apply {
-                action = ACTION_STOP_OFFER_ALERT
-                putExtra(EXTRA_CANCEL_OFFER_NOTIFICATION, cancelNotification)
-            }
-
-            try {
-                context.startService(intent)
-            } catch (error: Exception) {
-                Log.e(TAG, "Failed to request offer alert stop", error)
-            }
-        }
     }
 }
