@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
@@ -20,7 +19,7 @@ Future<bool> showAppConfirmDialog({
   final result = await showDialog<bool>(
     context: context,
     barrierDismissible: barrierDismissible,
-    builder: (context) {
+    builder: (dialogContext) {
       return Dialog(
         insetPadding: EdgeInsets.symmetric(horizontal: 18.w),
         shape: RoundedRectangleBorder(
@@ -34,7 +33,6 @@ Future<bool> showAppConfirmDialog({
             children: [
               Row(
                 children: [
-                  /// Icon
                   Container(
                     width: 40.r,
                     height: 40.r,
@@ -45,40 +43,39 @@ Future<bool> showAppConfirmDialog({
                     ),
                     child: Icon(icon, color: iconColor),
                   ),
-
                   AppSpacing.w12,
-
-                  /// Title
-                  Expanded(child: Text(title, style: AppTypography.titleSm)),
-                ],
-              ),
-
-              AppSpacing.h12,
-
-              /// Message
-              Text(message, style: AppTypography.bodyMuted),
-
-              AppSpacing.h16,
-
-              // Actions
-              Row(
-                children: [
-                  /// Cancel
                   Expanded(
-                    child: AppButton(
-                      backgroundColor: Colors.transparent,
-                      label: cancelLabel,
-                      onPressed: () => context.pop(false),
+                    child: Text(
+                      title,
+                      style: AppTypography.titleSm,
                     ),
                   ),
-
+                ],
+              ),
+              AppSpacing.h12,
+              Text(
+                message,
+                style: AppTypography.bodyMuted,
+              ),
+              AppSpacing.h16,
+              Row(
+                children: [
+                  Expanded(
+                    child: AppButton(
+                      label: cancelLabel,
+                      backgroundColor: Colors.transparent,
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop(false);
+                      },
+                    ),
+                  ),
                   AppSpacing.w12,
-
-                  /// Confirm
                   Expanded(
                     child: AppButton(
                       label: confirmLabel,
-                      onPressed: () => context.pop(true),
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop(true);
+                      },
                     ),
                   ),
                 ],

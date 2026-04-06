@@ -25,10 +25,12 @@ class ProfileSectionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accentColor = isDestructive ? AppColors.error : AppColors.textPrimary;
-    final iconBackgroundColor =
-        isDestructive ? AppColors.errorBg : AppColors.bgWarm;
-    final subtitleColor =
-        isDestructive ? AppColors.error : AppColors.textSecondary;
+    final iconBackgroundColor = isDestructive
+        ? AppColors.errorBg
+        : AppColors.bgWarm;
+    final subtitleColor = isDestructive
+        ? AppColors.error
+        : AppColors.textSecondary;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
@@ -73,7 +75,7 @@ class ProfileSectionItem extends StatelessWidget {
               ),
             ),
             Icon(
-              AppIcons.arrowf,
+              AppIcons.arrowForward,
               size: 14.r,
               color: AppColors.iconMuted,
             ),

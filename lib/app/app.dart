@@ -9,8 +9,14 @@ import 'package:taxi_driver_app/core/utils/screen_util_design_size.dart';
 import 'package:taxi_driver_app/core/widgets/app_background.dart';
 import 'package:taxi_driver_app/l10n/app_localizations.dart';
 
+/// Root application widget.
+///
+/// It configures routing, localization, screen adaptation, and the global
+/// background wrapper used across the app.
 class TaxiDriverApp extends ConsumerWidget {
   const TaxiDriverApp({super.key});
+
+  static const Locale _appLocale = Locale('ar');
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,12 +30,10 @@ class TaxiDriverApp extends ConsumerWidget {
           designSize: designSize,
           minTextAdapt: true,
           splitScreenMode: true,
-
-          fontSizeResolver: (fontSize, su) {
-            final scale = su.scaleText.clamp(0.90, 1.20);
+          fontSizeResolver: (fontSize, screenUtil) {
+            final scale = screenUtil.scaleText.clamp(0.90, 1.20);
             return fontSize * scale;
           },
-
           builder: (_, child) => child!,
           child: MaterialApp.router(
             debugShowCheckedModeBanner: false,
@@ -37,8 +41,8 @@ class TaxiDriverApp extends ConsumerWidget {
             onGenerateTitle: (context) => context.l10n.appTitle,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            locale: const Locale('ar'),
-            theme: AppTheme.light(const Locale('en')),
+            locale: _appLocale,
+            theme: AppTheme.light(_appLocale),
             routerConfig: router,
             builder: (context, child) {
               return Stack(

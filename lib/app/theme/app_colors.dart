@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
 
+/// Centralized application color palette.
 final class AppColors {
-  static const primary = Color(0xFFFFD400);
+  AppColors._();
 
-  static const bgWarm = Color(0xFFFFF8E1);
-  static const bgBase = Color(0xFFF7F7F7);
+  static const Color primary = Color(0xFFFFD400);
 
-  static const textPrimary = Color(0xFF111827);
-  static const textSecondary = Color(0xFF6B7280);
+  static const Color bgWarm = Color(0xFFFFF8E1);
+  static const Color bgBase = Color(0xFFF7F7F7);
 
-  static const border = Color(0xFFE5E7EB);
-  static const iconMuted = Color(0xFF9CA3AF);
+  static const Color textPrimary = Color(0xFF111827);
+  static const Color textSecondary = Color(0xFF6B7280);
 
-  //  Semantic (status)
-  static const success = Color(0xFF22C55E);
-  static const successBg = Color(0xFFD1FAE5);
-  static const error = Color(0xFFEF4444);
-  static const errorBg = Color(0xFFFEE2E2);
-  static const warning = Color(0xFF2C1E0A);
-  static const warningBg = Color(0xFFFFD166);
-  static const info = Color(0xFF1D4ED8);
-  static const infoBg = Color(0xFFEFF6FF);
+  static const Color border = Color(0xFFE5E7EB);
+  static const Color iconMuted = Color(0xFF9CA3AF);
 
-  static const white = Color(0xFFFFFFFF);
+  // Semantic colors.
+  static const Color success = Color(0xFF22C55E);
+  static const Color successBg = Color(0xFFD1FAE5);
+  static const Color error = Color(0xFFEF4444);
+  static const Color errorBg = Color(0xFFFEE2E2);
+  static const Color warning = Color(0xFF2C1E0A);
+  static const Color warningBg = Color(0xFFFFD166);
+  static const Color info = Color(0xFF1D4ED8);
+  static const Color infoBg = Color(0xFFEFF6FF);
+
+  static const Color white = Color(0xFFFFFFFF);
 }

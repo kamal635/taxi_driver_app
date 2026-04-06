@@ -65,7 +65,7 @@ class AcceptedCustomerPhoneTile extends StatelessWidget {
                   ),
                 ),
                 Icon(
-                  AppIcons.arrowf,
+                  AppIcons.arrowForward,
                   color: AppColors.iconMuted,
                   size: 18.r,
                 ),
