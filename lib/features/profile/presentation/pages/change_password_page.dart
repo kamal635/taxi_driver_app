@@ -16,8 +16,7 @@ class ChangePasswordPage extends ConsumerStatefulWidget {
   const ChangePasswordPage({super.key});
 
   @override
-  ConsumerState<ChangePasswordPage> createState() =>
-      _ChangePasswordPageState();
+  ConsumerState<ChangePasswordPage> createState() => _ChangePasswordPageState();
 }
 
 class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
@@ -134,7 +133,9 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
       return;
     }
 
-    await ref.read(setupPasswordControllerProvider.notifier).submit(
+    await ref
+        .read(setupPasswordControllerProvider.notifier)
+        .submit(
           newPassword: newPassword,
         );
   }

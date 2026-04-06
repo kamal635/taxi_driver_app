@@ -4,7 +4,7 @@ import 'package:taxi_driver_app/features/availability/domain/repositories/driver
 /// Updates the driver's availability status on the backend.
 final class SetDriverStatusUseCase {
   SetDriverStatusUseCase({required DriverStatusRepository repository})
-      : _repository = repository;
+    : _repository = repository;
 
   final DriverStatusRepository _repository;
 

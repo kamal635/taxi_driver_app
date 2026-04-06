@@ -10,7 +10,7 @@ abstract interface class DriverStatusRemoteDataSource {
 final class DriverStatusRemoteDataSourceImpl
     implements DriverStatusRemoteDataSource {
   DriverStatusRemoteDataSourceImpl({required ApiClient apiClient})
-      : _apiClient = apiClient;
+    : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 

@@ -12,67 +12,55 @@
   "signIn": "Sign in",
   "forgotPassword": "Forgot password?",
   "copyright": "© 2026 Taxi Driver App",
-  "notes":"Notes",
-
-  "unknown":"unknown",
-
-
+  "notes": "Notes",
+  "unknown": "unknown",
   "homeGreeting": "Hello,",
   "homeNetworkConnected": "Connected",
   "homeNetworkDisconnected": "Disconnected",
-
   "homeAvailabilityOnTitle": "You are available now",
   "homeAvailabilityOnSubtitle": "You will receive nearby ride requests once available",
-
   "homeAvailabilityOffTitle": "You are offline",
   "homeAvailabilityOffSubtitle": "Turn availability on to start receiving nearby ride requests",
-
   "actionConfirm": "Confirm",
   "actionCancel": "Cancel",
-
   "availabilityTurnOffTitle": "Turn off availability?",
   "availabilityTurnOffMessage": "You will stop receiving ride requests until you turn it on again.",
-
+  "availabilityActiveTripOnlineBlocked": "You can't go online right now because you have an active trip. Finish the current trip first.",
+  "@availabilityActiveTripOnlineBlocked": {
+    "description": "Shown when the driver tries to go online while an active trip is still in progress"
+  },
   "homeEmptyTitle": "Waiting for new requests...",
   "homeEmptySubtitle": "We are looking for new riders near your current area. Please stay close to the app.",
   "homeUpdateLocation": "Update location",
-
   "homeTabCurrent": "Current",
   "homeTabCompleted": "Completed",
-
   "homeRequestNewTitle": "New request",
   "homeRequestCurrentTitle": "Current ride",
   "homeRequestCompletedTitle": "Completed ride",
-
   "homePickupPrefix": "PICKUP: ",
   "homeDropoffPrefix": "DROPOFF: ",
   "homeFarePrefix": "Fare:",
-
   "homeAvailableIn": "Available in:",
-
   "actionAccept": "Accept",
   "actionReject": "Reject",
   "actionDone": "Done",
-
   "badgeNew": "NEW",
   "badgeLive": "LIVE",
   "badgeDone": "DONE",
-
   "navHome": "Home",
   "navTrips": "Trips",
   "navProfile": "Profile",
-
   "homeLastLocationUpdateNow": "Last location update: now",
   "homeLastLocationUpdateSecondsAgo": "Last location update: {seconds}s ago",
   "@homeLastLocationUpdateSecondsAgo": {
     "placeholders": {
-      "seconds": { "type": "int" }
+      "seconds": {
+        "type": "int"
+      }
     }
   },
-
   "exitAppTitle": "Exit app?",
   "exitAppMessage": "Are you sure you want to close the app?",
-
   "tripsSummaryTitle": "Your earnings at a glance",
   "tripsSummarySubtitle": "Track completed rides and earnings",
   "tripsSummaryTripsLabel": "Trips",
@@ -83,14 +71,11 @@
   "tripsRecentTitle": "Recent completed trips",
   "tripsEmptyTitle": "No trips yet",
   "tripsEmptySubtitle": "Completed trips will appear here once you finish your first ride.",
-  
   "online": "Online",
   "offline": "Offline",
-  
   "profileSectionAccount": "Account settings",
   "profileSectionSupport": "Support",
   "profileSectionSignOut": "Sign out",
-
   "profileEditTitle": "Edit profile",
   "profileEditSubtitle": "Update your personal info",
   "profileChangePasswordTitle": "Change password",
@@ -99,42 +84,38 @@
   "profileMyVehiclesSubtitle": "Manage your registered cars",
   "profileHelpCenterTitle": "Help center",
   "profileHelpCenterSubtitle": "FAQs and technical support",
-
   "profileSignOutTitle": "Sign out",
   "profileSignOutSubtitle": "Sign out from this account",
   "signOutConfirmMessage": "Are you sure you want to sign out from this account?",
   "signOutConfirmTitle": "Sign out?",
-
   "profileChangePhoto": "Change photo",
   "profileFullName": "Full name",
   "profileFullNameHint": "John Doe",
   "profilePhone": "Phone number",
   "profilePhoneHint": "+963 123 456 789",
   "profileEmail": "Email",
-
   "actionSaveChanges": "Save changes",
-
   "profileCurrentPassword": "Current password",
   "profileNewPassword": "New password",
   "profileConfirmNewPassword": "Confirm new password",
   "profilePasswordHint": "Password must be at least 8 characters.",
   "profileUpdatePasswordAction": "Update password",
-
   "vehicleTitle": "My Vehicle",
-
   "vehiclePlateNumberLabel": "Plate Number",
   "vehicleTaxiLanternNumberLabel": "Taxi Lantern Number",
   "vehicleModelLabel": "Model",
   "vehicleTypeLabel": "Type",
-
   "vehicleTypePublic": "Public",
   "vehicleTypePrivate": "Private",
-
   "vehicleInfoNote": "This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office.",
-
   "tripsTotalTrips": "total trips: ({count})",
-  "@tripsTotalTrips": { "placeholders": { "count": { "type": "int" } } },
- 
+  "@tripsTotalTrips": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "errorUnexpected": "Something went wrong. Please try again.",
   "errorNoInternet": "No internet connection. Check your network and try again.",
   "errorTimeout": "The request took too long. Please try again.",
@@ -148,24 +129,18 @@
   "errorSessionExpired": "Session expired. Please sign in again.",
   "errorServer": "Server error. Please try again later.",
   "errorBadResponse": "Unexpected server response. Please try again.",
-
   "authSetupPasswordTitle": "Create password",
   "authSetupPasswordSubtitle": "To finish setting up your account, create a new password.",
   "authNewPasswordLabel": "New password",
   "authConfirmNewPasswordLabel": "Confirm new password",
   "authCreatePasswordAction": "Create password",
   "authPasswordRulesHint": "Password must be at least 8 characters.",
-
   "locationServiceDisabled": "Please enable Location Services.",
   "locationPermissionRequired": "Location permission is required to go online.",
   "locationPermissionDeniedForever": "Location permission is permanently denied. Please enable it from Settings.",
   "locationPermissionUnableToDetermine": "Unable to determine location permission. Please try again.",
-   
   "locationNetworkError": "No internet connection. We can't update your location.",
-
   "actionSettings": "Settings",
-
-  
   "todayLabel": "Today",
   "@todayLabel": {
     "description": "Label used for trips completed today"
@@ -202,13 +177,10 @@
   "@weekdaySunday": {
     "description": "Weekday label for Sunday"
   },
-  
-  "all" : "All",
-  "month" : "Month",
-  "week" : "Week",
-  "day" : "Day",
-
-  
+  "all": "All",
+  "month": "Month",
+  "week": "Week",
+  "day": "Day",
   "profileAvatarChangePhoto": "Change photo",
   "@profileAvatarChangePhoto": {
     "description": "Action label to change the profile avatar photo"
@@ -217,25 +189,16 @@
   "@profileAvatarRemovePhoto": {
     "description": "Action label to remove the profile avatar photo"
   },
-
- 
   "profileAvatarPickFromGallery": "Choose from gallery",
   "profileAvatarTakePhoto": "Take a photo",
-
-   "homeOfferExpiresIn": "Expires in:",
-
-   "price":"Price: ",
-
-    "customerPhone": "CUSTOMER PHONE",
-
-
-
-    "decline": "Decline",
-
-    "tripCompleted": "Trip is Completed",
-    "tripProgress" :"Trip in Progress..",
-    "tapToCall":"Tap to call customer",
-    "totalFare"   :"TOTAL FARE",
-    "tripNotes":"TRIP NOTES",
-    "timeRemaining":"Time remaining to start"
+  "homeOfferExpiresIn": "Expires in:",
+  "price": "Price: ",
+  "customerPhone": "CUSTOMER PHONE",
+  "decline": "Decline",
+  "tripCompleted": "Trip is Completed",
+  "tripProgress": "Trip in Progress..",
+  "tapToCall": "Tap to call customer",
+  "totalFare": "TOTAL FARE",
+  "tripNotes": "TRIP NOTES",
+  "timeRemaining": "Time remaining to start"
 }

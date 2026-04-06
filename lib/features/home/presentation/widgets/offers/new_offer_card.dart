@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
+import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/decline_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/widgets/offers/offer_card.dart';
 
-/// Card for a newly received pending offer.
 class NewOfferCard extends ConsumerWidget {
   const NewOfferCard({super.key});
 
@@ -38,11 +38,13 @@ class NewOfferCard extends ConsumerWidget {
       isAcceptLoading: isAcceptLoading,
       isDeclineLoading: isDeclineLoading,
       onAccept: () async {
+        await ref.read(driverBackgroundServiceBridgeProvider).stopOfferAlert();
         await ref
             .read(acceptOfferControllerProvider.notifier)
             .accept(offerId: pendingOffer.offerId);
       },
       onDecline: () async {
+        await ref.read(driverBackgroundServiceBridgeProvider).stopOfferAlert();
         await ref
             .read(declineOfferControllerProvider.notifier)
             .decline(offerId: pendingOffer.offerId);

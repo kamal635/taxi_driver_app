@@ -248,6 +248,12 @@ abstract class AppLocalizations {
   /// **'You will stop receiving ride requests until you turn it on again.'**
   String get availabilityTurnOffMessage;
 
+  /// Shown when the driver tries to go online while an active trip is still in progress
+  ///
+  /// In en, this message translates to:
+  /// **'You can\'t go online right now because you have an active trip. Finish the current trip first.'**
+  String get availabilityActiveTripOnlineBlocked;
+
   /// No description provided for @homeEmptyTitle.
   ///
   /// In en, this message translates to:

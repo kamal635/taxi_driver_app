@@ -7,13 +7,12 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.graphics.Color
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.location.Location as AndroidLocation
 import android.location.LocationManager
-import android.media.AudioAttributes
-import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -22,7 +21,6 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationAvailability
@@ -31,7 +29,6 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
-import org.json.JSONException
 import org.json.JSONObject
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
@@ -58,6 +55,7 @@ class DriverForegroundService : Service() {
     private val nextAllowedSendAtMs = AtomicLong(0L)
 
     private val offerSocketManager = DriverOfferSocketManager()
+    private val offerAlertManager by lazy { OfferAlertManager(this) }
 
     private val networkExecutor: ExecutorService by lazy {
         Executors.newSingleThreadExecutor()
@@ -116,6 +114,16 @@ class DriverForegroundService : Service() {
                 START_STICKY
             }
 
+            ACTION_STOP_OFFER_ALERT -> {
+                handleStopOfferAlert(intent)
+                START_STICKY
+            }
+
+            ACTION_DISMISS_OFFER_NOTIFICATION -> {
+                handleDismissOfferNotification()
+                START_STICKY
+            }
+
             else -> {
                 if (intent == null) {
                     Log.w(TAG, "Service restarted with null intent")
@@ -130,6 +138,8 @@ class DriverForegroundService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         Log.d(TAG, "Service onTaskRemoved")
+        MainActivity.notifyFlutterServiceStopped("task_removed")
+        handleStop()
         super.onTaskRemoved(rootIntent)
     }
 
@@ -141,6 +151,7 @@ class DriverForegroundService : Service() {
 
         stopLocationUpdates()
         offerSocketManager.stop()
+        offerAlertManager.stopAlerting(cancelNotification = true)
 
         clearLastSentLocation()
 
@@ -226,6 +237,7 @@ class DriverForegroundService : Service() {
 
         stopLocationUpdates()
         offerSocketManager.stop()
+        offerAlertManager.stopAlerting(cancelNotification = true)
 
         currentToken = null
         currentDriverId = null
@@ -239,6 +251,19 @@ class DriverForegroundService : Service() {
 
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
+    }
+
+    private fun handleStopOfferAlert(intent: Intent?) {
+        val cancelNotification = intent?.getBooleanExtra(
+            EXTRA_CANCEL_OFFER_NOTIFICATION,
+            true
+        ) ?: true
+
+        offerAlertManager.stopAlerting(cancelNotification = cancelNotification)
+    }
+
+    private fun handleDismissOfferNotification() {
+        offerAlertManager.stopAlerting(cancelNotification = false)
     }
 
     private fun stopServiceDueToUnauthorized() {
@@ -625,146 +650,37 @@ class DriverForegroundService : Service() {
     // -------------------------------------------------------------------------
     // Offers / Notifications
     // -------------------------------------------------------------------------
-private fun buildServiceNotification(): Notification {
-    val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
-
-    val pendingIntent = PendingIntent.getActivity(
-        this,
-        0,
-        launchIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT or immutableFlag()
-    )
-
-    return NotificationCompat.Builder(this, CHANNEL_ID)
-        .setContentTitle("Driver mode is active")
-        .setContentText("Background location and incoming offers are running.")
-        .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-        .setContentIntent(pendingIntent)
-        .setOngoing(true)
-        .setOnlyAlertOnce(true)
-        .setCategory(NotificationCompat.CATEGORY_SERVICE)
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-        .build()
-}
-    private fun handleOfferReceived(payload: DriverOfferPayload) {
-        Log.d(TAG, "Offer received in service")
-
-        showOfferNotification(payload)
-
-        MainActivity.notifyFlutterOfferReceived(
-            payloadJson = payload.payloadJson
-        )
-    }
-
-    private fun showOfferNotification(payload: DriverOfferPayload) {
-        val notificationManager = NotificationManagerCompat.from(this)
-
-        if (!notificationManager.areNotificationsEnabled()) {
-            Log.w(TAG, "Offer notification skipped: notifications are disabled")
-            return
-        }
-
-        val payloadJson = payload.payloadJson
-
-        var title = "New trip offer"
-        var body = "You received a new offer."
-        var offerIdForLaunch: String? = null
-
-        try {
-            val json = JSONObject(payloadJson)
-
-            val offerId = json.optString("offerId")
-                .ifBlank { json.optString("id") }
-
-            val pickup = json.optString("pickup")
-                .ifBlank { json.optString("pickup_address") }
-
-            val price = json.optString("price")
-
-            body = buildString {
-                if (pickup.isNotBlank()) {
-                    append("Pickup: ")
-                    append(pickup)
-                } else {
-                    append("You received a new offer.")
-                }
-
-                if (price.isNotBlank()) {
-                    append(" • Price: ")
-                    append(price)
-                }
-            }
-
-            offerIdForLaunch = offerId.ifBlank { null }
-
-            Log.d(
-                TAG,
-                "Preparing offer notification -> offerId=$offerIdForLaunch, body=$body"
-            )
-        } catch (error: JSONException) {
-            Log.e(TAG, "Failed to parse offer payload for notification", error)
-        }
-
-        val notificationId = ((SystemClock.uptimeMillis() % Int.MAX_VALUE).toInt())
-            .coerceAtLeast(1)
-
-        val notification = buildOfferNotification(
-            title = title,
-            body = body,
-            offerId = offerIdForLaunch,
-            payloadJson = payloadJson
-        )
-
-        notificationManager.notify(notificationId, notification)
-
-        Log.d(
-            TAG,
-            "Offer notification shown -> id=$notificationId, offerId=$offerIdForLaunch"
-        )
-    }
-
-    private fun buildOfferNotification(
-        title: String,
-        body: String,
-        offerId: String?,
-        payloadJson: String
-    ): Notification {
-        val launchIntent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra(EXTRA_LAUNCH_SOURCE, LAUNCH_SOURCE_OFFER_NOTIFICATION)
-
-            if (!offerId.isNullOrBlank()) {
-                putExtra(EXTRA_LAUNCHED_OFFER_ID, offerId)
-            }
-
-            putExtra(EXTRA_LAUNCHED_OFFER_PAYLOAD, payloadJson)
-        }
-
-        val requestCode = ((SystemClock.uptimeMillis() % Int.MAX_VALUE).toInt())
-            .coerceAtLeast(1)
+    private fun buildServiceNotification(): Notification {
+        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
 
         val pendingIntent = PendingIntent.getActivity(
             this,
-            requestCode,
+            0,
             launchIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or immutableFlag()
         )
 
-        return NotificationCompat.Builder(this, OFFERS_CHANNEL_ID)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("وضع السائق يعمل")
+            .setContentText("التطبيق يرسل الموقع ويستقبل العروض في الخلفية")
+            .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .setOnlyAlertOnce(false)
-            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setVibrate(longArrayOf(0, 300, 200, 300))
-            .setWhen(System.currentTimeMillis())
             .build()
+    }
+
+    private fun handleOfferReceived(payload: DriverOfferPayload) {
+        Log.d(TAG, "Offer received in service")
+
+        offerAlertManager.showOfferAlert(payload.payloadJson)
+
+        MainActivity.notifyFlutterOfferReceived(
+            payloadJson = payload.payloadJson
+        )
     }
 
     private fun createNotificationChannels() {
@@ -774,45 +690,32 @@ private fun buildServiceNotification(): Notification {
 
         val serviceChannel = NotificationChannel(
             CHANNEL_ID,
-            "Driver background service",
-            NotificationManager.IMPORTANCE_DEFAULT
+            "تشغيل السائق في الخلفية",
+            NotificationManager.IMPORTANCE_LOW
         ).apply {
-            description = "Keeps driver mode active in the background"
+            description = "يبقي وضع السائق نشطًا أثناء العمل"
             setShowBadge(false)
             enableVibration(false)
             setSound(null, null)
         }
 
-        val soundUri = Uri.parse("android.resource://$packageName/raw/offer_alert")
-
         val offersChannel = NotificationChannel(
             OFFERS_CHANNEL_ID,
-            "Driver offers",
+            "عروض الرحلات",
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Shows incoming trip offers"
+            description = "تنبيه عند وصول عرض رحلة جديد"
             setShowBadge(true)
             enableVibration(true)
-            vibrationPattern = longArrayOf(0, 500, 250, 500, 250, 700)
+            vibrationPattern = longArrayOf(0, 250, 150, 250)
+            enableLights(true)
+            lightColor = Color.parseColor("#0EA5E9")
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-
-            setSound(
-                soundUri,
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
-            )
+            setSound(null, null)
         }
 
         manager.createNotificationChannel(serviceChannel)
         manager.createNotificationChannel(offersChannel)
-
-        val createdChannel = manager.getNotificationChannel(OFFERS_CHANNEL_ID)
-        Log.d(
-            TAG,
-            "Offers channel ready -> id=${createdChannel?.id}, importance=${createdChannel?.importance}, sound=${createdChannel?.sound}"
-        )
     }
 
     // -------------------------------------------------------------------------
@@ -877,8 +780,8 @@ private fun buildServiceNotification(): Notification {
         private const val PREF_TOKEN = "pref_token"
         private const val PREF_DRIVER_ID = "pref_driver_id"
 
-        const val CHANNEL_ID = "driver_background_service_v3"
-        const val OFFERS_CHANNEL_ID = "driver_offers_channel_v12"
+        const val CHANNEL_ID = "driver_background_service_v4"
+        const val OFFERS_CHANNEL_ID = "driver_offers_channel_v15"
 
         const val NOTIFICATION_ID = 1001
 
@@ -886,6 +789,10 @@ private fun buildServiceNotification(): Notification {
         const val ACTION_STOP = "driver_background_service.action.STOP"
         const val ACTION_LOCATION_UPDATE =
             "driver_background_service.action.LOCATION_UPDATE"
+        const val ACTION_STOP_OFFER_ALERT =
+            "driver_background_service.action.STOP_OFFER_ALERT"
+        const val ACTION_DISMISS_OFFER_NOTIFICATION =
+            "driver_background_service.action.DISMISS_OFFER_NOTIFICATION"
 
         private const val LOCATION_PENDING_INTENT_REQUEST_CODE = 1002
 
@@ -897,6 +804,9 @@ private fun buildServiceNotification(): Notification {
         const val EXTRA_LAUNCHED_OFFER_PAYLOAD = "extra_launched_offer_payload"
 
         const val LAUNCH_SOURCE_OFFER_NOTIFICATION = "offer_notification"
+        const val EXTRA_CANCEL_OFFER_NOTIFICATION = "extra_cancel_offer_notification"
+
+        const val OFFER_NOTIFICATION_ID = 1101
 
         private const val LOCATION_TICK_INTERVAL_MS = 15_000L
         private const val INITIAL_RETRY_BACKOFF_MS = 15_000L

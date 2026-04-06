@@ -19,7 +19,6 @@ import 'package:taxi_driver_app/features/availability/presentation/controllers/a
 import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
 
-/// Top bar shown above the shell branches.
 class AppTopBar extends ConsumerStatefulWidget {
   const AppTopBar({
     required this.title,
@@ -115,7 +114,7 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
 
     if (value && hasActiveTrip) {
       context.showAppSnack(
-        'You have an active trip. Complete it first.',
+        context.l10n.availabilityActiveTripOnlineBlocked,
         type: AppSnackType.error,
       );
       return;
@@ -150,13 +149,6 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
       ),
     );
 
-    final restoredCurrentOffer = ref.watch(restoredCurrentOfferProvider);
-    final acceptedOffer = ref
-        .watch(acceptOfferControllerProvider)
-        .value
-        ?.acceptedOffer;
-    final hasActiveTrip = restoredCurrentOffer != null || acceptedOffer != null;
-
     final avatarAsync = ref.watch(avatarControllerProvider);
     final avatarPath = avatarAsync.value;
 
@@ -171,7 +163,7 @@ class _AppTopBarState extends ConsumerState<AppTopBar> {
         AppSpacing.w10,
         PillSwitch(
           value: isOnline,
-          onChanged: isBusy || hasActiveTrip
+          onChanged: isBusy
               ? null
               : (value) => unawaited(_handleAvailabilityChanged(value)),
           offLabel: l10n.offline,

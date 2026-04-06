@@ -85,7 +85,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   /// Listens to auth state changes and reacts with UI side effects.
   void _listenToAuthState() {
-
     ref.listen(authControllerProvider, (previous, next) async {
       await next.whenOrNull(
         error: (error, _) {
@@ -125,13 +124,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     TextInput.finishAutofillContext();
     FocusScope.of(context).unfocus();
 
-    await ref.read(authControllerProvider.notifier).signIn(
-      phone: _phoneTextController.text.trim(),
-      password: _passwordTextController.text,
-      // fcmToken: Add later when push notifications are wired.
-    );
+    await ref
+        .read(authControllerProvider.notifier)
+        .signIn(
+          phone: _phoneTextController.text.trim(),
+          password: _passwordTextController.text,
+          // fcmToken: Add later when push notifications are wired.
+        );
   }
-
 
   Future<void> _saveSignedInSession(AuthSessionEntity session) async {
     final authSessionStore = ref.read(authSessionProvider);

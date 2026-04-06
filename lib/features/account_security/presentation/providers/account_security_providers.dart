@@ -12,12 +12,13 @@ final accountSecurityRemoteDataSourceProvider =
     });
 
 /// Provides the repository implementation used by the feature.
-final accountSecurityRepositoryProvider =
-    Provider<AccountSecurityRepository>((ref) {
-      return AccountSecurityRepositoryImpl(
-        ref.read(accountSecurityRemoteDataSourceProvider),
-      );
-    });
+final accountSecurityRepositoryProvider = Provider<AccountSecurityRepository>((
+  ref,
+) {
+  return AccountSecurityRepositoryImpl(
+    ref.read(accountSecurityRemoteDataSourceProvider),
+  );
+});
 
 /// Provides the use case responsible for setting the password.
 final setPasswordUseCaseProvider = Provider<SetPasswordUseCase>((ref) {

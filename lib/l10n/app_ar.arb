@@ -12,65 +12,55 @@
   "signIn": "تسجيل الدخول",
   "forgotPassword": "هل نسيت كلمة المرور؟",
   "copyright": "© 2026 تطبيق بوابة السائق",
-  "notes":"ملاحظات",
-  "unknown":"غير معروف",
-
+  "notes": "ملاحظات",
+  "unknown": "غير معروف",
   "homeGreeting": "مرحباً،",
   "homeNetworkConnected": "متصل بالشبكة",
   "homeNetworkDisconnected": "غير متصل بالشبكة",
-
   "homeAvailabilityOnTitle": "أنت متاح الآن",
   "homeAvailabilityOnSubtitle": "ستتلقى طلبات الركاب القريبة منك فور توفرها",
-
   "homeAvailabilityOffTitle": "أنت غير متاح حالياً",
   "homeAvailabilityOffSubtitle": "فعّل وضع التوفر لتبدأ باستقبال طلبات الركاب القريبة منك",
-
   "actionConfirm": "تأكيد",
   "actionCancel": "إلغاء",
-
   "availabilityTurnOffTitle": "هل تريد إيقاف التوفر؟",
   "availabilityTurnOffMessage": "لن تستقبل طلبات جديدة حتى تقوم بتفعيل التوفر مرة أخرى.",
-
+  "availabilityActiveTripOnlineBlocked": "لا يمكنك تفعيل وضع الأونلاين الآن لأن لديك رحلة نشطة. أنهِ الرحلة الحالية أولاً.",
+  "@availabilityActiveTripOnlineBlocked": {
+    "description": "رسالة تظهر عندما يحاول السائق تفعيل وضع الأونلاين أثناء وجود رحلة نشطة"
+  },
   "homeEmptyTitle": "بانتظار الطلبات الجديدة...",
   "homeEmptySubtitle": "نحن نبحث عن ركاب جدد في منطقتك الحالية. يرجى البقاء بالقرب من تطبيقك.",
   "homeUpdateLocation": "تحديث الموقع",
-
   "homeTabCurrent": "الحالية",
   "homeTabCompleted": "المكتملة",
-
   "homeRequestNewTitle": "طلب جديد",
   "homeRequestCurrentTitle": "طلب جاري",
   "homeRequestCompletedTitle": "طلب مكتمل",
-
   "homePickupPrefix": "الانطلاق: ",
   "homeDropoffPrefix": "الوجهة: ",
   "homeFarePrefix": "السعر:",
-
   "homeAvailableIn": "متاح بعد:",
-
   "actionAccept": "قبول",
   "actionReject": "رفض",
   "actionDone": "تم",
-
   "badgeNew": "جديد",
   "badgeLive": "جاري",
   "badgeDone": "تم",
-
   "navHome": "الرئيسية",
   "navTrips": "رحلاتي",
   "navProfile": "ملف شخصي",
-
   "homeLastLocationUpdateNow": "آخر تحديث للموقع: الآن",
   "homeLastLocationUpdateSecondsAgo": "آخر تحديث للموقع: قبل {seconds} ثانية",
   "@homeLastLocationUpdateSecondsAgo": {
     "placeholders": {
-      "seconds": { "type": "int" }
+      "seconds": {
+        "type": "int"
+      }
     }
   },
-
   "exitAppTitle": "إغلاق التطبيق؟",
   "exitAppMessage": "هل أنت متأكد أنك تريد إغلاق التطبيق؟",
-
   "tripsSummaryTitle": "نظرة سريعة على أرباحك",
   "tripsSummarySubtitle": "تابع الرحلات المكتملة والأرباح",
   "tripsSummaryTripsLabel": "الرحلات",
@@ -81,15 +71,11 @@
   "tripsRecentTitle": "الرحلات المكتملة مؤخراً",
   "tripsEmptyTitle": "لا توجد رحلات بعد",
   "tripsEmptySubtitle": "ستظهر الرحلات المكتملة هنا بعد إنهاء أول رحلة.",
-
   "online": "متصل",
   "offline": "غير متصل",
-
-  
   "profileSectionAccount": "إعدادات الحساب",
   "profileSectionSupport": "الدعم والمساعدة",
   "profileSectionSignOut": "تسجيل الخروج",
-
   "profileEditTitle": "تعديل الملف الشخصي",
   "profileEditSubtitle": "تحديث معلوماتك الشخصية",
   "profileChangePasswordTitle": "تغيير كلمة المرور",
@@ -98,43 +84,38 @@
   "profileMyVehiclesSubtitle": "إدارة السيارات المسجلة",
   "profileHelpCenterTitle": "مركز المساعدة",
   "profileHelpCenterSubtitle": "الأسئلة الشائعة والدعم الفني",
-
   "profileSignOutTitle": "تسجيل الخروج",
   "profileSignOutSubtitle": "الخروج من هذا الحساب",
   "signOutConfirmTitle": "تسجيل الخروج؟",
   "signOutConfirmMessage": "هل أنت متأكد أنك تريد تسجيل الخروج من هذا الحساب؟",
-
   "profileChangePhoto": "تغيير الصورة",
   "profileFullName": "الاسم الكامل",
   "profileFullNameHint": "الاسم الكامل",
   "profilePhoneHint": "+963 123 456 789",
   "profilePhone": "رقم الهاتف",
   "profileEmail": "البريد الإلكتروني",
-
   "actionSaveChanges": "حفظ التغييرات",
-
   "profileCurrentPassword": "كلمة المرور الحالية",
   "profileNewPassword": "كلمة المرور الجديدة",
   "profileConfirmNewPassword": "تأكيد كلمة المرور الجديدة",
   "profilePasswordHint": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل.",
   "profileUpdatePasswordAction": "تحديث كلمة المرور",
-
-
   "vehicleTitle": "مركبتي",
-
   "vehiclePlateNumberLabel": "رقم اللوحة",
   "vehicleTaxiLanternNumberLabel": "رقم فانوس التاكسي",
   "vehicleModelLabel": "الموديل",
   "vehicleTypeLabel": "النوع",
-
   "vehicleTypePublic": "عمومي",
   "vehicleTypePrivate": "خصوصي",
-
   "vehicleInfoNote": "معلومات هذه المركبة مسجّلة في النظام. إذا تغيّر أي تفصيل أو ظهر بشكل غير صحيح، يرجى التواصل مع المكتب.",
-
   "tripsTotalTrips": "إجمالي الرحلات: ({count})",
-  "@tripsTotalTrips": { "placeholders": { "count": { "type": "int" } } },
- 
+  "@tripsTotalTrips": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "errorUnexpected": "حدث خطأ غير متوقع. حاول مرة أخرى.",
   "errorNoInternet": "لا يوجد اتصال بالإنترنت. تأكد من الشبكة وحاول مجددًا.",
   "errorTimeout": "استغرق الطلب وقتًا طويلًا. حاول مرة أخرى.",
@@ -148,25 +129,18 @@
   "errorSessionExpired": "انتهت الجلسة. الرجاء تسجيل الدخول من جديد.",
   "errorServer": "مشكلة في السيرفر. حاول لاحقًا.",
   "errorBadResponse": "رد السيرفر غير متوقع. حاول مرة أخرى.",
-
-
   "authSetupPasswordTitle": "إنشاء كلمة المرور",
   "authSetupPasswordSubtitle": "لإكمال إعداد حسابك، أنشئ كلمة مرور جديدة.",
   "authNewPasswordLabel": "كلمة المرور الجديدة",
   "authConfirmNewPasswordLabel": "تأكيد كلمة المرور",
   "authCreatePasswordAction": "إنشاء كلمة المرور",
   "authPasswordRulesHint": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل.",
-
   "locationServiceDisabled": "يرجى تفعيل خدمات الموقع (GPS).",
   "locationPermissionRequired": "صلاحية الموقع مطلوبة لتفعيل وضع التوفر.",
   "locationPermissionDeniedForever": "تم رفض صلاحية الموقع نهائياً. يرجى تفعيلها من الإعدادات.",
   "locationPermissionUnableToDetermine": "تعذّر تحديد صلاحية الموقع. حاول مرة أخرى.",
-  
   "locationNetworkError": "لا يوجد اتصال بالإنترنت. لا يمكن تحديث موقعك.",
-
   "actionSettings": "الإعدادات",
-
-  
   "todayLabel": "اليوم",
   "@todayLabel": {
     "description": "تسمية تستخدم للرحلات المكتملة اليوم"
@@ -203,12 +177,10 @@
   "@weekdaySunday": {
     "description": "اسم يوم الأحد"
   },
-
-  "all" : "الكل",
-  "month" : "الشهر",
-  "week" : "الاسبوع",
-  "day" : "اليوم",
-  
+  "all": "الكل",
+  "month": "الشهر",
+  "week": "الاسبوع",
+  "day": "اليوم",
   "profileAvatarChangePhoto": "تغيير الصورة",
   "@profileAvatarChangePhoto": {
     "description": "زر لتغيير صورة الملف الشخصي"
@@ -217,25 +189,16 @@
   "@profileAvatarRemovePhoto": {
     "description": "زر لإزالة صورة الملف الشخصي"
   },
-
- 
-
   "profileAvatarPickFromGallery": "اختيار من المعرض",
   "profileAvatarTakePhoto": "التقاط صورة",
-
-    "homeOfferExpiresIn": "ينتهي خلال:",
-
-   "price":"السعر: ",
-
-   "customerPhone": "رقم الزبون",
-
-
-   "decline": "رفض",
-
-   "tripProgress":"الرحلة قيد التقدم...",
-   "tripCompleted": "اكتملت الرحلة",
-   "tapToCall":"اضغط للاتصال بالزبون",
-   "totalFare":"الإجرة الإجمالية",
-   "tripNotes":"ملاحظات الرحلة",
-   "timeRemaining":"الوقت المتبقي للبدء"
+  "homeOfferExpiresIn": "ينتهي خلال:",
+  "price": "السعر: ",
+  "customerPhone": "رقم الزبون",
+  "decline": "رفض",
+  "tripProgress": "الرحلة قيد التقدم...",
+  "tripCompleted": "اكتملت الرحلة",
+  "tapToCall": "اضغط للاتصال بالزبون",
+  "totalFare": "الإجرة الإجمالية",
+  "tripNotes": "ملاحظات الرحلة",
+  "timeRemaining": "الوقت المتبقي للبدء"
 }
