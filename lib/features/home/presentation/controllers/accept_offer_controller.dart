@@ -45,7 +45,7 @@ final class AcceptOfferController extends AsyncNotifier<AcceptOfferState> {
       final acceptedOffer = await _acceptOfferUseCase(offerId: offerId);
 
       ref.read(newOfferControllerProvider.notifier).clearCurrent();
-      unawaited(_setOfflineBestEffort());
+      unawaited(_stopRuntimeLocallyAfterAccept());
 
       state = AsyncData(
         AcceptOfferState(
@@ -64,13 +64,15 @@ final class AcceptOfferController extends AsyncNotifier<AcceptOfferState> {
     state = const AsyncData(AcceptOfferState());
   }
 
-  Future<void> _setOfflineBestEffort() async {
+  Future<void> _stopRuntimeLocallyAfterAccept() async {
     try {
       await ref
           .read(availabilityProvider.notifier)
-          .requestSetOnline(value: false);
+          .stopRuntimeLocallyAfterAccept();
     } on Exception catch (error) {
-      debugPrint('Failed to set availability offline: $error');
+      debugPrint(
+        'Failed to stop availability runtime locally after accept: $error',
+      );
     }
   }
 }

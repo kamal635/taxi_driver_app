@@ -200,5 +200,8 @@
   "tapToCall": "اضغط للاتصال بالزبون",
   "totalFare": "الإجرة الإجمالية",
   "tripNotes": "ملاحظات الرحلة",
-  "timeRemaining": "الوقت المتبقي للبدء"
+  "timeRemaining": "الوقت المتبقي للبدء",
+  "contactSupportLabel": "تحتاج مساعدة؟",
+  "contactSupportAction": "اضغط هنا",
+  "contactSupportContact": "للتواصل مع الدعم."
 }

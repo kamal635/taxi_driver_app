@@ -482,4 +482,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get timeRemaining => 'Time remaining to start';
+
+  @override
+  String get contactSupportLabel => 'Need help?';
+
+  @override
+  String get contactSupportAction => 'Tap here';
+
+  @override
+  String get contactSupportContact => 'Contact support.';
 }
