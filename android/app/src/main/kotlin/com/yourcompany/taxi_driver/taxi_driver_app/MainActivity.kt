@@ -113,6 +113,15 @@ class MainActivity : FlutterFragmentActivity() {
                     result.success(true)
                 }
 
+                "stopOfferAlert" -> {
+                    val cancelNotification = call.argument<Boolean>("cancelNotification") ?: true
+                    DriverForegroundService.requestStopOfferAlert(
+                        context = this,
+                        cancelNotification = cancelNotification
+                    )
+                    result.success(true)
+                }
+
                 "isServiceRunning" -> {
                     result.success(DriverForegroundService.isRunning)
                 }
@@ -146,6 +155,11 @@ class MainActivity : FlutterFragmentActivity() {
         if (launchSource != DriverForegroundService.LAUNCH_SOURCE_OFFER_NOTIFICATION) {
             return
         }
+
+        DriverForegroundService.requestStopOfferAlert(
+            context = this,
+            cancelNotification = true
+        )
 
         val offerId = intent.getStringExtra(
             DriverForegroundService.EXTRA_LAUNCHED_OFFER_ID

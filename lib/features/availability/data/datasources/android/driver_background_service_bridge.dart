@@ -143,6 +143,18 @@ class DriverBackgroundServiceBridge {
     await _channel.invokeMethod('stopService');
   }
 
+  /// Stops the currently playing native offer alert.
+  Future<void> stopOfferAlert({
+    bool cancelNotification = true,
+  }) async {
+    await _channel.invokeMethod(
+      'stopOfferAlert',
+      {
+        'cancelNotification': cancelNotification,
+      },
+    );
+  }
+
   /// Returns whether the native service is running right now.
   Future<bool> isServiceRunning() async {
     final result = await _channel.invokeMethod<bool>('isServiceRunning');

@@ -47,7 +47,7 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location"
-            android:stopWithTask="false" />
+            android:stopWithTask="true" />
 
         <activity
             android:name=".MainActivity"

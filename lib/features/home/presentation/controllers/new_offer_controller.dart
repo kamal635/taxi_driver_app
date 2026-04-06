@@ -52,6 +52,7 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
 
   void clearCurrent() {
     _cancelExpiryTimer();
+    _stopNativeOfferAlert();
 
     state = AsyncData(
       _currentState.copyWith(currentOffer: null),
@@ -83,6 +84,8 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     DriverOfferNotificationOpenEvent event,
   ) {
     debugPrint('Offer notification opened -> offerId=${event.offerId}');
+
+    _stopNativeOfferAlert();
 
     final payloadJson = event.payloadJson;
     if (payloadJson == null || payloadJson.isEmpty) {
@@ -122,6 +125,8 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     _cancelExpiryTimer();
 
     if (_isExpired(offer)) {
+      _stopNativeOfferAlert();
+
       state = AsyncData(
         _currentState.copyWith(
           currentOffer: null,
@@ -161,6 +166,8 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       final currentOffer = state.asData?.value.currentOffer;
       if (currentOffer?.offerId != offer.offerId) return;
 
+      _stopNativeOfferAlert();
+
       state = AsyncData(_currentState.copyWith(currentOffer: null));
 
       debugPrint('Pending offer expired locally -> id=${offer.offerId}');
@@ -170,6 +177,12 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
   void _cancelExpiryTimer() {
     _expiryTimer?.cancel();
     _expiryTimer = null;
+  }
+
+  void _stopNativeOfferAlert() {
+    unawaited(
+      ref.read(driverBackgroundServiceBridgeProvider).stopOfferAlert(),
+    );
   }
 
   bool _isExpired(NewOfferEntity offer) {

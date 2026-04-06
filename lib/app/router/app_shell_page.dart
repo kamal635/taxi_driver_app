@@ -10,6 +10,7 @@ import 'package:taxi_driver_app/app/router/widgets/bottom_nav.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
+import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
 import 'package:taxi_driver_app/features/home/presentation/controllers/restore_current_controller.dart';
 import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
@@ -71,6 +72,10 @@ class _AppShellPageState extends ConsumerState<AppShellPage> {
     if (mounted) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
     }
+
+    unawaited(
+      ref.read(driverBackgroundServiceBridgeProvider).stopOfferAlert(),
+    );
 
     unawaited(
       ref
