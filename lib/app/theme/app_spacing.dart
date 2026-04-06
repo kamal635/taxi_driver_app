@@ -1,7 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+/// Reusable spacing helpers based on ScreenUtil scaling.
 final class AppSpacing {
+  AppSpacing._();
+
   static SizedBox h(double value) => SizedBox(height: value.h);
   static SizedBox w(double value) => SizedBox(width: value.w);
 

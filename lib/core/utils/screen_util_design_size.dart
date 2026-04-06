@@ -2,27 +2,27 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 
-Size pickDesignSizeFromConstraints(BoxConstraints c) {
-  final w = c.maxWidth.isFinite ? c.maxWidth : 0.0;
-  final h = c.maxHeight.isFinite ? c.maxHeight : 0.0;
+const Size _phoneDesignSize = Size(360, 800);
+const Size _tabletDesignSize = Size(768, 1024);
+const Size _desktopDesignSize = Size(1440, 900);
 
-  final shortest = math.min(w, h);
+/// Picks a ScreenUtil design size based on the available layout constraints.
+Size pickDesignSizeFromConstraints(BoxConstraints constraints) {
+  final width = constraints.maxWidth.isFinite ? constraints.maxWidth : 0.0;
+  final height = constraints.maxHeight.isFinite ? constraints.maxHeight : 0.0;
+  final shortestSide = math.min(width, height);
 
-  // Safe default (tests/edge cases)
-  if (shortest <= 0 || shortest.isNaN) {
-    return const Size(360, 800);
+  if (shortestSide <= 0 || shortestSide.isNaN) {
+    return _phoneDesignSize;
   }
 
-  // Desktop / Large screens
-  if (w >= 1024) {
-    return const Size(1440, 900);
+  if (width >= 1024) {
+    return _desktopDesignSize;
   }
 
-  // Tablet
-  if (shortest >= 600) {
-    return const Size(768, 1024);
+  if (shortestSide >= 600) {
+    return _tabletDesignSize;
   }
 
-  // Phone
-  return const Size(360, 800);
+  return _phoneDesignSize;
 }

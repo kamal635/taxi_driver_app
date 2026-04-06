@@ -1,27 +1,28 @@
 enum LocationFailureReason {
-  /// GPS / Location services are OFF.
+  /// GPS or location services are turned off on the device.
   serviceDisabled,
 
-  /// Permission denied (can request again).
+  /// Permission is denied, but the app may ask again.
   permissionDenied,
 
-  /// Permission denied forever (must enable from Settings).
+  /// Permission is denied forever and must be enabled from settings.
   permissionDeniedForever,
 
-  /// Permission state can't be determined (e.g., unsupported platform/browser).
+  /// The platform could not determine the permission state.
   unableToDetermine,
 
+  /// Reserved for future networking-related location failures.
   networkError,
 }
 
 final class LocationReadyResult {
-  LocationReadyResult({
+  const LocationReadyResult({
     required this.isSuccess,
     this.reason,
   });
 
   factory LocationReadyResult.success() {
-    return LocationReadyResult(isSuccess: true);
+    return const LocationReadyResult(isSuccess: true);
   }
 
   factory LocationReadyResult.failure({

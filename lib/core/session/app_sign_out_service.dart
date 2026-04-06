@@ -8,38 +8,35 @@ final appSignOutServiceProvider = Provider<AppSignOutService>(
   AppSignOutService.new,
 );
 
+/// Performs app-level cleanup before clearing the session.
 class AppSignOutService {
   AppSignOutService(this._ref);
 
   final Ref _ref;
 
   Future<void> signOut() async {
-    // 1) Ensure driver runtime is offline.
     try {
       await _ref
           .read(availabilityProvider.notifier)
           .requestSetOnline(value: false);
-    } on Exception catch (_) {
-      // ignore: best-effort cleanup
+    } on Exception {
+      // Best-effort cleanup.
     }
 
-    // 2) Clear pending/new offer state.
     try {
       _ref.read(newOfferControllerProvider.notifier)
         ..clearCurrent()
         ..clearError();
-    } on Exception catch (_) {
-      // ignore
+    } on Exception {
+      // Best-effort cleanup.
     }
 
-    // 3) Clear accepted offer state.
     try {
       _ref.read(acceptOfferControllerProvider.notifier).clear();
-    } on Exception catch (_) {
-      // ignore
+    } on Exception {
+      // Best-effort cleanup.
     }
 
-    // 4) Clear auth session.
     await _ref.read(authSessionProvider).clear();
   }
 }

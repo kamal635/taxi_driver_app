@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 
+/// Animated on/off pill used for the driver availability toggle.
 class PillSwitch extends StatefulWidget {
   const PillSwitch({
     required this.value,
@@ -20,16 +21,13 @@ class PillSwitch extends StatefulWidget {
 
   final bool value;
   final ValueChanged<bool>? onChanged;
-
   final String onLabel;
   final String offLabel;
-
   final Duration duration;
   final double? height;
   final bool uppercase;
 
   /// Optional maximum width for the whole pill.
-  /// If null, the pill will use the measured "largest label" width.
   final double? maxWidth;
 
   @override
@@ -41,24 +39,20 @@ class _PillSwitchState extends State<PillSwitch>
   late bool _fromValue;
   late bool _toValue;
 
-  bool _animating = false;
-  int _animSeed = 0;
+  bool _isAnimating = false;
+  int _animationSeed = 0;
 
-  // Cached text metrics to avoid running TextPainter on every rebuild.
-  double _maxLabelW = 0;
+  double _maxLabelWidth = 0;
 
-  String? _cacheOnText;
-  String? _cacheOffText;
-  int? _cacheStyleHash;
-  double? _cacheTextScaleKey;
-  TextDirection? _cacheDirection;
+  String? _cachedOnText;
+  String? _cachedOffText;
+  int? _cachedStyleHash;
+  double? _cachedTextScaleKey;
+  TextDirection? _cachedDirection;
 
-  // -----------------------------
-  // Ring pulse animation
-  // -----------------------------
-  late final AnimationController _ringCtrl;
+  late final AnimationController _ringController;
   late final Animation<double> _ringScale;
-  int? _ringBumpedForSeed; // ensures "once per toggle"
+  int? _lastRingBumpSeed;
 
   @override
   void initState() {
@@ -66,40 +60,36 @@ class _PillSwitchState extends State<PillSwitch>
     _fromValue = widget.value;
     _toValue = widget.value;
 
-    _ringCtrl = AnimationController(
+    _ringController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 260),
     );
 
-    // Pulse: 1.0 -> 1.18 -> 0.95 -> 1.0
     _ringScale = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 1,
-          end: 1.18,
-        ).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween<double>(begin: 1, end: 1.18).chain(
+          CurveTween(curve: Curves.easeOut),
+        ),
         weight: 45,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 1.18,
-          end: 0.95,
-        ).chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween<double>(begin: 1.18, end: 0.95).chain(
+          CurveTween(curve: Curves.easeIn),
+        ),
         weight: 30,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 0.95,
-          end: 1,
-        ).chain(CurveTween(curve: Curves.easeOutBack)),
+        tween: Tween<double>(begin: 0.95, end: 1).chain(
+          CurveTween(curve: Curves.easeOutBack),
+        ),
         weight: 25,
       ),
-    ]).animate(_ringCtrl);
+    ]).animate(_ringController);
   }
 
   @override
   void dispose() {
-    _ringCtrl.dispose();
+    _ringController.dispose();
     super.dispose();
   }
 
@@ -113,61 +103,51 @@ class _PillSwitchState extends State<PillSwitch>
   void didUpdateWidget(covariant PillSwitch oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.onLabel != widget.onLabel ||
+    final labelsChanged =
+        oldWidget.onLabel != widget.onLabel ||
         oldWidget.offLabel != widget.offLabel ||
-        oldWidget.uppercase != widget.uppercase) {
-      _updateLabelMetricsIfNeeded(force: true);
-    } else {
-      _updateLabelMetricsIfNeeded();
-    }
+        oldWidget.uppercase != widget.uppercase;
+
+    _updateLabelMetricsIfNeeded(force: labelsChanged);
 
     if (oldWidget.value != widget.value) {
       setState(() {
         _fromValue = oldWidget.value;
         _toValue = widget.value;
-        _animating = true;
-        _animSeed++;
-        _ringBumpedForSeed = null; // reset bump for the new animation
+        _isAnimating = true;
+        _animationSeed++;
+        _lastRingBumpSeed = null;
       });
     }
   }
 
-  void _maybeBumpRing({
-    required double t,
-    required double threshold,
-  }) {
-    if (_ringBumpedForSeed == _animSeed) return;
-    if (t < threshold) return;
-
-    _ringBumpedForSeed = _animSeed;
-
-    // Avoid doing work inside the build of TweenAnimationBuilder.
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-      await _ringCtrl.forward(from: 0);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final h = widget.height ?? 30.h;
+    final height = widget.height ?? 30.h;
     final radius = BorderRadius.circular(999.r);
 
-    final paddingX = 10.w;
+    final horizontalPadding = 10.w;
     final gap = 12.w;
     final ringSize = 18.r;
     final safety = 6.w;
 
-    final contentPadding = EdgeInsets.symmetric(horizontal: paddingX);
+    final contentPadding = EdgeInsets.symmetric(horizontal: horizontalPadding);
 
-    final desiredWidth = _maxLabelW + (paddingX * 2) + gap + ringSize + safety;
+    final desiredWidth =
+        _maxLabelWidth + (horizontalPadding * 2) + gap + ringSize + safety;
 
-    Color bgFor({required bool v}) =>
-        v ? AppColors.successBg : AppColors.errorBg;
-    Color accentFor({required bool v}) =>
-        v ? AppColors.success : AppColors.error;
+    Color backgroundFor({required bool value}) {
+      return value ? AppColors.successBg : AppColors.errorBg;
+    }
 
-    Widget ringWidget({required Color accent, required bool bumpable}) {
+    Color accentFor({required bool value}) {
+      return value ? AppColors.success : AppColors.error;
+    }
+
+    Widget buildRing({
+      required Color accent,
+      required bool animated,
+    }) {
       const ringBorderWidth = 2.2;
 
       final ring = Container(
@@ -183,27 +163,36 @@ class _PillSwitchState extends State<PillSwitch>
         ),
       );
 
-      if (!bumpable) return ring;
-      return ScaleTransition(scale: _ringScale, child: ring);
+      if (!animated) {
+        return ring;
+      }
+
+      return ScaleTransition(
+        scale: _ringScale,
+        child: ring,
+      );
     }
 
-    Widget contentRow({required bool v, required bool bumpableRing}) {
-      final accent = accentFor(v: v);
-      final label = _shownLabelFor(v);
+    Widget buildContentRow({
+      required bool value,
+      required bool animatedRing,
+    }) {
+      final accent = accentFor(value: value);
+      final label = _shownLabelFor(value);
       final isRtl = Directionality.of(context) == TextDirection.rtl;
 
-      TextStyle labelStyle({required bool v}) {
-        final base = AppTypography.subtitleSm.copyWith(
+      TextStyle labelStyle() {
+        final baseStyle = AppTypography.subtitleSm.copyWith(
           fontWeight: FontWeight.w900,
           letterSpacing: 0.8,
           color: accent,
         );
 
-        // Arabic (RTL): shrink only when OFF
-        if (isRtl && !v) {
-          return base.copyWith(fontSize: 10.sp);
+        if (isRtl && !value) {
+          return baseStyle.copyWith(fontSize: 10.sp);
         }
-        return base;
+
+        return baseStyle;
       }
 
       return Row(
@@ -216,18 +205,23 @@ class _PillSwitchState extends State<PillSwitch>
                 maxLines: 1,
                 softWrap: false,
                 overflow: TextOverflow.ellipsis,
-                style: labelStyle(v: v),
+                style: labelStyle(),
               ),
             ),
           ),
           SizedBox(width: gap),
-          ringWidget(accent: accent, bumpable: bumpableRing),
+          buildRing(
+            accent: accent,
+            animated: animatedRing,
+          ),
         ],
       );
     }
 
-    final baseBg = _animating ? bgFor(v: _fromValue) : bgFor(v: widget.value);
-    final overlayBg = bgFor(v: _toValue);
+    final baseBackground = _isAnimating
+        ? backgroundFor(value: _fromValue)
+        : backgroundFor(value: widget.value);
+    final overlayBackground = backgroundFor(value: _toValue);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -240,113 +234,136 @@ class _PillSwitchState extends State<PillSwitch>
           fixedWidth = math.min(fixedWidth, constraints.maxWidth);
         }
 
-        // When the wipe reaches the ring area (near the end padding),
-        // bump the ring.
-        // Works for both LTR & RTL because reveal "reaches the far end" at the
-        //same t.
-        final bumpThreshold = (1.0 - (paddingX / fixedWidth)).clamp(0.0, 1.0);
-        final isEnabled = !_animating && widget.onChanged != null;
-        final pillBody = InkWell(
-          borderRadius: radius,
+        final bumpThreshold = (1.0 - (horizontalPadding / fixedWidth)).clamp(
+          0.0,
+          1.0,
+        );
 
-          onTap: isEnabled ? () => widget.onChanged!.call(!widget.value) : null,
-          child: Container(
-            decoration: BoxDecoration(
-              color: baseBg,
-              borderRadius: radius,
-              border: Border.all(color: AppColors.white, width: 2.r),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                  color: Colors.black.withValues(alpha: 0.10),
+        final isEnabled = !_isAnimating && widget.onChanged != null;
+
+        return SizedBox(
+          width: fixedWidth,
+          child: InkWell(
+            borderRadius: radius,
+            onTap: isEnabled
+                ? () => widget.onChanged!.call(!widget.value)
+                : null,
+            child: Container(
+              decoration: BoxDecoration(
+                color: baseBackground,
+                borderRadius: radius,
+                border: Border.all(
+                  color: AppColors.white,
+                  width: 2.r,
                 ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: radius,
-              child: SizedBox(
-                height: h,
-                child: Stack(
-                  children: [
-                    // Base (old) content layer.
-                    Padding(
-                      padding: contentPadding,
-                      child: Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: contentRow(
-                          v: _animating ? _fromValue : widget.value,
-                          bumpableRing: false,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                    color: Colors.black.withValues(alpha: 0.10),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: radius,
+                child: SizedBox(
+                  height: height,
+                  child: Stack(
+                    children: [
+                      Padding(
+                        padding: contentPadding,
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: buildContentRow(
+                            value: _isAnimating ? _fromValue : widget.value,
+                            animatedRing: false,
+                          ),
                         ),
                       ),
-                    ),
+                      if (_isAnimating)
+                        Positioned.fill(
+                          child: TweenAnimationBuilder<double>(
+                            key: ValueKey(_animationSeed),
+                            tween: Tween<double>(begin: 0, end: 1),
+                            duration: widget.duration,
+                            curve: Curves.easeOutCubic,
+                            onEnd: () {
+                              if (!mounted) return;
+                              setState(() {
+                                _isAnimating = false;
+                                _fromValue = _toValue;
+                              });
+                            },
+                            builder: (context, t, _) {
+                              _maybeBumpRing(
+                                progress: t,
+                                threshold: bumpThreshold,
+                              );
 
-                    // Animated fill + partially revealed new content.
-                    if (_animating)
-                      Positioned.fill(
-                        child: TweenAnimationBuilder<double>(
-                          key: ValueKey(_animSeed),
-                          tween: Tween<double>(begin: 0, end: 1),
-                          duration: widget.duration,
-                          curve: Curves.easeOutCubic,
-                          onEnd: () {
-                            if (!mounted) return;
-                            setState(() {
-                              _animating = false;
-                              _fromValue = _toValue;
-                            });
-                          },
-                          builder: (context, t, _) {
-                            _maybeBumpRing(t: t, threshold: bumpThreshold);
+                              final direction = Directionality.of(context);
+                              final clipper = _FillClipperDirectional(
+                                t,
+                                textDirection: direction,
+                              );
 
-                            final dir = Directionality.of(context);
-                            final clipper = _FillClipperDirectional(
-                              t,
-                              textDirection: dir,
-                            );
-
-                            return Stack(
-                              children: [
-                                ClipRect(
-                                  clipper: clipper,
-                                  child: SizedBox.expand(
-                                    child: ColoredBox(color: overlayBg),
-                                  ),
-                                ),
-                                ClipRect(
-                                  clipper: clipper,
-                                  child: Padding(
-                                    padding: contentPadding,
-                                    child: Align(
-                                      alignment:
-                                          AlignmentDirectional.centerStart,
-                                      child: contentRow(
-                                        v: _toValue,
-                                        bumpableRing: true,
+                              return Stack(
+                                children: [
+                                  ClipRect(
+                                    clipper: clipper,
+                                    child: SizedBox.expand(
+                                      child: ColoredBox(
+                                        color: overlayBackground,
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            );
-                          },
+                                  ClipRect(
+                                    clipper: clipper,
+                                    child: Padding(
+                                      padding: contentPadding,
+                                      child: Align(
+                                        alignment:
+                                            AlignmentDirectional.centerStart,
+                                        child: buildContentRow(
+                                          value: _toValue,
+                                          animatedRing: true,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         );
-
-        return SizedBox(width: fixedWidth, child: pillBody);
       },
     );
   }
 
-  String _shownLabelFor(bool v) {
-    final raw = v ? widget.onLabel : widget.offLabel;
-    return widget.uppercase ? raw.toUpperCase() : raw;
+  void _maybeBumpRing({
+    required double progress,
+    required double threshold,
+  }) {
+    if (_lastRingBumpSeed == _animationSeed) return;
+    if (progress < threshold) return;
+
+    _lastRingBumpSeed = _animationSeed;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await _ringController.forward(from: 0);
+    });
+  }
+
+  String _shownLabelFor(bool value) {
+    final rawLabel = value ? widget.onLabel : widget.offLabel;
+    return widget.uppercase ? rawLabel.toUpperCase() : rawLabel;
   }
 
   void _updateLabelMetricsIfNeeded({bool force = false}) {
@@ -365,24 +382,34 @@ class _PillSwitchState extends State<PillSwitch>
     final styleHash = textStyle.hashCode;
 
     if (!force &&
-        _cacheOnText == onText &&
-        _cacheOffText == offText &&
-        _cacheStyleHash == styleHash &&
-        _cacheTextScaleKey == textScaleKey &&
-        _cacheDirection == direction) {
+        _cachedOnText == onText &&
+        _cachedOffText == offText &&
+        _cachedStyleHash == styleHash &&
+        _cachedTextScaleKey == textScaleKey &&
+        _cachedDirection == direction) {
       return;
     }
 
-    final onW = _measureTextWidth(onText, textStyle, direction, textScaler);
-    final offW = _measureTextWidth(offText, textStyle, direction, textScaler);
+    final onWidth = _measureTextWidth(
+      onText,
+      textStyle,
+      direction,
+      textScaler,
+    );
+    final offWidth = _measureTextWidth(
+      offText,
+      textStyle,
+      direction,
+      textScaler,
+    );
 
-    _maxLabelW = math.max(onW, offW);
+    _maxLabelWidth = math.max(onWidth, offWidth);
 
-    _cacheOnText = onText;
-    _cacheOffText = offText;
-    _cacheStyleHash = styleHash;
-    _cacheTextScaleKey = textScaleKey;
-    _cacheDirection = direction;
+    _cachedOnText = onText;
+    _cachedOffText = offText;
+    _cachedStyleHash = styleHash;
+    _cachedTextScaleKey = textScaleKey;
+    _cachedDirection = direction;
   }
 
   double _measureTextWidth(
@@ -397,30 +424,34 @@ class _PillSwitchState extends State<PillSwitch>
       textDirection: direction,
       textScaler: textScaler,
     )..layout();
+
     return painter.width;
   }
 }
 
-/// Clips a rectangle from START to END based on [t] (0..1).
-/// LTR: left -> right
-/// RTL: right -> left
 class _FillClipperDirectional extends CustomClipper<Rect> {
-  _FillClipperDirectional(this.t, {required this.textDirection});
+  const _FillClipperDirectional(
+    this.progress, {
+    required this.textDirection,
+  });
 
-  final double t;
+  final double progress;
   final TextDirection textDirection;
 
   @override
   Rect getClip(Size size) {
-    final w = size.width * t.clamp(0.0, 1.0);
+    final width = size.width * progress.clamp(0.0, 1.0);
 
     if (textDirection == TextDirection.rtl) {
-      return Rect.fromLTWH(size.width - w, 0, w, size.height);
+      return Rect.fromLTWH(size.width - width, 0, width, size.height);
     }
-    return Rect.fromLTWH(0, 0, w, size.height);
+
+    return Rect.fromLTWH(0, 0, width, size.height);
   }
 
   @override
-  bool shouldReclip(covariant _FillClipperDirectional oldClipper) =>
-      oldClipper.t != t || oldClipper.textDirection != textDirection;
+  bool shouldReclip(covariant _FillClipperDirectional oldClipper) {
+    return oldClipper.progress != progress ||
+        oldClipper.textDirection != textDirection;
+  }
 }

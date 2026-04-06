@@ -2,11 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:taxi_driver_app/core/session/auth_session.dart';
 import 'package:taxi_driver_app/core/session/session_providers.dart';
 
 final dioProvider = Provider<Dio>((ref) {
   final authSession = ref.read(authSessionProvider);
-  // Main Dio instance used by the app for all API calls
+
   final dio = Dio(
     BaseOptions(
       baseUrl: 'https://taxi-backend.laithroom.com',
@@ -20,128 +21,69 @@ final dioProvider = Provider<Dio>((ref) {
     ),
   );
 
-  // Separate Dio instance dedicated for refresh requests.
-  // Important: it does NOT have the same interceptors to avoid refresh loops.
   final refreshDio = Dio(dio.options);
-
-  // A shared "in-flight refresh" future.
-  // If multiple requests fail with 401 at the same time,
-  //they will all await this
-  // instead of triggering multiple refresh calls.
-  Future<void>? refreshing;
+  Future<void>? refreshInFlight;
 
   dio.interceptors.add(
     QueuedInterceptorsWrapper(
-      // Runs before every request is sent
       onRequest: (options, handler) {
-        // Attach the current access token (if available)
         final token = authSession.token;
+
         if (token != null && token.isNotEmpty) {
           options.headers['Authorization'] = 'Bearer $token';
         }
+
         handler.next(options);
       },
+      onError: (error, handler) async {
+        final statusCode = error.response?.statusCode;
 
-      // Runs when any request fails
-      onError: (e, handler) async {
-        final status = e.response?.statusCode;
-
-        // Only handle 401 (Unauthorized). Other errors pass through.
-        if (status != 401) {
-          return handler.next(e);
+        if (statusCode != 401) {
+          return handler.next(error);
         }
 
-        // Original request that failed
-        final req = e.requestOptions;
+        final request = error.requestOptions;
 
-        // Prevent infinite retry loops:
-        // If we already retried this request once and still got 401 -> logout.
-        if (req.extra['retried'] == true) {
+        if (request.extra['retried'] == true) {
           await authSession.clear();
-          return handler.next(e);
+          return handler.next(error);
         }
 
-        // If there is no refresh token, we cannot refresh -> logout.
-        final rToken = authSession.refreshToken;
-        if (rToken == null || rToken.isEmpty) {
+        final refreshToken = authSession.refreshToken;
+        if (refreshToken == null || refreshToken.isEmpty) {
           await authSession.clear();
-          return handler.next(e);
+          return handler.next(error);
         }
 
         try {
-          // Start refresh only if it isn't already running.
-          // If refresh is already running, just await it.
-          refreshing ??= () async {
-            // Call refresh endpoint (example path/body — depends on backend)
-            final res = await refreshDio.post<dynamic>(
-              '/api/auth/refresh',
-              data: {
-                'refreshToken': rToken,
-              },
-            );
+          refreshInFlight ??= _refreshSession(
+            refreshDio: refreshDio,
+            authSession: authSession,
+            refreshToken: refreshToken,
+          );
 
-            final data = res.data;
-            final driverId = authSession.driverId;
-            final driverName = authSession.driverName;
-            final driverPhone = authSession.driverPhone;
-            // Parse tokens from response
-            final access = (data is Map ? data['token'] : null)?.toString();
-
-            // If server rotates refresh tokens, use the new one.
-            // Otherwise, keep the old one.
-            final newRefresh =
-                (data is Map ? data['refreshToken'] : null)?.toString() ??
-                rToken;
-
-            // If refresh didn't return a usable access token
-            //-> treat as failure.
-            if (access == null || access.isEmpty) {
-              throw Exception('Refresh did not return accessToken');
-            }
-
-            if (driverId == null) {
-              throw Exception('driverId is null ');
-            }
-
-            // Persist updated tokens in session + storage
-            await authSession.updateTokens(
-              driverName: driverName!,
-              driverPhone: driverPhone!,
-              driverId: driverId,
-              token: access,
-              refreshToken: newRefresh,
-            );
-          }();
-
-          // Wait until refresh finishes
-          await refreshing;
-        } on Exception catch (_) {
-          // Refresh failed -> logout
-          refreshing = null;
+          await refreshInFlight;
+        } on Exception {
+          refreshInFlight = null;
           await authSession.clear();
-          return handler.next(e);
+          return handler.next(error);
         } finally {
-          // Always reset refreshing future after completion
-          refreshing = null;
+          refreshInFlight = null;
         }
 
         try {
-          // Retry the original request once with the new access token
-          req.extra['retried'] = true;
-          req.headers['Authorization'] = 'Bearer ${authSession.token}';
+          request.extra['retried'] = true;
+          request.headers['Authorization'] = 'Bearer ${authSession.token}';
 
-          final response = await dio.fetch<dynamic>(req);
+          final response = await dio.fetch<dynamic>(request);
           return handler.resolve(response);
-        } on Exception catch (err) {
-          // If retry fails, forward the original error
-          //(or the DioException if available)
-          return handler.next(err is DioException ? err : e);
+        } on Exception catch (retryError) {
+          return handler.next(retryError is DioException ? retryError : error);
         }
       },
     ),
   );
 
-  // Add network logger only in debug mode
   if (kDebugMode) {
     dio.interceptors.add(
       PrettyDioLogger(
@@ -153,3 +95,49 @@ final dioProvider = Provider<Dio>((ref) {
 
   return dio;
 });
+
+Future<void> _refreshSession({
+  required Dio refreshDio,
+  required AuthSession authSession,
+  required String refreshToken,
+}) async {
+  final response = await refreshDio.post<dynamic>(
+    '/api/auth/refresh',
+    data: {
+      'refreshToken': refreshToken,
+    },
+  );
+
+  final data = response.data;
+  final driverId = authSession.driverId;
+  final driverName = authSession.driverName;
+  final driverPhone = authSession.driverPhone;
+
+  final accessToken = (data is Map ? data['token'] : null)?.toString();
+  final nextRefreshToken =
+      (data is Map ? data['refreshToken'] : null)?.toString() ?? refreshToken;
+
+  if (accessToken == null || accessToken.isEmpty) {
+    throw Exception('Refresh did not return accessToken');
+  }
+
+  if (driverId == null || driverId.isEmpty) {
+    throw Exception('driverId is null');
+  }
+
+  if (driverName == null || driverName.isEmpty) {
+    throw Exception('driverName is null');
+  }
+
+  if (driverPhone == null || driverPhone.isEmpty) {
+    throw Exception('driverPhone is null');
+  }
+
+  await authSession.updateTokens(
+    driverName: driverName,
+    driverPhone: driverPhone,
+    driverId: driverId,
+    token: accessToken,
+    refreshToken: nextRefreshToken,
+  );
+}

@@ -4,43 +4,43 @@ final class AuthSessionStorage {
   AuthSessionStorage({FlutterSecureStorage? storage})
     : _storage = storage ?? const FlutterSecureStorage();
 
-  static const _kAccessToken = 'access_token';
-  static const _kRefreshToken = 'refresh_token';
-  static const _kDriverId = 'driver_id';
-  static const _driverPhone = 'driver_phone';
-  static const _driverName = 'driver_name';
-  static const _kMustChangePassword = 'must_change_password';
+  static const _accessTokenKey = 'access_token';
+  static const _refreshTokenKey = 'refresh_token';
+  static const _driverIdKey = 'driver_id';
+  static const _driverPhoneKey = 'driver_phone';
+  static const _driverNameKey = 'driver_name';
+  static const _mustChangePasswordKey = 'must_change_password';
 
   final FlutterSecureStorage _storage;
 
-  Future<String?> readToken() async {
-    return _storage.read(key: _kAccessToken);
+  Future<String?> readToken() {
+    return _storage.read(key: _accessTokenKey);
   }
 
-  Future<String?> readRefreshToken() async {
-    return _storage.read(key: _kRefreshToken);
+  Future<String?> readRefreshToken() {
+    return _storage.read(key: _refreshTokenKey);
   }
 
-  Future<String?> readDriverId() async {
-    return _storage.read(key: _kDriverId);
+  Future<String?> readDriverId() {
+    return _storage.read(key: _driverIdKey);
   }
 
-  Future<String?> readDriverPhone() async {
-    return _storage.read(key: _driverPhone);
+  Future<String?> readDriverPhone() {
+    return _storage.read(key: _driverPhoneKey);
   }
 
-  Future<String?> readDriverName() async {
-    return _storage.read(key: _driverName);
+  Future<String?> readDriverName() {
+    return _storage.read(key: _driverNameKey);
   }
 
   Future<bool> readMustChangePassword() async {
-    final raw = await _storage.read(key: _kMustChangePassword);
+    final raw = await _storage.read(key: _mustChangePasswordKey);
     return raw == 'true';
   }
 
-  Future<void> writeMustChangePassword({required bool value}) async {
-    await _storage.write(
-      key: _kMustChangePassword,
+  Future<void> writeMustChangePassword({required bool value}) {
+    return _storage.write(
+      key: _mustChangePasswordKey,
       value: value.toString(),
     );
   }
@@ -53,25 +53,25 @@ final class AuthSessionStorage {
     required String driverName,
     required bool mustChangePassword,
   }) async {
-    await _storage.write(key: _kAccessToken, value: token);
-    await _storage.write(key: _kRefreshToken, value: refreshToken);
-    await _storage.write(key: _kDriverId, value: driverId);
-    await _storage.write(key: _driverPhone, value: driverPhone);
-    await _storage.write(key: _driverName, value: driverName);
+    await _storage.write(key: _accessTokenKey, value: token);
+    await _storage.write(key: _refreshTokenKey, value: refreshToken);
+    await _storage.write(key: _driverIdKey, value: driverId);
+    await _storage.write(key: _driverPhoneKey, value: driverPhone);
+    await _storage.write(key: _driverNameKey, value: driverName);
     await _storage.write(
-      key: _kMustChangePassword,
+      key: _mustChangePasswordKey,
       value: mustChangePassword.toString(),
     );
   }
 
   Future<void> clear() async {
     await Future.wait([
-      _storage.delete(key: _kAccessToken),
-      _storage.delete(key: _kRefreshToken),
-      _storage.delete(key: _kDriverId),
-      _storage.delete(key: _driverPhone),
-      _storage.delete(key: _driverName),
-      _storage.delete(key: _kMustChangePassword),
+      _storage.delete(key: _accessTokenKey),
+      _storage.delete(key: _refreshTokenKey),
+      _storage.delete(key: _driverIdKey),
+      _storage.delete(key: _driverPhoneKey),
+      _storage.delete(key: _driverNameKey),
+      _storage.delete(key: _mustChangePasswordKey),
     ]);
   }
 }

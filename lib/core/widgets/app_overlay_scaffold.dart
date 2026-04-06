@@ -6,6 +6,7 @@ import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
 
+/// Lightweight scaffold used for overlay-style pages pushed above the shell.
 class AppOverlayScaffold extends StatelessWidget {
   const AppOverlayScaffold({
     required this.title,
@@ -34,7 +35,10 @@ class AppOverlayScaffold extends StatelessWidget {
           icon: const Icon(AppIcons.arrowBack),
           onPressed: () => context.pop(),
         ),
-        title: Text(title, style: AppTypography.titleSm),
+        title: Text(
+          title,
+          style: AppTypography.titleSm,
+        ),
         centerTitle: true,
       ),
       body: SafeArea(

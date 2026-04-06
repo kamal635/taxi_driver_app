@@ -15,11 +15,8 @@ extension SnackBarX on BuildContext {
     VoidCallback? onAction,
     Duration duration = const Duration(seconds: 3),
   }) {
-    final messenger = ScaffoldMessenger.of(this)
-      // Avoid stacking multiple snackbars
-      ..hideCurrentSnackBar();
-
-    final style = _styleFor(type);
+    final messenger = ScaffoldMessenger.of(this)..hideCurrentSnackBar();
+    final style = _snackStyleFor(type);
 
     messenger.showSnackBar(
       SnackBar(
@@ -27,7 +24,7 @@ extension SnackBarX on BuildContext {
         margin: EdgeInsets.all(16.r),
         elevation: 0,
         duration: duration,
-        backgroundColor: style.bg,
+        backgroundColor: style.backgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.r),
         ),
@@ -35,7 +32,7 @@ extension SnackBarX on BuildContext {
           children: [
             Icon(
               style.icon,
-              color: style.fg,
+              color: style.foregroundColor,
               size: 20.r,
             ),
             AppSpacing.w12,
@@ -47,10 +44,10 @@ extension SnackBarX on BuildContext {
             ),
           ],
         ),
-        action: (actionLabel != null && onAction != null)
+        action: actionLabel != null && onAction != null
             ? SnackBarAction(
                 label: actionLabel,
-                textColor: style.fg,
+                textColor: style.foregroundColor,
                 onPressed: onAction,
               )
             : null,
@@ -59,26 +56,28 @@ extension SnackBarX on BuildContext {
   }
 }
 
-({Color bg, Color fg, IconData icon}) _styleFor(AppSnackType type) {
+({Color backgroundColor, Color foregroundColor, IconData icon}) _snackStyleFor(
+  AppSnackType type,
+) {
   return switch (type) {
     AppSnackType.success => (
-      bg: AppColors.success,
-      fg: AppColors.successBg,
+      backgroundColor: AppColors.success,
+      foregroundColor: AppColors.successBg,
       icon: AppIcons.success,
     ),
     AppSnackType.error => (
-      bg: AppColors.error,
-      fg: AppColors.errorBg,
+      backgroundColor: AppColors.error,
+      foregroundColor: AppColors.errorBg,
       icon: AppIcons.error,
     ),
     AppSnackType.warning => (
-      bg: AppColors.warning,
-      fg: AppColors.warningBg,
+      backgroundColor: AppColors.warning,
+      foregroundColor: AppColors.warningBg,
       icon: AppIcons.warning,
     ),
     AppSnackType.info => (
-      bg: AppColors.primary,
-      fg: AppColors.infoBg,
+      backgroundColor: AppColors.primary,
+      foregroundColor: AppColors.infoBg,
       icon: AppIcons.info,
     ),
   };

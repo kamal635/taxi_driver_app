@@ -1,103 +1,99 @@
 import 'package:dio/dio.dart';
 import 'package:taxi_driver_app/core/errors/failure.dart';
 
-Failure mapDioException(DioException e) {
-  // timeouts
-  if (e.type == DioExceptionType.connectionTimeout ||
-      e.type == DioExceptionType.sendTimeout ||
-      e.type == DioExceptionType.receiveTimeout) {
-    return TimeoutFailure(details: e);
+Failure mapDioException(DioException exception) {
+  if (exception.type == DioExceptionType.connectionTimeout ||
+      exception.type == DioExceptionType.sendTimeout ||
+      exception.type == DioExceptionType.receiveTimeout) {
+    return TimeoutFailure(details: exception);
   }
 
-  // cancelled
-  if (e.type == DioExceptionType.cancel) {
-    return CancelledFailure(details: e);
+  if (exception.type == DioExceptionType.cancel) {
+    return CancelledFailure(details: exception);
   }
 
-  // network
-  if (e.type == DioExceptionType.connectionError) {
-    return NetworkFailure(details: e);
+  if (exception.type == DioExceptionType.connectionError) {
+    return NetworkFailure(details: exception);
   }
 
-  // response-based
-  final status = e.response?.statusCode;
-  final data = e.response?.data;
+  final statusCode = exception.response?.statusCode;
+  final responseData = exception.response?.data;
+  final serverMessage = _extractServerMessage(responseData);
 
-  String? serverMessage;
-
-  if (data is Map) {
-    final map = data.cast<String, dynamic>();
-    serverMessage = (map['message'] ?? map['error'] ?? map['detail'])
-        ?.toString();
-  }
-
-  if (status == 400) {
+  if (statusCode == 400) {
     return ValidationFailure(
       message: serverMessage ?? 'Missing/invalid data',
-      statusCode: status,
-      details: data,
+      statusCode: statusCode,
+      details: responseData,
     );
   }
 
-  if (status == 401) {
+  if (statusCode == 401) {
     return UnauthorizedFailure(
       message: serverMessage ?? 'JWT invalid or expired',
-      statusCode: status,
-      details: data,
+      statusCode: statusCode,
+      details: responseData,
     );
   }
 
-  if (status == 409) {
+  if (statusCode == 409) {
     return ConflictFailure(
       message: serverMessage ?? 'Conflict',
-      statusCode: status,
-      details: data,
+      statusCode: statusCode,
+      details: responseData,
     );
   }
 
-  if (status == 423) {
+  if (statusCode == 423) {
     return LockedFailure(
       message: serverMessage ?? 'Account locked',
-      statusCode: status,
-      details: data,
+      statusCode: statusCode,
+      details: responseData,
     );
   }
 
-  if (status == 403) {
+  if (statusCode == 403) {
     return ForbiddenFailure(
       message: serverMessage ?? 'Forbidden',
-      statusCode: status,
-      details: data,
+      statusCode: statusCode,
+      details: responseData,
     );
   }
 
-  if (status == 404) {
+  if (statusCode == 404) {
     return NotFoundFailure(
       message: serverMessage ?? 'Not found',
-      statusCode: status,
-      details: data,
+      statusCode: statusCode,
+      details: responseData,
     );
   }
 
-  if (status != null && status >= 500) {
+  if (statusCode != null && statusCode >= 500) {
     return ServerFailure(
       message: serverMessage ?? 'Server error',
-      statusCode: status,
-      details: data,
+      statusCode: statusCode,
+      details: responseData,
     );
   }
 
-  if (status != null && status >= 400 && status < 500) {
+  if (statusCode != null && statusCode >= 400 && statusCode < 500) {
     return ValidationFailure(
       message: serverMessage ?? 'Invalid request',
-      statusCode: status,
-      details: data,
+      statusCode: statusCode,
+      details: responseData,
     );
   }
 
   return UnknownFailure(
-    message: serverMessage ?? (e.message ?? 'Unknown error'),
-    statusCode: status,
-    details: data,
+    message: serverMessage ?? (exception.message ?? 'Unknown error'),
+    statusCode: statusCode,
+    details: responseData,
   );
+}
+
+String? _extractServerMessage(Object? data) {
+  if (data is! Map) return null;
+
+  final map = data.cast<String, dynamic>();
+  return (map['message'] ?? map['error'] ?? map['detail'])?.toString();
 }

@@ -1,5 +1,3 @@
-// lib/core/errors/failure.dart
-
 sealed class Failure implements Exception {
   const Failure({
     required this.message,
@@ -7,14 +5,17 @@ sealed class Failure implements Exception {
     this.details,
   });
 
+  /// Technical or backend-facing message.
   final String message;
 
+  /// Optional HTTP status code when the error comes from an API response.
   final int? statusCode;
 
+  /// Optional raw details for debugging or logging.
   final Object? details;
 
   @override
-  String toString() => 'Failure( statusCode: $statusCode, message: $message)';
+  String toString() => 'Failure(statusCode: $statusCode, message: $message)';
 }
 
 final class NetworkFailure extends Failure {
@@ -25,13 +26,17 @@ final class NetworkFailure extends Failure {
 }
 
 final class TimeoutFailure extends Failure {
-  const TimeoutFailure({super.message = 'Request timeout', super.details})
-    : super(statusCode: null);
+  const TimeoutFailure({
+    super.message = 'Request timeout',
+    super.details,
+  }) : super(statusCode: null);
 }
 
 final class CancelledFailure extends Failure {
-  const CancelledFailure({super.message = 'Request cancelled', super.details})
-    : super(statusCode: null);
+  const CancelledFailure({
+    super.message = 'Request cancelled',
+    super.details,
+  }) : super(statusCode: null);
 }
 
 final class UnauthorizedFailure extends Failure {
@@ -66,6 +71,22 @@ final class ValidationFailure extends Failure {
   });
 }
 
+final class ConflictFailure extends Failure {
+  const ConflictFailure({
+    super.message = 'Conflict',
+    super.statusCode,
+    super.details,
+  });
+}
+
+final class LockedFailure extends Failure {
+  const LockedFailure({
+    super.message = 'Account locked',
+    super.statusCode,
+    super.details,
+  });
+}
+
 final class ServerFailure extends Failure {
   const ServerFailure({
     super.message = 'Server error',
@@ -84,22 +105,6 @@ final class ParsingFailure extends Failure {
 final class UnknownFailure extends Failure {
   const UnknownFailure({
     super.message = 'Something went wrong',
-    super.statusCode,
-    super.details,
-  });
-}
-
-final class ConflictFailure extends Failure {
-  const ConflictFailure({
-    super.message = 'Conflict',
-    super.statusCode,
-    super.details,
-  });
-}
-
-final class LockedFailure extends Failure {
-  const LockedFailure({
-    super.message = 'Account locked',
     super.statusCode,
     super.details,
   });

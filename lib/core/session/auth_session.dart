@@ -32,9 +32,9 @@ final class AuthSession extends ChangeNotifier {
     _token = await _storage.readToken();
     _refreshToken = await _storage.readRefreshToken();
     _driverId = await _storage.readDriverId();
-    _mustChangePassword = await _storage.readMustChangePassword();
     _driverName = await _storage.readDriverName();
     _driverPhone = await _storage.readDriverPhone();
+    _mustChangePassword = await _storage.readMustChangePassword();
 
     _isReady = true;
     notifyListeners();
@@ -51,17 +51,17 @@ final class AuthSession extends ChangeNotifier {
     _token = token;
     _refreshToken = refreshToken;
     _driverId = driverId;
-    _mustChangePassword = mustChangePassword;
-    _driverPhone = driverPhone;
     _driverName = driverName;
+    _driverPhone = driverPhone;
+    _mustChangePassword = mustChangePassword;
 
     await _storage.save(
       token: token,
       refreshToken: refreshToken,
       driverId: driverId,
-      mustChangePassword: mustChangePassword,
-      driverPhone: driverPhone,
       driverName: driverName,
+      driverPhone: driverPhone,
+      mustChangePassword: mustChangePassword,
     );
 
     notifyListeners();
@@ -107,7 +107,6 @@ final class AuthSession extends ChangeNotifier {
     _mustChangePassword = false;
 
     await _storage.clear();
-
     notifyListeners();
   }
 }

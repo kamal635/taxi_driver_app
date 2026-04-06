@@ -2,87 +2,98 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 
+/// Centralized typography tokens.
 final class AppTypography {
-  // Titles
-  static TextStyle get titleLg => TextStyle(
-    fontSize: 26.sp,
+  AppTypography._();
+
+  static TextStyle get titleLg => _style(
+    fontSize: 26,
     fontWeight: FontWeight.w800,
     color: AppColors.textPrimary,
     height: 1.15,
   );
 
-  static TextStyle get titleMd => TextStyle(
-    fontSize: 22.sp,
+  static TextStyle get titleMd => _style(
+    fontSize: 22,
     fontWeight: FontWeight.w800,
     color: AppColors.textPrimary,
-    height: 1.2,
+    height: 1.20,
   );
 
-  static TextStyle get titleSm => TextStyle(
-    fontSize: 18.sp,
+  static TextStyle get titleSm => _style(
+    fontSize: 18,
     fontWeight: FontWeight.w800,
     color: AppColors.textPrimary,
     height: 1.25,
   );
 
-  // Subtitles
-  static TextStyle get subtitleMd => TextStyle(
-    fontSize: 14.sp,
+  static TextStyle get subtitleMd => _style(
+    fontSize: 14,
     fontWeight: FontWeight.w500,
     color: AppColors.textSecondary,
-    height: 1.3,
+    height: 1.30,
   );
 
-  static TextStyle get subtitleSm => TextStyle(
-    fontSize: 12.sp,
+  static TextStyle get subtitleSm => _style(
+    fontSize: 12,
     fontWeight: FontWeight.w500,
     color: AppColors.textSecondary,
-    height: 1.3,
+    height: 1.30,
   );
 
-  // Labels (for field labels, section labels)
-  static TextStyle get labelMd => TextStyle(
-    fontSize: 13.sp,
+  static TextStyle get labelMd => _style(
+    fontSize: 13,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
     height: 1.25,
   );
 
-  static TextStyle get labelSm => TextStyle(
-    fontSize: 12.sp,
+  static TextStyle get labelSm => _style(
+    fontSize: 12,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
     height: 1.25,
   );
 
-  // Body (regular text)
-  static TextStyle get bodyMd => TextStyle(
-    fontSize: 14.sp,
+  static TextStyle get bodyMd => _style(
+    fontSize: 14,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
     height: 1.35,
   );
 
-  static TextStyle get bodySm => TextStyle(
-    fontSize: 13.sp,
+  static TextStyle get bodySm => _style(
+    fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColors.textPrimary,
     height: 1.35,
   );
 
-  // Muted body (helper text, hints)
-  static TextStyle get bodyMuted => TextStyle(
-    fontSize: 12.sp,
+  static TextStyle get bodyMuted => _style(
+    fontSize: 12,
     fontWeight: FontWeight.w500,
     color: AppColors.textSecondary,
     height: 1.35,
   );
 
-  // Button text
-  static TextStyle get button => TextStyle(
-    fontSize: 16.sp,
+  static TextStyle get button => _style(
+    fontSize: 16,
     fontWeight: FontWeight.w800,
     color: AppColors.textPrimary,
-    height: 1.2,
+    height: 1.20,
   );
+
+  static TextStyle _style({
+    required double fontSize,
+    required FontWeight fontWeight,
+    required Color color,
+    required double height,
+  }) {
+    return TextStyle(
+      fontSize: fontSize.sp,
+      fontWeight: fontWeight,
+      color: color,
+      height: height,
+    );
+  }
 }

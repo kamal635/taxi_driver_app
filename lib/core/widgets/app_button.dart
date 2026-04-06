@@ -23,6 +23,8 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveLabelColor = labelColor ?? AppColors.textPrimary;
+
     return SizedBox(
       width: double.infinity,
       height: 40.h,
@@ -30,26 +32,30 @@ class AppButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? AppColors.primary,
-          foregroundColor: AppColors.textPrimary,
+          foregroundColor: effectiveLabelColor,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.r),
-            side: BorderSide(color: borderColor ?? Colors.transparent),
+            side: BorderSide(
+              color: borderColor ?? Colors.transparent,
+            ),
           ),
         ),
         child: isLoading
             ? SizedBox(
                 width: 18.w,
                 height: 18.w,
-                child: const CircularProgressIndicator(
+                child: CircularProgressIndicator(
                   strokeWidth: 3,
-                  color: AppColors.primary,
+                  color: effectiveLabelColor,
                 ),
               )
             : Text(
                 label,
-                style: AppTypography.button.copyWith(color: labelColor),
                 overflow: TextOverflow.ellipsis,
+                style: AppTypography.button.copyWith(
+                  color: effectiveLabelColor,
+                ),
               ),
       ),
     );

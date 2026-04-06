@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+/// Selected font family with ordered fallbacks.
 final class FontChoice {
   const FontChoice(this.primary, this.fallback);
 
@@ -7,13 +8,15 @@ final class FontChoice {
   final List<String> fallback;
 }
 
+/// Centralized application font families.
 final class AppFonts {
-  static const english = 'Archivo';
-  static const arabic = 'NotoKufiArabic';
+  AppFonts._();
 
+  static const String english = 'Archivo';
+  static const String arabic = 'NotoKufiArabic';
+
+  /// Resolve the primary font for the active locale.
   static FontChoice resolve(Locale locale) {
-    // Only special-case scripts where you want a specific primary font.
-    // Arabic locales → force Cairo as primary.
     switch (locale.languageCode) {
       case 'ar':
         return const FontChoice(arabic, <String>[english]);

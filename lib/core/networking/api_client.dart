@@ -10,6 +10,7 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 
 class ApiClient {
   ApiClient(this._dio);
+
   final Dio _dio;
 
   Future<Map<String, dynamic>> postJson(
@@ -17,25 +18,15 @@ class ApiClient {
     Map<String, dynamic>? body,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? query,
-  }) async {
-    try {
-      final res = await _dio.post<Map<String, dynamic>>(
+  }) {
+    return _executeJsonRequest(
+      () => _dio.post<Map<String, dynamic>>(
         path,
         data: body,
         queryParameters: query,
         options: Options(headers: headers),
-      );
-
-      final data = res.data;
-      if (data == null) {
-        throw const ParsingFailure(message: 'Empty response body');
-      }
-      return data;
-    } on DioException catch (e) {
-      throw mapDioException(e);
-    } on FormatException catch (e) {
-      throw ParsingFailure(details: e);
-    }
+      ),
+    );
   }
 
   Future<void> postVoid(
@@ -43,17 +34,15 @@ class ApiClient {
     Map<String, dynamic>? body,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? query,
-  }) async {
-    try {
-      await _dio.post<void>(
+  }) {
+    return _executeVoidRequest(
+      () => _dio.post<void>(
         path,
         data: body,
         queryParameters: query,
         options: Options(headers: headers),
-      );
-    } on DioException catch (e) {
-      throw mapDioException(e);
-    }
+      ),
+    );
   }
 
   Future<Map<String, dynamic>> putJson(
@@ -61,25 +50,15 @@ class ApiClient {
     Map<String, dynamic>? body,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? query,
-  }) async {
-    try {
-      final res = await _dio.put<Map<String, dynamic>>(
+  }) {
+    return _executeJsonRequest(
+      () => _dio.put<Map<String, dynamic>>(
         path,
         data: body,
         queryParameters: query,
         options: Options(headers: headers),
-      );
-
-      final data = res.data;
-      if (data == null) {
-        throw const ParsingFailure(message: 'Empty response body');
-      }
-      return data;
-    } on DioException catch (e) {
-      throw mapDioException(e);
-    } on FormatException catch (e) {
-      throw ParsingFailure(details: e);
-    }
+      ),
+    );
   }
 
   Future<void> putVoid(
@@ -87,56 +66,71 @@ class ApiClient {
     Map<String, dynamic>? body,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? query,
-  }) async {
-    try {
-      await _dio.put<void>(
+  }) {
+    return _executeVoidRequest(
+      () => _dio.put<void>(
         path,
         data: body,
         queryParameters: query,
         options: Options(headers: headers),
-      );
-    } on DioException catch (e) {
-      throw mapDioException(e);
-    }
+      ),
+    );
   }
 
   Future<Map<String, dynamic>> getJson(
     String path, {
     Map<String, dynamic>? headers,
     Map<String, dynamic>? query,
-  }) async {
-    try {
-      final res = await _dio.get<Map<String, dynamic>>(
+  }) {
+    return _executeJsonRequest(
+      () => _dio.get<Map<String, dynamic>>(
         path,
         queryParameters: query,
         options: Options(headers: headers),
-      );
-
-      final data = res.data;
-      if (data == null) {
-        throw const ParsingFailure(message: 'Empty response body');
-      }
-      return data;
-    } on DioException catch (e) {
-      throw mapDioException(e);
-    } on FormatException catch (e) {
-      throw ParsingFailure(details: e);
-    }
+      ),
+    );
   }
 
   Future<void> getVoid(
     String path, {
     Map<String, dynamic>? headers,
     Map<String, dynamic>? query,
-  }) async {
-    try {
-      await _dio.get<void>(
+  }) {
+    return _executeVoidRequest(
+      () => _dio.get<void>(
         path,
         queryParameters: query,
         options: Options(headers: headers),
-      );
-    } on DioException catch (e) {
-      throw mapDioException(e);
+      ),
+    );
+  }
+
+  Future<Map<String, dynamic>> _executeJsonRequest(
+    Future<Response<Map<String, dynamic>>> Function() request,
+  ) async {
+    try {
+      final response = await request();
+      final data = response.data;
+
+      if (data == null) {
+        throw const ParsingFailure(message: 'Empty response body');
+      }
+
+      return data;
+    } on DioException catch (error) {
+      throw mapDioException(error);
+    } on FormatException catch (error) {
+      throw ParsingFailure(details: error);
+    }
+  }
+
+  Future<void> _executeVoidRequest(
+    Future<Response<void>> Function() request,
+  ) async {
+    try {
+      await request();
+    } on DioException catch (error) {
+      throw mapDioException(error);
     }
   }
 }

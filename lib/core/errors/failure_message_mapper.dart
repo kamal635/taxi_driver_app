@@ -6,7 +6,7 @@ enum FailureContext {
   authLogin,
 }
 
-/// Maps a Failure/Exception to a localized, user-friendly message.
+/// Maps a technical error to a localized user-facing message.
 String failureToUserMessage(
   Object error, {
   required AppLocalizations l10n,
@@ -16,33 +16,20 @@ String failureToUserMessage(
     return l10n.errorUnexpected;
   }
 
-  switch (error) {
-    case NetworkFailure():
-      return l10n.errorNoInternet;
-    case TimeoutFailure():
-      return l10n.errorTimeout;
-    case CancelledFailure():
-      return l10n.errorCancelled;
-    case LockedFailure():
-      return l10n.errorAccountLocked;
-    case ConflictFailure():
-      return l10n.errorConflict;
-    case ValidationFailure():
-      return l10n.errorValidation;
-    case NotFoundFailure():
-      return l10n.errorNotFound;
-    case ForbiddenFailure():
-      return l10n.errorForbidden;
-    case UnauthorizedFailure():
-      if (context == FailureContext.authLogin) {
-        return l10n.errorInvalidCredentials;
-      }
-      return l10n.errorSessionExpired;
-    case ServerFailure():
-      return l10n.errorServer;
-    case ParsingFailure():
-      return l10n.errorBadResponse;
-    case UnknownFailure():
-      return l10n.errorUnexpected;
-  }
+  return switch (error) {
+    NetworkFailure() => l10n.errorNoInternet,
+    TimeoutFailure() => l10n.errorTimeout,
+    CancelledFailure() => l10n.errorCancelled,
+    LockedFailure() => l10n.errorAccountLocked,
+    ConflictFailure() => l10n.errorConflict,
+    ValidationFailure() => l10n.errorValidation,
+    NotFoundFailure() => l10n.errorNotFound,
+    ForbiddenFailure() => l10n.errorForbidden,
+    UnauthorizedFailure() => context == FailureContext.authLogin
+        ? l10n.errorInvalidCredentials
+        : l10n.errorSessionExpired,
+    ServerFailure() => l10n.errorServer,
+    ParsingFailure() => l10n.errorBadResponse,
+    UnknownFailure() => l10n.errorUnexpected,
+  };
 }
