@@ -14,13 +14,15 @@ class AppSignOutService {
 
   final Ref _ref;
 
-  Future<void> signOut() async {
-    try {
-      await _ref
-          .read(availabilityProvider.notifier)
-          .requestSetOnline(value: false);
-    } on Exception {
-      // Best-effort cleanup.
+  Future<void> signOut({bool notifyBackend = true}) async {
+    if (notifyBackend) {
+      try {
+        await _ref
+            .read(availabilityProvider.notifier)
+            .requestSetOnline(value: false);
+      } on Exception {
+        // Best-effort cleanup.
+      }
     }
 
     try {

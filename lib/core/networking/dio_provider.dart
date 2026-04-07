@@ -1,12 +1,16 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:taxi_driver_app/core/session/app_sign_out_service.dart';
 import 'package:taxi_driver_app/core/session/auth_session.dart';
 import 'package:taxi_driver_app/core/session/session_providers.dart';
 
 final dioProvider = Provider<Dio>((ref) {
   final authSession = ref.read(authSessionProvider);
+  final appSignOutService = ref.read(appSignOutServiceProvider);
+
+  Future<void> forceLocalSignOut() {
+    return appSignOutService.signOut(notifyBackend: false);
+  }
 
   final dio = Dio(
     BaseOptions(
@@ -24,6 +28,32 @@ final dioProvider = Provider<Dio>((ref) {
   final refreshDio = Dio(dio.options);
   Future<void>? refreshInFlight;
 
+  bool isForcedLogoutStatus(DioException error) {
+    final status = error.response?.statusCode;
+
+    if (status == 401) return true;
+
+    if (status == 403) {
+      final data = error.response?.data;
+      final message = data is Map
+          ? (data['message'] ?? data['error'] ?? data['detail'])?.toString()
+          : null;
+
+      if (message != null) {
+        final normalized = message.toLowerCase();
+        if (normalized.contains('deleted') ||
+            normalized.contains('disabled') ||
+            normalized.contains('inactive') ||
+            normalized.contains('blocked') ||
+            normalized.contains('revoked')) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   dio.interceptors.add(
     QueuedInterceptorsWrapper(
       onRequest: (options, handler) {
@@ -36,22 +66,27 @@ final dioProvider = Provider<Dio>((ref) {
         handler.next(options);
       },
       onError: (error, handler) async {
-        final statusCode = error.response?.statusCode;
+        final request = error.requestOptions;
 
-        if (statusCode != 401) {
+        if (!isForcedLogoutStatus(error)) {
           return handler.next(error);
         }
 
-        final request = error.requestOptions;
-
+        // لو نفس الطلب رجع مرة ثانية بعد retry → اخرج
         if (request.extra['retried'] == true) {
-          await authSession.clear();
+          await forceLocalSignOut();
+          return handler.next(error);
+        }
+
+        // لا تحاول refresh على refresh endpoint نفسه
+        if (request.path == '/api/auth/refresh') {
+          await forceLocalSignOut();
           return handler.next(error);
         }
 
         final refreshToken = authSession.refreshToken;
         if (refreshToken == null || refreshToken.isEmpty) {
-          await authSession.clear();
+          await forceLocalSignOut();
           return handler.next(error);
         }
 
@@ -64,8 +99,7 @@ final dioProvider = Provider<Dio>((ref) {
 
           await refreshInFlight;
         } on Exception {
-          refreshInFlight = null;
-          await authSession.clear();
+          await forceLocalSignOut();
           return handler.next(error);
         } finally {
           refreshInFlight = null;
@@ -77,21 +111,18 @@ final dioProvider = Provider<Dio>((ref) {
 
           final response = await dio.fetch<dynamic>(request);
           return handler.resolve(response);
-        } on Exception catch (retryError) {
-          return handler.next(retryError is DioException ? retryError : error);
+        } on DioException catch (retryError) {
+          if (isForcedLogoutStatus(retryError)) {
+            await forceLocalSignOut();
+          }
+          return handler.next(retryError);
+        } on Exception {
+          await forceLocalSignOut();
+          return handler.next(error);
         }
       },
     ),
   );
-
-  if (kDebugMode) {
-    dio.interceptors.add(
-      PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-      ),
-    );
-  }
 
   return dio;
 });
