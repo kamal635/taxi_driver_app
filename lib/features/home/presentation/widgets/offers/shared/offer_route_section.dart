@@ -18,98 +18,240 @@ class OfferRouteSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
     final l10n = context.l10n;
 
     final stops = [
       _RouteStopData(
         label: l10n.homePickupPrefix,
         title: pickup,
-        color: AppColors.info,
+        type: _RouteStopType.pickup,
       ),
       _RouteStopData(
         label: l10n.homeDropoffPrefix,
         title: dropoff,
-        color: AppColors.error,
+        type: _RouteStopType.dropoff,
       ),
     ];
 
-    return Stack(
-      children: [
-        Positioned(
-          left: isRtl ? null : 4.5.r,
-          right: isRtl ? 4.5.r : null,
-          top: 10.r,
-          bottom: 10.r,
-          child: Container(
-            width: 3.r,
-            color: AppColors.border,
-          ),
-        ),
-        Column(
-          children: List.generate(stops.length, (index) {
-            final stop = stops[index];
-            final isLast = index == stops.length - 1;
+    if (stops.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-            return Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : 24.r),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        stops.length,
+        (index) {
+          final stop = stops[index];
+          final isLast = index == stops.length - 1;
+
+          return Padding(
+            padding: EdgeInsets.only(bottom: isLast ? 0 : 1.h),
+            child: _OfferRouteTimelineTile(
+              stop: stop,
+              isLast: isLast,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _OfferRouteTimelineTile extends StatelessWidget {
+  const _OfferRouteTimelineTile({
+    required this.stop,
+    required this.isLast,
+  });
+
+  final _RouteStopData stop;
+  final bool isLast;
+
+  static const double _minConnectorHeight = 66;
+  static const double _connectorTopOffset = 14;
+  static const double _minTileHeight =
+      _connectorTopOffset + _minConnectorHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = _RouteTimelinePalette.fromType(stop.type);
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: _minTileHeight,
+      ),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              width: 20.w,
+              child: Stack(
+                alignment: Alignment.topCenter,
                 children: [
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Container(
-                      width: 12.r,
-                      height: 12.r,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: stop.color.withValues(alpha: 0.2),
-                          width: 16.r,
-                        ),
-                        color: stop.color,
-                        shape: BoxShape.circle,
+                  if (!isLast)
+                    const Positioned.fill(
+                      top: _connectorTopOffset,
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: _DottedVerticalConnector(),
                       ),
                     ),
-                  ),
-                  AppSpacing.w16,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          stop.label,
-                          style: AppTypography.subtitleSm.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        AppSpacing.h4,
-                        Text(
-                          stop.title,
-                          style: AppTypography.bodyMd.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 2.h),
+                    child: _RouteTimelineMarker(palette: palette),
                   ),
                 ],
               ),
-            );
-          }),
+            ),
+            AppSpacing.w4,
+            Expanded(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      stop.label,
+                      style: AppTypography.subtitleSm.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    AppSpacing.h4,
+                    Text(
+                      stop.title,
+                      style: AppTypography.bodyMd.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      softWrap: true,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
+}
+
+class _RouteTimelineMarker extends StatelessWidget {
+  const _RouteTimelineMarker({
+    required this.palette,
+  });
+
+  final _RouteTimelinePalette palette;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 18.r,
+      height: 18.r,
+      decoration: BoxDecoration(
+        color: palette.backgroundColor,
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
+      child: Container(
+        width: 9.r,
+        height: 9.r,
+        decoration: BoxDecoration(
+          color: palette.dotColor,
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+}
+
+class _DottedVerticalConnector extends StatelessWidget {
+  const _DottedVerticalConnector();
+
+  static const double minHeight = 12;
+  static const double _dotSize = 2;
+  static const double _gap = 1;
+  static const int _minDots = 3;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final rawHeight = constraints.maxHeight;
+
+        if (!rawHeight.isFinite || rawHeight <= 0) {
+          return const SizedBox.shrink();
+        }
+
+        final height = rawHeight < minHeight ? minHeight : rawHeight;
+
+        final dotCount = ((height + _gap) / (_dotSize + _gap)).floor().clamp(
+          _minDots,
+          100,
+        );
+
+        return SizedBox(
+          width: _dotSize,
+          height: height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(
+              dotCount,
+              (_) => Container(
+                width: _dotSize,
+                height: _dotSize,
+                decoration: BoxDecoration(
+                  color: AppColors.iconMuted.withValues(alpha: 0.5),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+enum _RouteStopType {
+  pickup,
+  dropoff,
 }
 
 class _RouteStopData {
   const _RouteStopData({
     required this.label,
     required this.title,
-    required this.color,
+    required this.type,
   });
 
   final String label;
   final String title;
-  final Color color;
+  final _RouteStopType type;
+}
+
+class _RouteTimelinePalette {
+  const _RouteTimelinePalette({
+    required this.dotColor,
+    required this.backgroundColor,
+  });
+
+  factory _RouteTimelinePalette.fromType(_RouteStopType type) {
+    switch (type) {
+      case _RouteStopType.pickup:
+        return _RouteTimelinePalette(
+          dotColor: AppColors.info,
+          backgroundColor: AppColors.info.withValues(alpha: 0.1),
+        );
+      case _RouteStopType.dropoff:
+        return _RouteTimelinePalette(
+          dotColor: AppColors.error,
+          backgroundColor: AppColors.error.withValues(alpha: 0.1),
+        );
+    }
+  }
+
+  final Color dotColor;
+  final Color backgroundColor;
 }

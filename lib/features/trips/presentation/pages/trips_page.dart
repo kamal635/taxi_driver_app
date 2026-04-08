@@ -44,7 +44,9 @@ class TripsPage extends ConsumerWidget {
               earningsText:
                   'SYP ${formatOrderPrice(result?.totalProfits ?? "0")}',
             ),
+
             AppSpacing.h12,
+
             TripsFilterDropdown(
               value: result?.period ?? CompletedPeriod.all,
               enabled: !tripsState.isLoading && !tripsState.isRefreshing,
@@ -56,12 +58,16 @@ class TripsPage extends ConsumerWidget {
                     .changePeriod(value);
               },
             ),
+
             AppSpacing.h18,
+
             TripsSectionHeader(
               title: context.l10n.tripsRecentTitle,
               subtitle: context.l10n.tripsTotalTrips(result?.count ?? 0),
             ),
+
             AppSpacing.h12,
+
             TripsContentSection(
               offers: offers,
               isInitialLoading: isInitialLoading,

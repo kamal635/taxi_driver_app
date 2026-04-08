@@ -14,19 +14,17 @@ class TripsSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
           style: AppTypography.titleSm,
         ),
-        AppSpacing.w8,
-        Expanded(
-          child: Text(
-            subtitle,
-            style: AppTypography.subtitleSm,
-          ),
+        AppSpacing.h10,
+        Text(
+          subtitle,
+          style: AppTypography.subtitleSm,
         ),
       ],
     );

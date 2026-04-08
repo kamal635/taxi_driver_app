@@ -4,9 +4,7 @@ import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/utils/price_formatter.dart';
 import 'package:taxi_driver_app/features/trips/domain/entities/completed_offer_entity.dart';
-import 'package:taxi_driver_app/features/trips/presentation/formatters/completed_trip_time_formatter.dart';
 import 'package:taxi_driver_app/features/trips/presentation/widgets/completed_trip_card.dart';
 import 'package:taxi_driver_app/features/trips/presentation/widgets/trips_empty_state.dart';
 import 'package:taxi_driver_app/features/trips/presentation/widgets/trips_loading_state.dart';
@@ -55,14 +53,7 @@ class TripsContentSection extends StatelessWidget {
           itemBuilder: (context, index) {
             final offer = offers[index];
 
-            return CompletedTripCard(
-              placeTitle: offer.pickup,
-              timeText: CompletedTripTimeFormatter.format(
-                context,
-                offer.updatedAt,
-              ),
-              fareText: 'SYP ${formatOrderPrice(offer.price)}',
-            );
+            return CompletedTripCard(offer: offer);
           },
         ),
       ],
