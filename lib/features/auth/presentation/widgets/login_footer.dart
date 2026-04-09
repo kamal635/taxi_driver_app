@@ -19,7 +19,9 @@ class LoginFooter extends StatelessWidget {
           RichText(
             textAlign: TextAlign.center,
             text: TextSpan(
-              style: AppTypography.bodySm,
+              style: AppTypography.bodySm.copyWith(
+                fontFamily: 'NotoKufiArabic',
+              ),
               children: [
                 TextSpan(
                   text: '${context.l10n.contactSupportLabel} ',

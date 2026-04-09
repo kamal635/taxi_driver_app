@@ -148,7 +148,7 @@ class _OfferHeaderState extends State<OfferHeader> {
         Text(l10n.totalFare, style: AppTypography.subtitleSm),
         AppSpacing.h4,
         Text(
-          '${formatOrderPrice(widget.totalFare)} SYP',
+          '${formatOrderPrice(widget.totalFare)} ل.س',
           style: AppTypography.titleMd,
         ),
       ],
