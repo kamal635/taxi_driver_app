@@ -49,7 +49,7 @@ class TripsContentSection extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: offers.length,
-          separatorBuilder: (_, _) => AppSpacing.h12,
+          separatorBuilder: (_, _) => AppSpacing.h4,
           itemBuilder: (context, index) {
             final offer = offers[index];
 

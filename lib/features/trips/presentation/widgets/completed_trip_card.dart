@@ -9,15 +9,34 @@ import 'package:taxi_driver_app/features/trips/domain/entities/completed_offer_e
 import 'package:taxi_driver_app/features/trips/presentation/formatters/completed_trip_time_formatter.dart';
 import 'package:taxi_driver_app/features/trips/presentation/widgets/trips_card_surface.dart';
 
-enum TripsTimelineItemType {
-  from,
-  to,
+enum TripStopType {
+  pickup,
+  dropoff,
 }
 
 class CompletedTripCard extends StatelessWidget {
-  const CompletedTripCard({required this.offer, super.key});
+  const CompletedTripCard({
+    required this.offer,
+    super.key,
+  });
 
   final CompletedOfferEntity offer;
+
+  List<TripTimelineItemData> get _timelineItems {
+    return [
+      TripTimelineItemData(
+        label: 'من',
+        value: offer.pickup,
+        type: TripStopType.pickup,
+      ),
+      if (offer.dropoff?.trim().isNotEmpty ?? false)
+        TripTimelineItemData(
+          label: 'إلى',
+          value: offer.dropoff!.trim(),
+          type: TripStopType.dropoff,
+        ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,76 +50,76 @@ class CompletedTripCard extends StatelessWidget {
           ),
           AppSpacing.w4,
           Expanded(
-            child: TripsTimeline(
-              items: [
-                TripsTimelineItemData(
-                  title: offer.pickup,
-                  where: 'من',
-                  type: TripsTimelineItemType.from,
-                ),
-
-                TripsTimelineItemData(
-                  title: offer.dropoff ?? '',
-                  where: 'إلى',
-                  type: TripsTimelineItemType.to,
-                ),
-              ],
-            ),
+            child: TripTimeline(items: _timelineItems),
           ),
-
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-
-            children: [
-              Text(
-                CompletedTripTimeFormatter.format(context, offer.updatedAt),
-                style: AppTypography.subtitleSm.copyWith(
-                  color: AppColors.iconMuted,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              AppSpacing.h12,
-              Text(
-                'SYP ${formatOrderPrice(offer.price)}',
-                style: AppTypography.subtitleMd.copyWith(
-                  color: AppColors.success,
-                  fontWeight: FontWeight.bold,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
+          AppSpacing.w8,
+          _CompletedTripMeta(offer: offer),
         ],
       ),
     );
   }
 }
 
-class TripsTimelineItemData {
-  const TripsTimelineItemData({
-    required this.title,
-    required this.where,
-    required this.type,
-    this.subtitle,
+class _CompletedTripMeta extends StatelessWidget {
+  const _CompletedTripMeta({
+    required this.offer,
   });
 
-  final String title;
-  final String where;
-  final String? subtitle;
-  final TripsTimelineItemType type;
+  final CompletedOfferEntity offer;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          CompletedTripTimeFormatter.format(context, offer.updatedAt),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTypography.subtitleSm.copyWith(
+            color: AppColors.iconMuted,
+            fontSize: 10.sp,
+          ),
+        ),
+        AppSpacing.h12,
+        Text(
+          '${formatOrderPrice(offer.price)} ل.س',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTypography.subtitleMd.copyWith(
+            color: AppColors.success,
+            fontWeight: FontWeight.bold,
+            fontSize: 12.sp,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-class TripsTimeline extends StatelessWidget {
-  const TripsTimeline({
+@immutable
+class TripTimelineItemData {
+  const TripTimelineItemData({
+    required this.label,
+    required this.value,
+    required this.type,
+  });
+
+  final String label;
+  final String value;
+  final TripStopType type;
+}
+
+class TripTimeline extends StatelessWidget {
+  const TripTimeline({
     required this.items,
     super.key,
   });
 
-  final List<TripsTimelineItemData> items;
+  final List<TripTimelineItemData> items;
 
   @override
   Widget build(BuildContext context) {
-    // space between marker and subtitle + space between title and subtitle
     if (items.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -109,88 +128,53 @@ class TripsTimeline extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: List.generate(
         items.length,
-        (index) {
-          final item = items[index];
-          final isLast = index == items.length - 1;
-
-          return Padding(
-            padding: EdgeInsets.only(bottom: isLast ? 0 : 1),
-            child: _TripsTimelineTile(
-              item: item,
-              isLast: isLast,
-            ),
-          );
-        },
+        (index) => Padding(
+          padding: EdgeInsets.only(
+            bottom: _TripTimelineDimensions.itemSpacing.h,
+          ),
+          child: TripTimelineTile(
+            item: items[index],
+            showConnector: index != items.length - 1,
+          ),
+        ),
       ),
     );
   }
 }
 
-class _TripsTimelineTile extends StatelessWidget {
-  const _TripsTimelineTile({
+class TripTimelineTile extends StatelessWidget {
+  const TripTimelineTile({
     required this.item,
-    required this.isLast,
+    required this.showConnector,
+    super.key,
   });
 
-  final TripsTimelineItemData item;
-  final bool isLast;
-
-  static const double _minConnectorHeight = 12;
-  static const double _connectorTopOffset = 14;
-  static const double _minTileHeight =
-      _connectorTopOffset + _minConnectorHeight;
+  final TripTimelineItemData item;
+  final bool showConnector;
 
   @override
   Widget build(BuildContext context) {
-    final palette = _TimelinePalette.fromType(item.type);
+    final palette = TripStopPalette.fromType(item.type);
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(
-        minHeight: _minTileHeight,
+      constraints: BoxConstraints(
+        minHeight: _TripTimelineDimensions.minTileHeight.h,
       ),
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(
-              width: 20.w,
-              child: Stack(
-                alignment: Alignment.topCenter,
-                children: [
-                  if (!isLast)
-                    const Positioned.fill(
-                      top: _connectorTopOffset,
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: _DottedVerticalConnector(),
-                      ),
-                    ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 2.h),
-                    child: _TimelineMarker(palette: palette),
-                  ),
-                ],
-              ),
+            TripStopIndicator(
+              palette: palette,
+              showConnector: showConnector,
             ),
             AppSpacing.w4,
             Expanded(
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: '${item.where}: ',
-                        style: AppTypography.subtitleSm,
-                      ),
-                      TextSpan(
-                        text: item.title,
-                        style: AppTypography.bodySm,
-                      ),
-                    ],
-                  ),
-                  softWrap: true,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: _TripTimelineDimensions.textTopPadding.h,
                 ),
+                child: _TripTimelineText(item: item),
               ),
             ),
           ],
@@ -200,26 +184,100 @@ class _TripsTimelineTile extends StatelessWidget {
   }
 }
 
+class TripStopIndicator extends StatelessWidget {
+  const TripStopIndicator({
+    required this.palette,
+    required this.showConnector,
+    super.key,
+  });
+
+  final TripStopPalette palette;
+  final bool showConnector;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: _TripTimelineDimensions.indicatorWidth.w,
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+              top: _TripTimelineDimensions.markerTopPadding.h,
+            ),
+            child: _TimelineMarker(palette: palette),
+          ),
+          if (showConnector)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 1),
+                child: Center(
+                  child: CustomPaint(
+                    painter: _DottedVerticalLinePainter(
+                      color: AppColors.iconMuted.withValues(alpha: 0.45),
+                    ),
+                    child: SizedBox(
+                      width: _TripTimelineDimensions.connectorWidth.w,
+                      height: double.infinity,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TripTimelineText extends StatelessWidget {
+  const _TripTimelineText({
+    required this.item,
+  });
+
+  final TripTimelineItemData item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: '${item.label}: ',
+            style: AppTypography.subtitleSm,
+          ),
+          TextSpan(
+            text: item.value,
+            style: AppTypography.bodySm.copyWith(fontSize: 10.sp),
+          ),
+        ],
+      ),
+      textAlign: TextAlign.right,
+      softWrap: true,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
 class _TimelineMarker extends StatelessWidget {
   const _TimelineMarker({
     required this.palette,
   });
 
-  final _TimelinePalette palette;
+  final TripStopPalette palette;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 12.r,
-      height: 12.r,
+      width: _TripTimelineDimensions.markerSize.r,
+      height: _TripTimelineDimensions.markerSize.r,
       decoration: BoxDecoration(
         color: palette.backgroundColor,
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,
       child: Container(
-        width: 6.r,
-        height: 6.r,
+        width: _TripTimelineDimensions.innerDotSize.r,
+        height: _TripTimelineDimensions.innerDotSize.r,
         decoration: BoxDecoration(
           color: palette.dotColor,
           shape: BoxShape.circle,
@@ -229,76 +287,81 @@ class _TimelineMarker extends StatelessWidget {
   }
 }
 
-class _DottedVerticalConnector extends StatelessWidget {
-  const _DottedVerticalConnector();
+class _DottedVerticalLinePainter extends CustomPainter {
+  const _DottedVerticalLinePainter({
+    required this.color,
+  });
 
-  static const double minHeight = 12;
-  static const double _dotSize = 2;
-  static const double _gap = 1;
-  static const int _minDots = 3;
+  final Color color;
+
+  static const double _dotDiameter = 2;
+  static const double _gap = 3;
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final rawHeight = constraints.maxHeight;
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
 
-        if (!rawHeight.isFinite || rawHeight <= 0) {
-          return const SizedBox.shrink();
-        }
+    const radius = _dotDiameter / 2;
+    final centerX = size.width / 2;
 
-        final height = rawHeight < minHeight ? minHeight : rawHeight;
+    // const double topInset = 3;
+    var currentY = radius;
 
-        final dotCount = ((height + _gap) / (_dotSize + _gap)).floor().clamp(
-          _minDots,
-          100,
-        );
+    while (currentY <= size.height - radius) {
+      canvas.drawCircle(
+        Offset(centerX, currentY),
+        radius,
+        paint,
+      );
+      currentY += _dotDiameter + _gap;
+    }
+  }
 
-        return SizedBox(
-          width: _dotSize,
-          height: height,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(
-              dotCount,
-              (_) => Container(
-                width: _dotSize,
-                height: _dotSize,
-                decoration: BoxDecoration(
-                  color: AppColors.iconMuted.withValues(alpha: 0.5),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+  @override
+  bool shouldRepaint(covariant _DottedVerticalLinePainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }
 
-class _TimelinePalette {
-  const _TimelinePalette({
+class TripStopPalette {
+  const TripStopPalette({
     required this.dotColor,
     required this.backgroundColor,
   });
 
-  factory _TimelinePalette.fromType(TripsTimelineItemType type) {
+  factory TripStopPalette.fromType(TripStopType type) {
     switch (type) {
-      case TripsTimelineItemType.from:
-        return _TimelinePalette(
+      case TripStopType.pickup:
+        return TripStopPalette(
           dotColor: AppColors.info,
-          backgroundColor: AppColors.info.withValues(alpha: 0.1),
+          backgroundColor: AppColors.info.withValues(alpha: 0.10),
         );
-
-      case TripsTimelineItemType.to:
-        return _TimelinePalette(
+      case TripStopType.dropoff:
+        return TripStopPalette(
           dotColor: AppColors.error,
-          backgroundColor: AppColors.error.withValues(alpha: 0.1),
+          backgroundColor: AppColors.error.withValues(alpha: 0.10),
         );
     }
   }
 
   final Color dotColor;
   final Color backgroundColor;
+}
+
+class _TripTimelineDimensions {
+  const _TripTimelineDimensions._();
+
+  static const double indicatorWidth = 20;
+  static const double markerSize = 12;
+  static const double innerDotSize = 6;
+  static const double connectorWidth = 2;
+  static const double markerTopPadding = 2;
+  static const double textTopPadding = 0;
+  static const double connectorMinHeight = 12;
+  static const double itemSpacing = 0;
+
+  static const double minTileHeight =
+      markerTopPadding + markerSize + connectorMinHeight;
 }
