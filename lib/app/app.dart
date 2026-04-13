@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/router/router_providers.dart';
 import 'package:taxi_driver_app/app/theme/app_theme.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
+import 'package:taxi_driver_app/core/session/app_force_logout_coordinator.dart';
 import 'package:taxi_driver_app/core/utils/centered_page.dart';
 import 'package:taxi_driver_app/core/utils/screen_util_design_size.dart';
 import 'package:taxi_driver_app/core/widgets/app_background.dart';
@@ -20,6 +21,8 @@ class TaxiDriverApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(appForceLogoutCoordinatorProvider);
+
     final router = ref.watch(goRouterProvider);
 
     return LayoutBuilder(

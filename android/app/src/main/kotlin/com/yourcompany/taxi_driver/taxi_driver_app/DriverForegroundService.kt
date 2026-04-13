@@ -329,7 +329,8 @@ class DriverForegroundService : Service() {
         offerSocketManager.start(
             token = currentToken!!,
             driverId = currentDriverId!!,
-            onOfferReceived = ::handleOfferReceived
+            onOfferReceived = ::handleOfferReceived,
+            onForceLogout = ::handleForceLogout,
         )
     }
 
@@ -394,12 +395,14 @@ class DriverForegroundService : Service() {
     }
 
     private fun stopServiceDueToUnauthorized() {
-        Log.e(TAG, "Unauthorized token detected. Stopping service.")
-        MainActivity.notifyFlutterServiceStopped("unauthorized")
+           Log.e(TAG, "Unauthorized token detected. Forcing app logout.")
 
-        serviceHandler.post {
-            handleStop()
-        }
+            handleForceLogout(
+            DriverForceLogoutPayload(
+               reason = "unauthorized",
+              payloadJson = """{"reason":"unauthorized"}""",
+          )
+       )
     }
 
     private fun stopServiceDueToLocationIssue(reason: String) {
@@ -799,6 +802,26 @@ class DriverForegroundService : Service() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
     }
+    
+
+    private fun handleForceLogout(payload: DriverForceLogoutPayload) {
+    Log.w(TAG, "Force logout received in service -> reason=${payload.reason}")
+
+    MainActivity.notifyFlutterForceLogout(
+        reason = payload.reason,
+        payloadJson = payload.payloadJson,
+    )
+
+    serviceHandler.post {
+        if (!isStoppingService.compareAndSet(false, true)) {
+            Log.d(TAG, "handleForceLogout ignored: service is already stopping")
+            return@post
+        }
+
+        performFullLocalStop()
+      }
+    }
+
 
     private fun handleOfferReceived(payload: DriverOfferPayload) {
         Log.d(TAG, "Offer received in service")

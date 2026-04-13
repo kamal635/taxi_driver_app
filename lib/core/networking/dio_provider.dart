@@ -30,24 +30,29 @@ final dioProvider = Provider<Dio>((ref) {
 
   bool isForcedLogoutStatus(DioException error) {
     final status = error.response?.statusCode;
+    final data = error.response?.data;
 
-    if (status == 401) return true;
+    final message = data is Map
+        ? (data['message'] ?? data['error'] ?? data['detail'])?.toString()
+        : null;
 
-    if (status == 403) {
-      final data = error.response?.data;
-      final message = data is Map
-          ? (data['message'] ?? data['error'] ?? data['detail'])?.toString()
-          : null;
+    final normalized = message?.toLowerCase();
 
-      if (message != null) {
-        final normalized = message.toLowerCase();
-        if (normalized.contains('deleted') ||
-            normalized.contains('disabled') ||
-            normalized.contains('inactive') ||
-            normalized.contains('blocked') ||
-            normalized.contains('revoked')) {
-          return true;
-        }
+    if (status == 401 || status == 423) {
+      return true;
+    }
+
+    if (normalized != null) {
+      if (normalized.contains('must_change_password') ||
+          normalized.contains('must change password') ||
+          normalized.contains('password reset required') ||
+          normalized.contains('reauth') ||
+          normalized.contains('deleted') ||
+          normalized.contains('disabled') ||
+          normalized.contains('inactive') ||
+          normalized.contains('blocked') ||
+          normalized.contains('revoked')) {
+        return true;
       }
     }
 
