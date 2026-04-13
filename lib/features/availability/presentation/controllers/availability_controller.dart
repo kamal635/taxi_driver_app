@@ -154,6 +154,32 @@ class AvailabilityController extends Notifier<AvailabilityState> {
     }
   }
 
+  Future<void> forceLocalOfflineCleanup() async {
+    final runtimeController = ref.read(driverRuntimeControllerProvider);
+    final localDataSource = ref.read(availabilityLocalDataSourceProvider);
+
+    _clearLocationError();
+    _clearServerError();
+
+    state = state.copyWith(
+      isOnline: false,
+      isBusy: false,
+      locationError: null,
+      serverError: null,
+    );
+
+    try {
+      await runtimeController.stopOnlineRuntime();
+    } on Exception catch (error, stackTrace) {
+      debugPrint(
+        'forceLocalOfflineCleanup stop runtime failed: $error\n$stackTrace',
+      );
+    }
+
+    await _stopTracking();
+    await localDataSource.saveOnlineRequested(value: false);
+  }
+
   void clearLocationError() => _clearLocationError();
 
   void clearServerError() => _clearServerError();

@@ -8,37 +8,52 @@ final appSignOutServiceProvider = Provider<AppSignOutService>(
   AppSignOutService.new,
 );
 
-/// Performs app-level cleanup before clearing the session.
 class AppSignOutService {
   AppSignOutService(this._ref);
 
   final Ref _ref;
+  bool _isSigningOut = false;
 
   Future<void> signOut({bool notifyBackend = true}) async {
-    if (notifyBackend) {
+    if (_isSigningOut) return;
+    _isSigningOut = true;
+
+    try {
+      if (notifyBackend) {
+        try {
+          await _ref
+              .read(availabilityProvider.notifier)
+              .requestSetOnline(value: false);
+        } on Exception {
+          // Best-effort cleanup.
+        }
+      } else {
+        try {
+          await _ref
+              .read(availabilityProvider.notifier)
+              .forceLocalOfflineCleanup();
+        } on Exception {
+          // Best-effort cleanup.
+        }
+      }
+
       try {
-        await _ref
-            .read(availabilityProvider.notifier)
-            .requestSetOnline(value: false);
+        _ref.read(newOfferControllerProvider.notifier)
+          ..clearCurrent()
+          ..clearError();
       } on Exception {
         // Best-effort cleanup.
       }
-    }
 
-    try {
-      _ref.read(newOfferControllerProvider.notifier)
-        ..clearCurrent()
-        ..clearError();
-    } on Exception {
-      // Best-effort cleanup.
-    }
+      try {
+        _ref.read(acceptOfferControllerProvider.notifier).clear();
+      } on Exception {
+        // Best-effort cleanup.
+      }
 
-    try {
-      _ref.read(acceptOfferControllerProvider.notifier).clear();
-    } on Exception {
-      // Best-effort cleanup.
+      await _ref.read(authSessionProvider).clear();
+    } finally {
+      _isSigningOut = false;
     }
-
-    await _ref.read(authSessionProvider).clear();
   }
 }

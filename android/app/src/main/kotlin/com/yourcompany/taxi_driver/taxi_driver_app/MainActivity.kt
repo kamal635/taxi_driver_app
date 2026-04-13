@@ -140,6 +140,9 @@ class MainActivity : FlutterFragmentActivity() {
 
                     result.success(true)
                 }
+                "consumePendingForceLogout" -> {
+                     result.success(consumePendingForceLogout())
+}
                 else -> result.notImplemented()
             }
         }
@@ -172,7 +175,13 @@ class MainActivity : FlutterFragmentActivity() {
             payloadJson = payloadJson
         )
     }
+    
 
+    private fun consumePendingForceLogout(): Map<String, String?>? {
+        val pending = pendingForceLogout
+        pendingForceLogout = null
+        return pending
+    }
     private fun consumePendingOfferNotificationOpen(): Map<String, String?>? {
         val pending = pendingOfferNotificationOpen
         pendingOfferNotificationOpen = null
@@ -291,43 +300,61 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     companion object {
-        private const val TAG = "DriverService"
+    private const val TAG = "DriverService"
 
-        private var serviceMethodChannel: MethodChannel? = null
-        private var pendingOfferNotificationOpen: Map<String, String?>? = null
-        private val mainHandler = Handler(Looper.getMainLooper())
+    private var serviceMethodChannel: MethodChannel? = null
+    private var pendingOfferNotificationOpen: Map<String, String?>? = null
+    private var pendingForceLogout: Map<String, String?>? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
 
-        fun notifyFlutterServiceStopped(reason: String) {
-            mainHandler.post {
-                serviceMethodChannel?.invokeMethod(
-                    "serviceStopped",
-                    mapOf("reason" to reason)
-                )
-            }
-        }
-
-        fun notifyFlutterOfferReceived(payloadJson: String) {
-            mainHandler.post {
-                serviceMethodChannel?.invokeMethod(
-                    "offerReceived",
-                    mapOf("payloadJson" to payloadJson)
-                )
-            }
-        }
-
-        fun notifyFlutterOfferNotificationOpened(
-            offerId: String?,
-            payloadJson: String?
-        ) {
-            mainHandler.post {
-                serviceMethodChannel?.invokeMethod(
-                    "offerNotificationOpened",
-                    mapOf(
-                        "offerId" to offerId,
-                        "payloadJson" to payloadJson
-                    )
-                )
-            }
+    fun notifyFlutterServiceStopped(reason: String) {
+        mainHandler.post {
+            serviceMethodChannel?.invokeMethod(
+                "serviceStopped",
+                mapOf("reason" to reason)
+            )
         }
     }
+
+    fun notifyFlutterOfferReceived(payloadJson: String) {
+        mainHandler.post {
+            serviceMethodChannel?.invokeMethod(
+                "offerReceived",
+                mapOf("payloadJson" to payloadJson)
+            )
+        }
+    }
+
+    fun notifyFlutterOfferNotificationOpened(
+        offerId: String?,
+        payloadJson: String?
+    ) {
+        mainHandler.post {
+            serviceMethodChannel?.invokeMethod(
+                "offerNotificationOpened",
+                mapOf(
+                    "offerId" to offerId,
+                    "payloadJson" to payloadJson
+                )
+            )
+        }
+    }
+
+    fun notifyFlutterForceLogout(
+        reason: String,
+        payloadJson: String?,
+    ) {
+        pendingForceLogout = mapOf(
+            "reason" to reason,
+            "payloadJson" to payloadJson,
+        )
+
+        mainHandler.post {
+            serviceMethodChannel?.invokeMethod(
+                "forceLogout",
+                pendingForceLogout,
+            )
+        }
+    }
+}
 }

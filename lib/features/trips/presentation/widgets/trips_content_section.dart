@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
@@ -37,14 +35,6 @@ class TripsContentSection extends StatelessWidget {
 
     return Column(
       children: [
-        if (isRefreshing)
-          Padding(
-            padding: EdgeInsets.only(bottom: 12.h),
-            child: const LinearProgressIndicator(
-              color: AppColors.primary,
-              minHeight: 3,
-            ),
-          ),
         ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

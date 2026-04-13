@@ -29,6 +29,16 @@ final class DriverOfferNotificationOpenEvent {
   final String? payloadJson;
 }
 
+final class DriverForceLogoutEvent {
+  const DriverForceLogoutEvent({
+    required this.reason,
+    required this.payloadJson,
+  });
+
+  final String reason;
+  final String? payloadJson;
+}
+
 class DriverBackgroundServiceBridge {
   DriverBackgroundServiceBridge() {
     _channel.setMethodCallHandler(_handleNativeCall);
@@ -49,6 +59,9 @@ class DriverBackgroundServiceBridge {
   _offerNotificationOpenController =
       StreamController<DriverOfferNotificationOpenEvent>.broadcast();
 
+  final StreamController<DriverForceLogoutEvent> _forceLogoutController =
+      StreamController<DriverForceLogoutEvent>.broadcast();
+
   Stream<DriverBackgroundServiceEvent> get serviceEvents =>
       _serviceEventsController.stream;
 
@@ -57,6 +70,9 @@ class DriverBackgroundServiceBridge {
 
   Stream<DriverOfferNotificationOpenEvent> get offerNotificationOpens =>
       _offerNotificationOpenController.stream;
+
+  Stream<DriverForceLogoutEvent> get forceLogoutEvents =>
+      _forceLogoutController.stream;
 
   Future<void> _handleNativeCall(MethodCall call) async {
     switch (call.method) {
@@ -92,6 +108,19 @@ class DriverBackgroundServiceBridge {
         _offerNotificationOpenController.add(
           DriverOfferNotificationOpenEvent(
             offerId: args['offerId']?.toString(),
+            payloadJson: args['payloadJson']?.toString(),
+          ),
+        );
+        return;
+
+      case 'forceLogout':
+        final args = Map<Object?, Object?>.from(
+          call.arguments as Map? ?? const {},
+        );
+
+        _forceLogoutController.add(
+          DriverForceLogoutEvent(
+            reason: args['reason']?.toString() ?? 'force_logout',
             payloadJson: args['payloadJson']?.toString(),
           ),
         );
@@ -156,6 +185,19 @@ class DriverBackgroundServiceBridge {
     );
   }
 
+  Future<DriverForceLogoutEvent?> consumePendingForceLogout() async {
+    final result = await _channel.invokeMethod<Map<Object?, Object?>?>(
+      'consumePendingForceLogout',
+    );
+
+    if (result == null) return null;
+
+    return DriverForceLogoutEvent(
+      reason: result['reason']?.toString() ?? 'force_logout',
+      payloadJson: result['payloadJson']?.toString(),
+    );
+  }
+
   Future<bool> isServiceRunning() async {
     final result = await _channel.invokeMethod<bool>('isServiceRunning');
     return result ?? false;
@@ -178,5 +220,6 @@ class DriverBackgroundServiceBridge {
     unawaited(_serviceEventsController.close());
     unawaited(_offerEventsController.close());
     unawaited(_offerNotificationOpenController.close());
+    unawaited(_forceLogoutController.close());
   }
 }
