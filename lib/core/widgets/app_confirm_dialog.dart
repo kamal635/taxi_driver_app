@@ -10,7 +10,7 @@ Future<bool> showAppConfirmDialog({
   required String title,
   required String message,
   required String confirmLabel,
-  required String cancelLabel,
+  String? cancelLabel,
   IconData icon = Icons.help_outline_rounded,
   bool barrierDismissible = false,
   Color? iconColor,
@@ -60,16 +60,18 @@ Future<bool> showAppConfirmDialog({
               AppSpacing.h16,
               Row(
                 children: [
-                  Expanded(
-                    child: AppButton(
-                      label: cancelLabel,
-                      backgroundColor: Colors.transparent,
-                      onPressed: () {
-                        Navigator.of(dialogContext).pop(false);
-                      },
+                  if (cancelLabel != null) ...[
+                    Expanded(
+                      child: AppButton(
+                        label: cancelLabel,
+                        backgroundColor: Colors.transparent,
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop(false);
+                        },
+                      ),
                     ),
-                  ),
-                  AppSpacing.w12,
+                    AppSpacing.w12,
+                  ],
                   Expanded(
                     child: AppButton(
                       label: confirmLabel,

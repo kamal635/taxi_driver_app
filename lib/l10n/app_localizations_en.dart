@@ -491,4 +491,115 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contactSupportContact => 'Contact support.';
+
+  @override
+  String get appUpdateTitle => 'New update available';
+
+  @override
+  String appUpdateVersionLabel(String version) {
+    return 'New version: $version';
+  }
+
+  @override
+  String get appUpdateDownloading => 'Downloading update...';
+
+  @override
+  String appUpdateDownloadingProgress(int progress) {
+    return 'Downloading $progress%';
+  }
+
+  @override
+  String get appUpdateAction => 'Update';
+
+  @override
+  String get appUpdateLater => 'Later';
+
+  @override
+  String get appUpdateCancelDownload => 'Cancel download';
+
+  @override
+  String get appUpdateUrlNotReady => 'The update link is not ready yet.';
+
+  @override
+  String get appUpdateDownloadFailed =>
+      'Failed to download the update. Please try again.';
+
+  @override
+  String get appUpdateInstallFailed =>
+      'Couldn\'t start the installation. If the system opened Settings, allow installs from this source, then tap Update again.';
+
+  @override
+  String get appUpdateInstalling => 'Opening installer...';
+
+  @override
+  String get appUpdateBackgroundStarted =>
+      'Update download started in the background';
+
+  @override
+  String get appUpdateInstallerOpening =>
+      'Update downloaded. Opening installer now';
+
+  @override
+  String get appUpdateInvalidPackage =>
+      'The downloaded file is not a valid APK';
+
+  @override
+  String get profileSectionApp => 'App';
+
+  @override
+  String get profileAppUpdateTitle => 'App update';
+
+  @override
+  String get profileAppUpdateSubtitleChecking =>
+      'Checking for the latest version...';
+
+  @override
+  String get profileAppUpdateSubtitleRetry =>
+      'Could not complete the update. Tap to try again.';
+
+  @override
+  String get appUpdatePageTitle => 'App updates';
+
+  @override
+  String get appUpdateCheckFailed => 'Could not check for updates right now.';
+
+  @override
+  String get appUpdateRetryCheck => 'Check again';
+
+  @override
+  String appUpdateCurrentVersionLabel(String version) {
+    return 'Current version: $version';
+  }
+
+  @override
+  String profileAppUpdateSubtitleAvailable(String version) {
+    return 'A new version is available now ($version).';
+  }
+
+  @override
+  String profileAppUpdateSubtitleRequired(String version) {
+    return 'A required update is available ($version).';
+  }
+
+  @override
+  String profileAppUpdateSubtitleUpToDate(String version) {
+    return 'You are using the latest available version ($version).';
+  }
+
+  @override
+  String get appUpdateInstallerOpenedHint =>
+      'The installer has been opened. Complete the update from the system installer screen.';
+
+  @override
+  String get appUpdateCancel => 'Cancel update';
+
+  @override
+  String get appUpdateReadyToDownload => 'An update is ready to download';
+
+  @override
+  String get appUpdateDownloadCancelled => 'Update download was cancelled';
+
+  @override
+  String get profileAppUpdateEntrySubtitle =>
+      'Check the current version and available updates';
 }

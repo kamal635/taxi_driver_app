@@ -13,6 +13,10 @@ class ProfileSectionItem extends StatelessWidget {
     required this.icon,
     required this.onPressed,
     this.isDestructive = false,
+    this.accentColor,
+    this.iconBackgroundColor,
+    this.subtitleColor,
+    this.trailing,
     super.key,
   });
 
@@ -21,16 +25,22 @@ class ProfileSectionItem extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
   final bool isDestructive;
+  final Color? accentColor;
+  final Color? iconBackgroundColor;
+  final Color? subtitleColor;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = isDestructive ? AppColors.error : AppColors.textPrimary;
-    final iconBackgroundColor = isDestructive
-        ? AppColors.errorBg
-        : AppColors.bgWarm;
-    final subtitleColor = isDestructive
-        ? AppColors.error
-        : AppColors.textSecondary;
+    final resolvedAccentColor =
+        accentColor ??
+        (isDestructive ? AppColors.error : AppColors.textPrimary);
+    final resolvedIconBackgroundColor =
+        iconBackgroundColor ??
+        (isDestructive ? AppColors.errorBg : AppColors.bgWarm);
+    final resolvedSubtitleColor =
+        subtitleColor ??
+        (isDestructive ? AppColors.error : AppColors.textSecondary);
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
@@ -42,14 +52,14 @@ class ProfileSectionItem extends StatelessWidget {
               width: 42.r,
               height: 42.r,
               decoration: BoxDecoration(
-                color: iconBackgroundColor,
+                color: resolvedIconBackgroundColor,
                 borderRadius: BorderRadius.circular(14.r),
                 border: Border.all(color: AppColors.border),
               ),
               child: Icon(
                 icon,
                 size: 22.r,
-                color: accentColor,
+                color: resolvedAccentColor,
               ),
             ),
             AppSpacing.w12,
@@ -61,24 +71,25 @@ class ProfileSectionItem extends StatelessWidget {
                     title,
                     style: AppTypography.labelMd.copyWith(
                       fontWeight: FontWeight.w900,
-                      color: accentColor,
+                      color: resolvedAccentColor,
                     ),
                   ),
                   AppSpacing.h6,
                   Text(
                     subtitle,
                     style: AppTypography.subtitleSm.copyWith(
-                      color: subtitleColor,
+                      color: resolvedSubtitleColor,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(
-              AppIcons.arrowForward,
-              size: 14.r,
-              color: AppColors.iconMuted,
-            ),
+            trailing ??
+                Icon(
+                  AppIcons.arrowForward,
+                  size: 14.r,
+                  color: AppColors.iconMuted,
+                ),
           ],
         ),
       ),

@@ -203,5 +203,108 @@
   "timeRemaining": "Time remaining to start",
   "contactSupportLabel": "Need help?",
   "contactSupportAction": "Tap here",
-  "contactSupportContact":  "Contact support."
+  "contactSupportContact":  "Contact support.",
+    "appUpdateTitle": "New update available",
+  "@appUpdateTitle": {
+    "description": "Title of the app update dialog"
+  },
+  "appUpdateVersionLabel": "New version: {version}",
+  "@appUpdateVersionLabel": {
+    "description": "Label showing the new available version",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateDownloading": "Downloading update...",
+  "@appUpdateDownloading": {
+    "description": "Shown while the update apk is downloading"
+  },
+  "appUpdateDownloadingProgress": "Downloading {progress}%",
+  "@appUpdateDownloadingProgress": {
+    "description": "Shown while the update apk is downloading with progress",
+    "placeholders": {
+      "progress": {
+        "type": "int"
+      }
+    }
+  },
+  "appUpdateAction": "Update",
+  "@appUpdateAction": {
+    "description": "Primary action to start the update"
+  },
+  "appUpdateLater": "Later",
+  "@appUpdateLater": {
+    "description": "Secondary action to postpone the update"
+  },
+  "appUpdateCancelDownload": "Cancel download",
+  "@appUpdateCancelDownload": {
+    "description": "Secondary action to cancel the update download"
+  },
+  "appUpdateUrlNotReady": "The update link is not ready yet.",
+  "@appUpdateUrlNotReady": {
+    "description": "Error shown when apk url is missing or invalid"
+  },
+  "appUpdateDownloadFailed": "Failed to download the update. Please try again.",
+  "@appUpdateDownloadFailed": {
+    "description": "Error shown when the update download fails"
+  },
+  "appUpdateInstallFailed": "Couldn't start the installation. If the system opened Settings, allow installs from this source, then tap Update again.",
+  "@appUpdateInstallFailed": {
+    "description": "Error shown when the apk installation flow could not start"
+  },
+  "appUpdateInstalling": "Opening installer...",
+  "appUpdateBackgroundStarted": "Update download started in the background",
+"appUpdateInstallerOpening": "Update downloaded. Opening installer now",
+"appUpdateInvalidPackage": "The downloaded file is not a valid APK"
+,
+  "profileSectionApp": "App",
+  "profileAppUpdateTitle": "App update",
+  "profileAppUpdateSubtitleChecking": "Checking for the latest version...",
+  "profileAppUpdateSubtitleRetry": "Could not complete the update. Tap to try again.",
+  "appUpdatePageTitle": "App updates",
+  "appUpdateCheckFailed": "Could not check for updates right now.",
+  "appUpdateRetryCheck": "Check again",
+  "appUpdateCurrentVersionLabel": "Current version: {version}",
+  "@appUpdateCurrentVersionLabel": {
+    "description": "Label showing the currently installed app version",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "profileAppUpdateSubtitleAvailable": "A new version is available now ({version}).",
+  "@profileAppUpdateSubtitleAvailable": {
+    "description": "Subtitle shown when an optional app update is available",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "profileAppUpdateSubtitleRequired": "A required update is available ({version}).",
+  "@profileAppUpdateSubtitleRequired": {
+    "description": "Subtitle shown when a required app update is available",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "profileAppUpdateSubtitleUpToDate": "You are using the latest available version ({version}).",
+  "@profileAppUpdateSubtitleUpToDate": {
+    "description": "Subtitle shown when the app is already on the latest version",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateInstallerOpenedHint": "The installer has been opened. Complete the update from the system installer screen.",
+"appUpdateCancel": "Cancel update",
+"appUpdateReadyToDownload": "An update is ready to download",
+"appUpdateDownloadCancelled": "Update download was cancelled",
+"profileAppUpdateEntrySubtitle": "Check the current version and available updates"
 }

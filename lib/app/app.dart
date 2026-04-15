@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/router/router_providers.dart';
+import 'package:taxi_driver_app/app/router/providers/go_router_provider.dart';
 import 'package:taxi_driver_app/app/theme/app_theme.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/session/app_force_logout_coordinator.dart';
@@ -10,10 +10,6 @@ import 'package:taxi_driver_app/core/utils/screen_util_design_size.dart';
 import 'package:taxi_driver_app/core/widgets/app_background.dart';
 import 'package:taxi_driver_app/l10n/app_localizations.dart';
 
-/// Root application widget.
-///
-/// It configures routing, localization, screen adaptation, and the global
-/// background wrapper used across the app.
 class TaxiDriverApp extends ConsumerWidget {
   const TaxiDriverApp({super.key});
 
