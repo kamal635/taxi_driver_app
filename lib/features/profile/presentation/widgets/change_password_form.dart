@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/widgets/app_text_field.dart';
+import 'package:taxi_driver_app/shared/presentation/forms/password_fields/password_fields_group.dart';
 
-/// Password inputs used by the profile password change screen.
 class ChangePasswordForm extends StatelessWidget {
   const ChangePasswordForm({
     required this.newPasswordController,
@@ -28,42 +24,17 @@ class ChangePasswordForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        AppTextField(
-          controller: newPasswordController,
-          enabled: enabled,
-          labelText: context.l10n.profileNewPassword,
-          hintText: context.l10n.passwordHint,
-          obscureText: obscureNewPassword,
-          textInputAction: TextInputAction.next,
-          prefixIcon: const Icon(AppIcons.lock),
-          suffixIcon: IconButton(
-            color: AppColors.iconMuted,
-            onPressed: onToggleNewPasswordVisibility,
-            icon: Icon(
-              obscureNewPassword ? AppIcons.eye : AppIcons.eyeOff,
-            ),
-          ),
-        ),
-        AppSpacing.h12,
-        AppTextField(
-          controller: confirmPasswordController,
-          enabled: enabled,
-          labelText: context.l10n.profileConfirmNewPassword,
-          hintText: context.l10n.passwordHint,
-          obscureText: obscureConfirmPassword,
-          textInputAction: TextInputAction.done,
-          prefixIcon: const Icon(AppIcons.lock),
-          suffixIcon: IconButton(
-            color: AppColors.iconMuted,
-            onPressed: onToggleConfirmPasswordVisibility,
-            icon: Icon(
-              obscureConfirmPassword ? AppIcons.eye : AppIcons.eyeOff,
-            ),
-          ),
-        ),
-      ],
+    return PasswordFieldsGroup(
+      passwordController: newPasswordController,
+      confirmPasswordController: confirmPasswordController,
+      passwordLabel: context.l10n.profileNewPassword,
+      confirmPasswordLabel: context.l10n.profileConfirmNewPassword,
+      hintText: context.l10n.passwordHint,
+      isPasswordObscured: obscureNewPassword,
+      isConfirmPasswordObscured: obscureConfirmPassword,
+      onTogglePasswordVisibility: onToggleNewPasswordVisibility,
+      onToggleConfirmPasswordVisibility: onToggleConfirmPasswordVisibility,
+      enabled: enabled,
     );
   }
 }

@@ -203,5 +203,108 @@
   "timeRemaining": "الوقت المتبقي للبدء",
   "contactSupportLabel": "تحتاج مساعدة؟",
   "contactSupportAction": "اضغط هنا",
-  "contactSupportContact": "للتواصل مع الدعم."
+  "contactSupportContact": "للتواصل مع الدعم.",
+    "appUpdateTitle": "يوجد تحديث جديد",
+  "@appUpdateTitle": {
+    "description": "عنوان نافذة تحديث التطبيق"
+  },
+  "appUpdateVersionLabel": "الإصدار الجديد: {version}",
+  "@appUpdateVersionLabel": {
+    "description": "سطر يوضح رقم الإصدار الجديد",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateDownloading": "جاري تنزيل التحديث...",
+  "@appUpdateDownloading": {
+    "description": "نص يظهر أثناء تنزيل التحديث"
+  },
+  "appUpdateDownloadingProgress": "جاري التنزيل {progress}%",
+  "@appUpdateDownloadingProgress": {
+    "description": "نص يظهر نسبة تقدم تنزيل التحديث",
+    "placeholders": {
+      "progress": {
+        "type": "int"
+      }
+    }
+  },
+  "appUpdateAction": "تحديث",
+  "@appUpdateAction": {
+    "description": "زر بدء التحديث"
+  },
+  "appUpdateLater": "لاحقًا",
+  "@appUpdateLater": {
+    "description": "زر تأجيل التحديث"
+  },
+  "appUpdateCancelDownload": "إلغاء التنزيل",
+  "@appUpdateCancelDownload": {
+    "description": "زر إلغاء تنزيل التحديث"
+  },
+  "appUpdateUrlNotReady": "رابط التحديث غير جاهز بعد",
+  "@appUpdateUrlNotReady": {
+    "description": "رسالة عندما يكون رابط apk غير جاهز"
+  },
+  "appUpdateDownloadFailed": "فشل تنزيل التحديث. حاول مرة ثانية.",
+  "@appUpdateDownloadFailed": {
+    "description": "رسالة خطأ عند فشل تنزيل التحديث"
+  },
+  "appUpdateInstallFailed": "تعذر بدء التثبيت. إذا فتح لك النظام الإعدادات، فعّل السماح بالتثبيت من هذا المصدر ثم اضغط تحديث مرة ثانية.",
+  "@appUpdateInstallFailed": {
+    "description": "رسالة خطأ عند تعذر بدء تثبيت apk"
+  },
+  "appUpdateInstalling": "جاري فتح التثبيت...",
+  "appUpdateBackgroundStarted": "بدأ تنزيل التحديث في الخلفية",
+"appUpdateInstallerOpening": "تم تنزيل التحديث، سيتم فتح التثبيت الآن",
+"appUpdateInvalidPackage": "الملف المنزّل ليس APK صالحًا"
+,
+  "profileSectionApp": "التطبيق",
+  "profileAppUpdateTitle": "تحديث التطبيق",
+  "profileAppUpdateSubtitleChecking": "جارٍ التحقق من آخر إصدار...",
+  "profileAppUpdateSubtitleRetry": "تعذر إكمال التحديث. اضغط للمحاولة مرة ثانية.",
+  "appUpdatePageTitle": "تحديثات التطبيق",
+  "appUpdateCheckFailed": "تعذر التحقق من التحديثات الآن.",
+  "appUpdateRetryCheck": "إعادة التحقق",
+  "appUpdateCurrentVersionLabel": "الإصدار الحالي: {version}",
+  "@appUpdateCurrentVersionLabel": {
+    "description": "سطر يوضح الإصدار الحالي المثبت",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "profileAppUpdateSubtitleAvailable": "يوجد إصدار جديد متاح الآن ({version}).",
+  "@profileAppUpdateSubtitleAvailable": {
+    "description": "نص يظهر عند توفر تحديث اختياري",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "profileAppUpdateSubtitleRequired": "يوجد تحديث إجباري متاح ({version}).",
+  "@profileAppUpdateSubtitleRequired": {
+    "description": "نص يظهر عند توفر تحديث إجباري",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "profileAppUpdateSubtitleUpToDate": "أنت تستخدم آخر إصدار متاح ({version}).",
+  "@profileAppUpdateSubtitleUpToDate": {
+    "description": "نص يظهر عندما يكون التطبيق على آخر إصدار",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "appUpdateInstallerOpenedHint": "تم فتح مثبت التحديث. أكمل التحديث من شاشة التثبيت الخاصة بالنظام.",
+  "appUpdateCancel": "إلغاء التحديث",
+"appUpdateReadyToDownload": "يوجد تحديث جاهز للتنزيل",
+"appUpdateDownloadCancelled": "تم إلغاء تنزيل التحديث",
+"profileAppUpdateEntrySubtitle": "تحقق من الإصدار الحالي والتحديثات المتاحة"
 }

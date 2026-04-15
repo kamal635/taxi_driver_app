@@ -1021,6 +1021,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Contact support.'**
   String get contactSupportContact;
+
+  /// Title of the app update dialog
+  ///
+  /// In en, this message translates to:
+  /// **'New update available'**
+  String get appUpdateTitle;
+
+  /// Label showing the new available version
+  ///
+  /// In en, this message translates to:
+  /// **'New version: {version}'**
+  String appUpdateVersionLabel(String version);
+
+  /// Shown while the update apk is downloading
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading update...'**
+  String get appUpdateDownloading;
+
+  /// Shown while the update apk is downloading with progress
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading {progress}%'**
+  String appUpdateDownloadingProgress(int progress);
+
+  /// Primary action to start the update
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get appUpdateAction;
+
+  /// Secondary action to postpone the update
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get appUpdateLater;
+
+  /// Secondary action to cancel the update download
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel download'**
+  String get appUpdateCancelDownload;
+
+  /// Error shown when apk url is missing or invalid
+  ///
+  /// In en, this message translates to:
+  /// **'The update link is not ready yet.'**
+  String get appUpdateUrlNotReady;
+
+  /// Error shown when the update download fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to download the update. Please try again.'**
+  String get appUpdateDownloadFailed;
+
+  /// Error shown when the apk installation flow could not start
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t start the installation. If the system opened Settings, allow installs from this source, then tap Update again.'**
+  String get appUpdateInstallFailed;
+
+  /// No description provided for @appUpdateInstalling.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening installer...'**
+  String get appUpdateInstalling;
+
+  /// No description provided for @appUpdateBackgroundStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Update download started in the background'**
+  String get appUpdateBackgroundStarted;
+
+  /// No description provided for @appUpdateInstallerOpening.
+  ///
+  /// In en, this message translates to:
+  /// **'Update downloaded. Opening installer now'**
+  String get appUpdateInstallerOpening;
+
+  /// No description provided for @appUpdateInvalidPackage.
+  ///
+  /// In en, this message translates to:
+  /// **'The downloaded file is not a valid APK'**
+  String get appUpdateInvalidPackage;
+
+  /// No description provided for @profileSectionApp.
+  ///
+  /// In en, this message translates to:
+  /// **'App'**
+  String get profileSectionApp;
+
+  /// No description provided for @profileAppUpdateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App update'**
+  String get profileAppUpdateTitle;
+
+  /// No description provided for @profileAppUpdateSubtitleChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for the latest version...'**
+  String get profileAppUpdateSubtitleChecking;
+
+  /// No description provided for @profileAppUpdateSubtitleRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not complete the update. Tap to try again.'**
+  String get profileAppUpdateSubtitleRetry;
+
+  /// No description provided for @appUpdatePageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App updates'**
+  String get appUpdatePageTitle;
+
+  /// No description provided for @appUpdateCheckFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check for updates right now.'**
+  String get appUpdateCheckFailed;
+
+  /// No description provided for @appUpdateRetryCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get appUpdateRetryCheck;
+
+  /// Label showing the currently installed app version
+  ///
+  /// In en, this message translates to:
+  /// **'Current version: {version}'**
+  String appUpdateCurrentVersionLabel(String version);
+
+  /// Subtitle shown when an optional app update is available
+  ///
+  /// In en, this message translates to:
+  /// **'A new version is available now ({version}).'**
+  String profileAppUpdateSubtitleAvailable(String version);
+
+  /// Subtitle shown when a required app update is available
+  ///
+  /// In en, this message translates to:
+  /// **'A required update is available ({version}).'**
+  String profileAppUpdateSubtitleRequired(String version);
+
+  /// Subtitle shown when the app is already on the latest version
+  ///
+  /// In en, this message translates to:
+  /// **'You are using the latest available version ({version}).'**
+  String profileAppUpdateSubtitleUpToDate(String version);
+
+  /// No description provided for @appUpdateInstallerOpenedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The installer has been opened. Complete the update from the system installer screen.'**
+  String get appUpdateInstallerOpenedHint;
+
+  /// No description provided for @appUpdateCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel update'**
+  String get appUpdateCancel;
+
+  /// No description provided for @appUpdateReadyToDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'An update is ready to download'**
+  String get appUpdateReadyToDownload;
+
+  /// No description provided for @appUpdateDownloadCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Update download was cancelled'**
+  String get appUpdateDownloadCancelled;
+
+  /// No description provided for @profileAppUpdateEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the current version and available updates'**
+  String get profileAppUpdateEntrySubtitle;
 }
 
 class _AppLocalizationsDelegate

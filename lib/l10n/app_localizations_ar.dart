@@ -490,4 +490,111 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get contactSupportContact => 'للتواصل مع الدعم.';
+
+  @override
+  String get appUpdateTitle => 'يوجد تحديث جديد';
+
+  @override
+  String appUpdateVersionLabel(String version) {
+    return 'الإصدار الجديد: $version';
+  }
+
+  @override
+  String get appUpdateDownloading => 'جاري تنزيل التحديث...';
+
+  @override
+  String appUpdateDownloadingProgress(int progress) {
+    return 'جاري التنزيل $progress%';
+  }
+
+  @override
+  String get appUpdateAction => 'تحديث';
+
+  @override
+  String get appUpdateLater => 'لاحقًا';
+
+  @override
+  String get appUpdateCancelDownload => 'إلغاء التنزيل';
+
+  @override
+  String get appUpdateUrlNotReady => 'رابط التحديث غير جاهز بعد';
+
+  @override
+  String get appUpdateDownloadFailed => 'فشل تنزيل التحديث. حاول مرة ثانية.';
+
+  @override
+  String get appUpdateInstallFailed =>
+      'تعذر بدء التثبيت. إذا فتح لك النظام الإعدادات، فعّل السماح بالتثبيت من هذا المصدر ثم اضغط تحديث مرة ثانية.';
+
+  @override
+  String get appUpdateInstalling => 'جاري فتح التثبيت...';
+
+  @override
+  String get appUpdateBackgroundStarted => 'بدأ تنزيل التحديث في الخلفية';
+
+  @override
+  String get appUpdateInstallerOpening =>
+      'تم تنزيل التحديث، سيتم فتح التثبيت الآن';
+
+  @override
+  String get appUpdateInvalidPackage => 'الملف المنزّل ليس APK صالحًا';
+
+  @override
+  String get profileSectionApp => 'التطبيق';
+
+  @override
+  String get profileAppUpdateTitle => 'تحديث التطبيق';
+
+  @override
+  String get profileAppUpdateSubtitleChecking => 'جارٍ التحقق من آخر إصدار...';
+
+  @override
+  String get profileAppUpdateSubtitleRetry =>
+      'تعذر إكمال التحديث. اضغط للمحاولة مرة ثانية.';
+
+  @override
+  String get appUpdatePageTitle => 'تحديثات التطبيق';
+
+  @override
+  String get appUpdateCheckFailed => 'تعذر التحقق من التحديثات الآن.';
+
+  @override
+  String get appUpdateRetryCheck => 'إعادة التحقق';
+
+  @override
+  String appUpdateCurrentVersionLabel(String version) {
+    return 'الإصدار الحالي: $version';
+  }
+
+  @override
+  String profileAppUpdateSubtitleAvailable(String version) {
+    return 'يوجد إصدار جديد متاح الآن ($version).';
+  }
+
+  @override
+  String profileAppUpdateSubtitleRequired(String version) {
+    return 'يوجد تحديث إجباري متاح ($version).';
+  }
+
+  @override
+  String profileAppUpdateSubtitleUpToDate(String version) {
+    return 'أنت تستخدم آخر إصدار متاح ($version).';
+  }
+
+  @override
+  String get appUpdateInstallerOpenedHint =>
+      'تم فتح مثبت التحديث. أكمل التحديث من شاشة التثبيت الخاصة بالنظام.';
+
+  @override
+  String get appUpdateCancel => 'إلغاء التحديث';
+
+  @override
+  String get appUpdateReadyToDownload => 'يوجد تحديث جاهز للتنزيل';
+
+  @override
+  String get appUpdateDownloadCancelled => 'تم إلغاء تنزيل التحديث';
+
+  @override
+  String get profileAppUpdateEntrySubtitle =>
+      'تحقق من الإصدار الحالي والتحديثات المتاحة';
 }

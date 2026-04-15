@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taxi_driver_app/app/router/app_routes.dart';
+import 'package:taxi_driver_app/app/router/config/app_route_paths.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
@@ -11,9 +10,7 @@ import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
 import 'package:taxi_driver_app/core/session/session_providers.dart';
 import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_result.dart';
 import 'package:taxi_driver_app/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:taxi_driver_app/features/auth/presentation/widgets/login_footer.dart';
-import 'package:taxi_driver_app/features/auth/presentation/widgets/login_form.dart';
-import 'package:taxi_driver_app/features/auth/presentation/widgets/login_header.dart';
+import 'package:taxi_driver_app/features/auth/presentation/widgets/login_screen_body.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -25,6 +22,7 @@ class LoginPage extends ConsumerStatefulWidget {
 class _LoginPageState extends ConsumerState<LoginPage> {
   late final TextEditingController _phoneTextController;
   late final TextEditingController _passwordTextController;
+  ProviderSubscription<AsyncValue<AuthSignInResult?>>? _authSubscription;
 
   bool _isPasswordObscured = true;
 
@@ -33,26 +31,60 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     super.initState();
     _phoneTextController = TextEditingController();
     _passwordTextController = TextEditingController();
+
+    _authSubscription = ref.listenManual<AsyncValue<AuthSignInResult?>>(
+      authControllerProvider,
+      _handleAuthStateChanged,
+    );
   }
 
   @override
   void dispose() {
+    _authSubscription?.close();
     _phoneTextController.dispose();
     _passwordTextController.dispose();
     super.dispose();
   }
 
+  Future<void> _handleAuthStateChanged(
+    AsyncValue<AuthSignInResult?>? previous,
+    AsyncValue<AuthSignInResult?> next,
+  ) async {
+    await next.whenOrNull(
+      error: (error, _) async {
+        final message = failureToUserMessage(
+          error,
+          l10n: context.l10n,
+          context: FailureContext.authLogin,
+        );
+
+        context.showAppSnack(message, type: AppSnackType.error);
+      },
+      data: (result) async {
+        if (result == null || result == previous?.value) {
+          return;
+        }
+
+        switch (result) {
+          case AuthSignedIn(:final authSession):
+            await _saveSignedInSession(authSession);
+            return;
+          case AuthSetupRequired(:final authSession):
+            await _saveSetupRequiredSession(authSession);
+            return;
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authControllerProvider);
-    final isLoading = authState.isLoading;
-
-    _listenToAuthState();
+    final isLoading = ref.watch(
+      authControllerProvider.select((state) => state.isLoading),
+    );
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
+      body: DecoratedBox(
         decoration: const BoxDecoration(
           gradient: RadialGradient(
             center: Alignment.topCenter,
@@ -61,77 +93,23 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ),
         child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      children: [
-                        const LoginHeader(),
-                        LoginForm(
-                          phoneController: _phoneTextController,
-                          passwordController: _passwordTextController,
-                          obscurePassword: _isPasswordObscured,
-                          onTogglePasswordVisibility: _togglePasswordVisibility,
-                          isLoading: isLoading,
-                          onSubmit: isLoading ? null : _submitSignIn,
-                        ),
-                        const Spacer(),
-                        const LoginFooter(),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+          child: LoginScreenBody(
+            phoneController: _phoneTextController,
+            passwordController: _passwordTextController,
+            obscurePassword: _isPasswordObscured,
+            onTogglePasswordVisibility: () {
+              setState(() {
+                _isPasswordObscured = !_isPasswordObscured;
+              });
             },
+            isLoading: isLoading,
+            onSubmit: isLoading ? null : _submitSignIn,
           ),
         ),
       ),
     );
   }
 
-  /// Listens to auth state changes and reacts with UI side effects.
-  void _listenToAuthState() {
-    ref.listen(authControllerProvider, (previous, next) async {
-      await next.whenOrNull(
-        error: (error, _) {
-          final message = failureToUserMessage(
-            error,
-            l10n: context.l10n,
-            context: FailureContext.authLogin,
-          );
-
-          context.showAppSnack(message, type: AppSnackType.error);
-        },
-        data: (result) async {
-          if (result == null) {
-            return;
-          }
-
-          switch (result) {
-            case AuthSignedIn(:final authSession):
-              await _saveSignedInSession(authSession);
-              return;
-
-            case AuthSetupRequired(:final authSession):
-              await _saveSetupRequiredSession(authSession);
-              return;
-          }
-        },
-      );
-    });
-  }
-
-  void _togglePasswordVisibility() {
-    setState(() => _isPasswordObscured = !_isPasswordObscured);
-  }
-
-  /// Submits the current form values to the auth controller.
   Future<void> _submitSignIn() async {
     TextInput.finishAutofillContext();
     FocusScope.of(context).unfocus();
@@ -141,48 +119,40 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         .signIn(
           phone: _phoneTextController.text.trim(),
           password: _passwordTextController.text,
-          // fcmToken: Add later when push notifications are wired.
         );
   }
 
   Future<void> _saveSignedInSession(AuthSessionEntity session) async {
-    final authSessionStore = ref.read(authSessionProvider);
+    await ref
+        .read(authSessionProvider)
+        .saveAfterLogin(
+          driverName: session.driverName,
+          driverPhone: session.driverPhone,
+          driverId: session.driverId,
+          token: session.accessToken,
+          refreshToken: session.refreshToken,
+          mustChangePassword: false,
+        );
 
-    await authSessionStore.saveAfterLogin(
-      driverName: session.driverName,
-      driverPhone: session.driverPhone,
-      driverId: session.driverId,
-      token: session.accessToken,
-      refreshToken: session.refreshToken,
-      mustChangePassword: false,
-    );
-
-    if (!mounted) {
-      return;
+    if (mounted) {
+      context.go(AppRoutePaths.home);
     }
-
-    context.go(AppRoutes.home);
   }
 
   Future<void> _saveSetupRequiredSession(AuthSessionEntity session) async {
-    final authSessionStore = ref.read(authSessionProvider);
+    await ref
+        .read(authSessionProvider)
+        .saveAfterLogin(
+          driverName: session.driverName,
+          driverPhone: session.driverPhone,
+          driverId: session.driverId,
+          token: session.accessToken,
+          refreshToken: session.refreshToken,
+          mustChangePassword: true,
+        );
 
-    await authSessionStore.saveAfterLogin(
-      driverName: session.driverName,
-      driverPhone: session.driverPhone,
-      driverId: session.driverId,
-      token: session.accessToken,
-      refreshToken: session.refreshToken,
-      mustChangePassword: true,
-    );
-
-    if (!mounted) {
-      return;
+    if (mounted) {
+      context.go(AppRoutePaths.setupPassword, extra: session);
     }
-
-    context.go(
-      AppRoutes.setupPassword,
-      extra: session,
-    );
   }
 }

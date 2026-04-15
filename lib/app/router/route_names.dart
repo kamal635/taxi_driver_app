@@ -1,12 +1,15 @@
+import 'package:taxi_driver_app/app/router/config/app_route_names.dart';
+
 abstract final class RouteNames {
   const RouteNames._();
 
-  static const String login = 'login';
-  static const String setupPassword = 'setupPassword';
+  static const String login = AppRouteNames.login;
+  static const String setupPassword = AppRouteNames.setupPassword;
 
-  static const String home = 'home';
-  static const String trips = 'trips';
-  static const String profile = 'profile';
+  static const String home = AppRouteNames.home;
+  static const String trips = AppRouteNames.trips;
+  static const String profile = AppRouteNames.profile;
 
-  static const String profilePassword = 'profilePassword';
+  static const String profilePassword = AppRouteNames.profilePassword;
+  static const String profileAppUpdate = AppRouteNames.profileAppUpdate;
 }
