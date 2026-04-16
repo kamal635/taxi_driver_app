@@ -4,7 +4,9 @@ import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/widgets/app_button.dart';
+import 'package:taxi_driver_app/core/widgets/app_text_button.dart';
 
+/// Shows a shared confirm dialog and returns `true` only when confirmed.
 Future<bool> showAppConfirmDialog({
   required BuildContext context,
   required String title,
@@ -37,11 +39,14 @@ Future<bool> showAppConfirmDialog({
                     width: 40.r,
                     height: 40.r,
                     decoration: BoxDecoration(
-                      color: backgroundColorIcon,
+                      color: backgroundColorIcon ?? AppColors.bgWarm,
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(color: AppColors.border),
                     ),
-                    child: Icon(icon, color: iconColor),
+                    child: Icon(
+                      icon,
+                      color: iconColor ?? AppColors.textPrimary,
+                    ),
                   ),
                   AppSpacing.w12,
                   Expanded(
@@ -62,15 +67,14 @@ Future<bool> showAppConfirmDialog({
                 children: [
                   if (cancelLabel != null) ...[
                     Expanded(
-                      child: AppButton(
+                      child: AppTextButton(
                         label: cancelLabel,
-                        backgroundColor: Colors.transparent,
                         onPressed: () {
                           Navigator.of(dialogContext).pop(false);
                         },
                       ),
                     ),
-                    AppSpacing.w12,
+                    AppSpacing.w8,
                   ],
                   Expanded(
                     child: AppButton(

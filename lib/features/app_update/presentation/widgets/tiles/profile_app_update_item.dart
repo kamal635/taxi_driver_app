@@ -4,14 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taxi_driver_app/app/router/route_names.dart';
+import 'package:taxi_driver_app/app/router/config/app_route_names.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
+import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/features/app_update/data/services/app_update_service.dart';
+import 'package:taxi_driver_app/features/app_update/domain/app_update_check_result.dart';
 import 'package:taxi_driver_app/features/app_update/presentation/controllers/app_update_flow_controller.dart';
+import 'package:taxi_driver_app/features/app_update/presentation/helpers/app_update_text_resolver.dart';
 import 'package:taxi_driver_app/features/app_update/presentation/providers/app_update_providers.dart';
-import 'package:taxi_driver_app/features/profile/presentation/widgets/profile_section_item.dart';
+import 'package:taxi_driver_app/features/profile/presentation/widgets/profile/profile_section_item.dart';
 
+/// Profile entry point for the app update flow.
 class ProfileAppUpdateItem extends ConsumerWidget {
   const ProfileAppUpdateItem({super.key});
 
@@ -29,13 +32,13 @@ class ProfileAppUpdateItem extends ConsumerWidget {
     return ProfileSectionItem(
       title: context.l10n.profileAppUpdateTitle,
       subtitle: appearance.subtitle,
-      icon: Icons.system_update_alt_rounded,
+      icon: AppIcons.update,
       accentColor: appearance.accentColor,
       iconBackgroundColor: appearance.iconBackgroundColor,
       subtitleColor: appearance.subtitleColor,
       trailing: appearance.trailing,
       onPressed: () async {
-        await context.pushNamed(RouteNames.profileAppUpdate);
+        await context.pushNamed(AppRouteNames.profileAppUpdate);
       },
     );
   }
@@ -46,10 +49,10 @@ class ProfileAppUpdateItem extends ConsumerWidget {
     required AppUpdateFlowState flowState,
   }) {
     final statusResult = state.asData?.value;
-    final hiddenVersionCode = flowState.hiddenVersionCode;
-    final latestVersionCode = statusResult?.info?.latestVersionCode;
-    final isHiddenSameVersion =
-        hiddenVersionCode != null && latestVersionCode == hiddenVersionCode;
+    final isHiddenSameVersion = AppUpdateTextResolver.isInstallerHintHidden(
+      flowState: flowState,
+      result: statusResult,
+    );
 
     if (flowState.isDownloading) {
       final progressPercent = (flowState.progress * 100).round().clamp(0, 100);
@@ -82,7 +85,7 @@ class ProfileAppUpdateItem extends ConsumerWidget {
         iconBackgroundColor: AppColors.errorBg,
         subtitleColor: AppColors.error,
         trailing: Icon(
-          Icons.refresh_rounded,
+          AppIcons.refresh,
           size: 18.r,
           color: AppColors.error,
         ),
@@ -127,25 +130,15 @@ class ProfileAppUpdateItem extends ConsumerWidget {
           );
         }
 
-        final versionLabel = _resolveCurrentVersionLabel(result);
+        final versionLabel = AppUpdateTextResolver.resolveCurrentVersionLabel(
+          result,
+        );
 
         return _ProfileAppUpdateAppearance(
           subtitle: context.l10n.profileAppUpdateSubtitleUpToDate(versionLabel),
         );
       },
     );
-  }
-
-  String _resolveCurrentVersionLabel(AppUpdateCheckResult result) {
-    final currentVersion = result.currentVersionName.trim();
-    if (currentVersion.isNotEmpty) {
-      return currentVersion;
-    }
-
-    final latestVersion = result.info?.latestVersionName.trim();
-    return (latestVersion != null && latestVersion.isNotEmpty)
-        ? latestVersion
-        : '—';
   }
 }
 
@@ -234,7 +227,7 @@ class _AnimatedDownloadTrailingIconState
         );
       },
       child: Icon(
-        Icons.download_sharp,
+        AppIcons.download,
         size: 22.r,
         color: AppColors.primary,
       ),

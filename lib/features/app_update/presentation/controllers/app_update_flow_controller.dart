@@ -1,23 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/features/app_update/data/services/app_update_service.dart';
+import 'package:taxi_driver_app/features/app_update/domain/app_update_check_result.dart';
+import 'package:taxi_driver_app/features/app_update/domain/app_update_install_failure.dart';
 import 'package:taxi_driver_app/features/app_update/presentation/providers/app_update_providers.dart';
-
-const _apkSignatureFirstByte = 0x50;
-const _apkSignatureSecondByte = 0x4B;
 
 enum AppUpdateFlowPhase {
   idle,
   downloading,
   installing,
   failed,
-}
-
-enum AppUpdateFlowError {
-  urlNotReady,
-  invalidPackage,
-  downloadFailed,
-  installFailed,
 }
 
 class AppUpdateFlowState {
@@ -32,7 +23,7 @@ class AppUpdateFlowState {
   final AppUpdateFlowPhase phase;
   final double progress;
   final AppUpdateCheckResult? result;
-  final AppUpdateFlowError? error;
+  final AppUpdateInstallFailure? error;
   final int? hiddenVersionCode;
 
   bool get isBusy =>
@@ -48,7 +39,7 @@ class AppUpdateFlowState {
     double? progress,
     AppUpdateCheckResult? result,
     bool clearResult = false,
-    AppUpdateFlowError? error,
+    AppUpdateInstallFailure? error,
     bool clearError = false,
     int? hiddenVersionCode,
     bool clearHiddenVersionCode = false,
@@ -65,9 +56,8 @@ class AppUpdateFlowState {
   }
 }
 
+/// Controls the optional in-app update flow shown from the profile section.
 class AppUpdateFlowController extends Notifier<AppUpdateFlowState> {
-  AppUpdateService get _updateService => ref.read(appUpdateServiceProvider);
-
   CancelToken? _cancelToken;
 
   @override
@@ -90,17 +80,6 @@ class AppUpdateFlowController extends Notifier<AppUpdateFlowState> {
       return;
     }
 
-    if (!info.hasDownloadUrl && !info.hasDriveFileId) {
-      state = state.copyWith(
-        phase: AppUpdateFlowPhase.failed,
-        progress: 0,
-        result: result,
-        error: AppUpdateFlowError.urlNotReady,
-        clearHiddenVersionCode: true,
-      );
-      return;
-    }
-
     final cancelToken = CancelToken();
     _cancelToken = cancelToken;
 
@@ -113,43 +92,28 @@ class AppUpdateFlowController extends Notifier<AppUpdateFlowState> {
     );
 
     try {
-      final apkFile = await _updateService.downloadApk(
-        info: info,
-        cancelToken: cancelToken,
-        onProgress: (progress) {
-          state = state.copyWith(
-            phase: AppUpdateFlowPhase.downloading,
-            progress: progress,
-            result: result,
-            clearError: true,
+      await ref
+          .read(appUpdateInstallerServiceProvider)
+          .installUpdate(
+            info: info,
+            cancelToken: cancelToken,
+            onDownloadProgress: (progress) {
+              state = state.copyWith(
+                phase: AppUpdateFlowPhase.downloading,
+                progress: progress,
+                result: result,
+                clearError: true,
+              );
+            },
+            onInstalling: () {
+              state = state.copyWith(
+                phase: AppUpdateFlowPhase.installing,
+                progress: 1,
+                result: result,
+                clearError: true,
+              );
+            },
           );
-        },
-      );
-
-      final bytes = await apkFile.readAsBytes();
-      final isZipLike =
-          bytes.length >= 4 &&
-          bytes[0] == _apkSignatureFirstByte &&
-          bytes[1] == _apkSignatureSecondByte;
-
-      if (!isZipLike) {
-        state = state.copyWith(
-          phase: AppUpdateFlowPhase.failed,
-          progress: 0,
-          result: result,
-          error: AppUpdateFlowError.invalidPackage,
-        );
-        return;
-      }
-
-      state = state.copyWith(
-        phase: AppUpdateFlowPhase.installing,
-        progress: 1,
-        result: result,
-        clearError: true,
-      );
-
-      await ref.read(apkInstallServiceProvider).install(apkFile);
 
       state = AppUpdateFlowState(
         hiddenVersionCode: info.latestVersionCode,
@@ -170,14 +134,14 @@ class AppUpdateFlowController extends Notifier<AppUpdateFlowState> {
         phase: AppUpdateFlowPhase.failed,
         progress: 0,
         result: result,
-        error: AppUpdateFlowError.downloadFailed,
+        error: AppUpdateInstallFailure.downloadFailed,
       );
-    } on Exception {
+    } on AppUpdateInstallerException catch (exception) {
       state = state.copyWith(
         phase: AppUpdateFlowPhase.failed,
         progress: 0,
         result: result,
-        error: AppUpdateFlowError.installFailed,
+        error: exception.failure,
       );
     } finally {
       if (identical(_cancelToken, cancelToken)) {

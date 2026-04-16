@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/networking/api_client.dart';
+import 'package:taxi_driver_app/core/networking/providers/network_client_providers.dart';
 import 'package:taxi_driver_app/features/account_security/data/datasources/account_security_remote_data_source.dart';
 import 'package:taxi_driver_app/features/account_security/data/repositories/account_security_repository_impl.dart';
 import 'package:taxi_driver_app/features/account_security/domain/repositories/account_security_repository.dart';

@@ -3,6 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 
+/// Shared primary action button.
+///
+/// The API stays intentionally small so feature widgets can reuse the same
+/// button without rebuilding local variants every time.
 class AppButton extends StatelessWidget {
   const AppButton({
     required this.label,
@@ -12,6 +16,7 @@ class AppButton extends StatelessWidget {
     this.backgroundColor,
     this.borderColor,
     this.labelColor,
+    this.height = 44,
   });
 
   final String label;
@@ -20,6 +25,7 @@ class AppButton extends StatelessWidget {
   final Color? backgroundColor;
   final Color? borderColor;
   final Color? labelColor;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +33,17 @@ class AppButton extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      height: 40.h,
+      height: height.h,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? AppColors.primary,
           foregroundColor: effectiveLabelColor,
+          disabledBackgroundColor: (backgroundColor ?? AppColors.primary)
+              .withValues(alpha: 0.55),
+          disabledForegroundColor: effectiveLabelColor.withValues(alpha: 0.70),
           elevation: 0,
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.r),
             side: BorderSide(
@@ -52,6 +62,7 @@ class AppButton extends StatelessWidget {
               )
             : Text(
                 label,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: AppTypography.button.copyWith(
                   color: effectiveLabelColor,

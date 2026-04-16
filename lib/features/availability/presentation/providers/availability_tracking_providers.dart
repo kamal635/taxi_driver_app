@@ -2,7 +2,7 @@ import 'dart:async' show unawaited;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:taxi_driver_app/core/location/location_providers.dart';
-import 'package:taxi_driver_app/core/networking/api_client.dart';
+import 'package:taxi_driver_app/core/networking/providers/network_client_providers.dart';
 import 'package:taxi_driver_app/features/availability/data/datasources/remote/driver_status_remote_data_source.dart';
 import 'package:taxi_driver_app/features/availability/data/repositories/driver_status_repository_impl.dart';
 import 'package:taxi_driver_app/features/availability/data/trackers/geolocator_location_tracker.dart';

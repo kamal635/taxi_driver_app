@@ -5,9 +5,11 @@ import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/constants/app_icons.dart';
 
+/// Semantic snackbar variants used across the app.
 enum AppSnackType { success, error, warning, info }
 
 extension SnackBarX on BuildContext {
+  /// Shows a consistently styled floating snackbar.
   void showAppSnack(
     String message, {
     AppSnackType type = AppSnackType.info,
@@ -15,7 +17,12 @@ extension SnackBarX on BuildContext {
     VoidCallback? onAction,
     Duration duration = const Duration(seconds: 3),
   }) {
+    if (message.trim().isEmpty) {
+      return;
+    }
+
     final messenger = ScaffoldMessenger.of(this)..hideCurrentSnackBar();
+
     final style = _snackStyleFor(type);
 
     messenger.showSnackBar(
@@ -39,7 +46,9 @@ extension SnackBarX on BuildContext {
             Expanded(
               child: Text(
                 message,
-                style: AppTypography.labelSm.copyWith(color: AppColors.white),
+                style: AppTypography.labelSm.copyWith(
+                  color: style.foregroundColor,
+                ),
               ),
             ),
           ],
@@ -77,7 +86,7 @@ extension SnackBarX on BuildContext {
     ),
     AppSnackType.info => (
       backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.infoBg,
+      foregroundColor: AppColors.textPrimary,
       icon: AppIcons.info,
     ),
   };
