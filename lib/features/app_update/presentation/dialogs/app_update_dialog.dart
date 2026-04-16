@@ -5,11 +5,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
+import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/widgets/app_button.dart';
 import 'package:taxi_driver_app/core/widgets/app_confirm_dialog.dart';
-import 'package:taxi_driver_app/features/app_update/data/services/app_update_service.dart';
+import 'package:taxi_driver_app/features/app_update/domain/app_update_check_result.dart';
+import 'package:taxi_driver_app/features/app_update/domain/app_update_install_failure.dart';
+import 'package:taxi_driver_app/features/app_update/presentation/helpers/app_update_text_resolver.dart';
 import 'package:taxi_driver_app/features/app_update/presentation/providers/app_update_providers.dart';
+import 'package:taxi_driver_app/features/app_update/presentation/widgets/common/app_update_card_header.dart';
 
 enum AppUpdateDialogAction {
   later,
@@ -41,7 +45,7 @@ Future<AppUpdateDialogAction> showAppUpdateDialog({
       confirmLabel: context.l10n.appUpdateAction,
       cancelLabel: context.l10n.appUpdateLater,
       barrierDismissible: true,
-      icon: Icons.system_update_alt_rounded,
+      icon: AppIcons.update,
       iconColor: AppColors.primary,
       backgroundColorIcon: AppColors.infoBg,
     );
@@ -75,7 +79,7 @@ class _ForceAppUpdateDialog extends ConsumerStatefulWidget {
 class _ForceAppUpdateDialogState extends ConsumerState<_ForceAppUpdateDialog> {
   _ForceAppUpdatePhase _phase = _ForceAppUpdatePhase.idle;
   double _progress = 0;
-  String? _errorMessage;
+  AppUpdateInstallFailure? _error;
   CancelToken? _cancelToken;
 
   AppUpdateCheckResult get _result => widget.result;
@@ -93,13 +97,7 @@ class _ForceAppUpdateDialogState extends ConsumerState<_ForceAppUpdateDialog> {
 
   Future<void> _startForceUpdate() async {
     final info = _result.info;
-    if (info == null) return;
-
-    if (!info.hasDownloadUrl && !info.hasDriveFileId) {
-      if (!mounted) return;
-      setState(() {
-        _errorMessage = context.l10n.appUpdateUrlNotReady;
-      });
+    if (info == null) {
       return;
     }
 
@@ -109,72 +107,72 @@ class _ForceAppUpdateDialogState extends ConsumerState<_ForceAppUpdateDialog> {
     setState(() {
       _phase = _ForceAppUpdatePhase.downloading;
       _progress = 0;
-      _errorMessage = null;
+      _error = null;
     });
 
     try {
-      final apkFile = await ref
-          .read(appUpdateServiceProvider)
-          .downloadApk(
+      await ref
+          .read(appUpdateInstallerServiceProvider)
+          .installUpdate(
             info: info,
             cancelToken: cancelToken,
-            onProgress: (progress) {
-              if (!mounted) return;
+            onDownloadProgress: (progress) {
+              if (!mounted) {
+                return;
+              }
+
               setState(() {
                 _progress = progress;
               });
             },
+            onInstalling: () {
+              if (!mounted) {
+                return;
+              }
+
+              setState(() {
+                _phase = _ForceAppUpdatePhase.installing;
+                _progress = 1;
+              });
+            },
           );
 
-      final bytes = await apkFile.readAsBytes();
-      final isZipLike =
-          bytes.length >= 4 && bytes[0] == 0x50 && bytes[1] == 0x4B;
-
-      if (!isZipLike) {
-        if (!mounted) return;
-        setState(() {
-          _phase = _ForceAppUpdatePhase.idle;
-          _errorMessage = context.l10n.appUpdateInvalidPackage;
-        });
+      if (!mounted) {
         return;
       }
 
-      if (!mounted) return;
-
-      setState(() {
-        _phase = _ForceAppUpdatePhase.installing;
-        _progress = 1;
-      });
-
-      await ref.read(apkInstallServiceProvider).install(apkFile);
-
-      if (!mounted) return;
       Navigator.of(context).pop(AppUpdateDialogAction.update);
     } on DioException catch (error) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
-      if (error.type == DioExceptionType.cancel) {
+      if (CancelToken.isCancel(error)) {
         setState(() {
           _phase = _ForceAppUpdatePhase.idle;
           _progress = 0;
-          _errorMessage = null;
+          _error = null;
         });
         return;
       }
 
       setState(() {
         _phase = _ForceAppUpdatePhase.idle;
-        _errorMessage = context.l10n.appUpdateDownloadFailed;
+        _error = AppUpdateInstallFailure.downloadFailed;
       });
-    } on Exception {
-      if (!mounted) return;
+    } on AppUpdateInstallerException catch (exception) {
+      if (!mounted) {
+        return;
+      }
 
       setState(() {
         _phase = _ForceAppUpdatePhase.idle;
-        _errorMessage = context.l10n.appUpdateInstallFailed;
+        _error = exception.failure;
       });
     } finally {
-      _cancelToken = null;
+      if (identical(_cancelToken, cancelToken)) {
+        _cancelToken = null;
+      }
     }
   }
 
@@ -197,29 +195,11 @@ class _ForceAppUpdateDialogState extends ConsumerState<_ForceAppUpdateDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 40.r,
-                    height: 40.r,
-                    decoration: BoxDecoration(
-                      color: AppColors.infoBg,
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: const Icon(
-                      Icons.system_update_alt_rounded,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  AppSpacing.w12,
-                  Expanded(
-                    child: Text(
-                      l10n.appUpdateTitle,
-                      style: AppTypography.titleSm,
-                    ),
-                  ),
-                ],
+              AppUpdateCardHeader(
+                icon: AppIcons.update,
+                iconColor: AppColors.primary,
+                iconBackgroundColor: AppColors.infoBg,
+                title: l10n.appUpdateTitle,
               ),
               AppSpacing.h12,
               Text(
@@ -269,10 +249,13 @@ class _ForceAppUpdateDialogState extends ConsumerState<_ForceAppUpdateDialog> {
                   ],
                 ),
               ],
-              if (_errorMessage != null) ...[
+              if (_error != null) ...[
                 AppSpacing.h12,
                 Text(
-                  _errorMessage!,
+                  AppUpdateTextResolver.resolveFlowErrorMessage(
+                    context,
+                    _error,
+                  ),
                   style: AppTypography.bodyMuted.copyWith(
                     color: AppColors.error,
                   ),

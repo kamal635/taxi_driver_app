@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:taxi_driver_app/core/networking/api_client.dart';
+import 'package:taxi_driver_app/core/networking/providers/network_client_providers.dart';
 import 'package:taxi_driver_app/features/home/data/datasources/remote/offer_remote_data_source.dart';
 import 'package:taxi_driver_app/features/home/data/repositories/offer_repository_impl.dart';
 import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';

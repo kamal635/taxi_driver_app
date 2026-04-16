@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 /// Centralized icon catalog used across the app.
+///
+/// Keeping icon selections in a single place makes visual updates easier and
+/// avoids scattering raw material icons across unrelated features.
 final class AppIcons {
+  AppIcons._();
+
   static const IconData taxi = Icons.local_taxi_rounded;
   static const IconData email = Icons.email_rounded;
   static const IconData lock = Icons.lock_rounded;
@@ -24,6 +29,13 @@ final class AppIcons {
   static const IconData delete = Icons.delete_outline_rounded;
   static const IconData timer = Icons.timer_outlined;
   static const IconData history = Icons.history_rounded;
+
+  // Update flow icons.
+  static const IconData update = Icons.system_update_alt_rounded;
+  static const IconData updateRequired = Icons.priority_high_rounded;
+  static const IconData verified = Icons.verified_rounded;
+  static const IconData refresh = Icons.refresh_rounded;
+  static const IconData download = Icons.download_sharp;
 
   // Snackbar / status icons.
   static const IconData success = Icons.check_circle_rounded;

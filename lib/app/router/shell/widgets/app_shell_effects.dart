@@ -3,8 +3,8 @@ import 'dart:async' show StreamSubscription, unawaited;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:taxi_driver_app/app/router/config/app_route_names.dart';
 import 'package:taxi_driver_app/app/router/config/app_route_paths.dart';
-import 'package:taxi_driver_app/app/router/route_names.dart';
 import 'package:taxi_driver_app/features/app_update/presentation/dialogs/app_update_dialog.dart';
 import 'package:taxi_driver_app/features/app_update/presentation/providers/app_update_providers.dart';
 import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
@@ -138,7 +138,7 @@ class _AppShellEffectsState extends ConsumerState<AppShellEffects> {
       return;
     }
 
-    await context.pushNamed(RouteNames.profileAppUpdate);
+    await context.pushNamed(AppRouteNames.profileAppUpdate);
   }
 
   void _handleOfferNotificationOpen(DriverOfferNotificationOpenEvent event) {

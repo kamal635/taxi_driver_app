@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 
+/// Shared text field used by forms across the app.
 class AppTextField extends StatelessWidget {
   const AppTextField({
     required this.hintText,
@@ -20,6 +22,10 @@ class AppTextField extends StatelessWidget {
     this.onChanged,
     this.onFieldSubmitted,
     this.focusNode,
+    this.inputFormatters,
+    this.autocorrect = true,
+    this.enableSuggestions = true,
+    this.textCapitalization = TextCapitalization.none,
     super.key,
   });
 
@@ -37,6 +43,10 @@ class AppTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onFieldSubmitted;
   final FocusNode? focusNode;
+  final List<TextInputFormatter>? inputFormatters;
+  final bool autocorrect;
+  final bool enableSuggestions;
+  final TextCapitalization textCapitalization;
 
   @override
   Widget build(BuildContext context) {
@@ -61,10 +71,14 @@ class AppTextField extends StatelessWidget {
           textInputAction: textInputAction,
           obscureText: obscureText,
           autofillHints: autofillHints,
+          validator: validator,
           onChanged: onChanged,
           onFieldSubmitted: onFieldSubmitted,
+          inputFormatters: inputFormatters,
+          autocorrect: autocorrect,
+          enableSuggestions: enableSuggestions,
+          textCapitalization: textCapitalization,
           style: AppTypography.bodyMd,
-          validator: validator,
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: AppTypography.bodyMuted,
@@ -81,35 +95,30 @@ class AppTextField extends StatelessWidget {
                     child: prefixIcon!,
                   ),
             suffixIcon: suffixIcon,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14.r),
-              borderSide: const BorderSide(color: AppColors.border),
+            border: _border(),
+            enabledBorder: _border(),
+            focusedBorder: _border(
+              color: AppColors.primary,
+              width: 1.6,
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14.r),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14.r),
-              borderSide: const BorderSide(
-                color: AppColors.primary,
-                width: 1.6,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14.r),
-              borderSide: const BorderSide(color: AppColors.error),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14.r),
-              borderSide: const BorderSide(
-                color: AppColors.error,
-                width: 1.6,
-              ),
+            errorBorder: _border(color: AppColors.error),
+            focusedErrorBorder: _border(
+              color: AppColors.error,
+              width: 1.6,
             ),
           ),
         ),
       ],
+    );
+  }
+
+  OutlineInputBorder _border({
+    Color color = AppColors.border,
+    double width = 1,
+  }) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14.r),
+      borderSide: BorderSide(color: color, width: width),
     );
   }
 }

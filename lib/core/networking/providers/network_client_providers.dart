@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/networking/client/api_client.dart';
+import 'package:taxi_driver_app/core/networking/api_client.dart';
 import 'package:taxi_driver_app/core/networking/config/network_constants.dart';
 import 'package:taxi_driver_app/core/networking/interceptors/auth_header_interceptor.dart';
 import 'package:taxi_driver_app/core/networking/interceptors/session_refresh_interceptor.dart';

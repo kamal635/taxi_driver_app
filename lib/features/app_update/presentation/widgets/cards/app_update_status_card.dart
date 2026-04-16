@@ -4,13 +4,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
+import 'package:taxi_driver_app/core/constants/app_icons.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:taxi_driver_app/core/widgets/app_button.dart';
-import 'package:taxi_driver_app/features/app_update/data/services/app_update_service.dart';
+import 'package:taxi_driver_app/features/app_update/domain/app_update_check_result.dart';
 import 'package:taxi_driver_app/features/app_update/presentation/controllers/app_update_flow_controller.dart';
+import 'package:taxi_driver_app/features/app_update/presentation/helpers/app_update_text_resolver.dart';
 import 'package:taxi_driver_app/features/app_update/presentation/providers/app_update_providers.dart';
-import 'package:taxi_driver_app/features/profile/presentation/widgets/profile_card_surface.dart';
+import 'package:taxi_driver_app/features/app_update/presentation/widgets/common/app_update_card_header.dart';
+import 'package:taxi_driver_app/shared/presentation/widgets/surfaces/app_card_surface.dart';
 
+/// Full update details card displayed on the dedicated update page.
 class AppUpdateStatusCard extends ConsumerWidget {
   const AppUpdateStatusCard({super.key});
 
@@ -21,7 +25,7 @@ class AppUpdateStatusCard extends ConsumerWidget {
 
     final statusResult = statusState.asData?.value;
     final activeResult = flowState.result ?? statusResult;
-    final isHiddenSameVersion = _isHiddenForSameVersion(
+    final isHiddenSameVersion = AppUpdateTextResolver.isInstallerHintHidden(
       flowState: flowState,
       result: statusResult,
     );
@@ -73,18 +77,8 @@ class AppUpdateStatusCard extends ConsumerWidget {
     );
   }
 
-  bool _isHiddenForSameVersion({
-    required AppUpdateFlowState flowState,
-    required AppUpdateCheckResult? result,
-  }) {
-    final hiddenVersionCode = flowState.hiddenVersionCode;
-    final latestVersionCode = result?.info?.latestVersionCode;
-
-    return hiddenVersionCode != null && latestVersionCode == hiddenVersionCode;
-  }
-
   Widget _buildLoadingCard(BuildContext context) {
-    return ProfileCardSurface(
+    return AppCardSurface(
       child: Row(
         children: [
           SizedBox(
@@ -108,7 +102,7 @@ class AppUpdateStatusCard extends ConsumerWidget {
     required BuildContext context,
     required WidgetRef ref,
   }) {
-    return ProfileCardSurface(
+    return AppCardSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -134,14 +128,14 @@ class AppUpdateStatusCard extends ConsumerWidget {
     required BuildContext context,
     required AppUpdateCheckResult result,
   }) {
-    final version = _resolveCurrentVersionLabel(result);
+    final version = AppUpdateTextResolver.resolveCurrentVersionLabel(result);
 
-    return ProfileCardSurface(
+    return AppCardSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(
-            icon: Icons.verified_rounded,
+          AppUpdateCardHeader(
+            icon: AppIcons.verified,
             iconColor: AppColors.textPrimary,
             iconBackgroundColor: AppColors.bgWarm,
             title: context.l10n.profileAppUpdateTitle,
@@ -163,14 +157,14 @@ class AppUpdateStatusCard extends ConsumerWidget {
   }) {
     final info = result.info!;
 
-    return ProfileCardSurface(
+    return AppCardSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(
+          AppUpdateCardHeader(
             icon: result.isForceUpdate
-                ? Icons.priority_high_rounded
-                : Icons.system_update_alt_rounded,
+                ? AppIcons.updateRequired
+                : AppIcons.update,
             iconColor: result.isForceUpdate
                 ? AppColors.error
                 : AppColors.textPrimary,
@@ -197,7 +191,7 @@ class AppUpdateStatusCard extends ConsumerWidget {
           AppSpacing.h8,
           Text(
             context.l10n.appUpdateCurrentVersionLabel(
-              _resolveCurrentVersionLabel(result),
+              AppUpdateTextResolver.resolveCurrentVersionLabel(result),
             ),
             style: AppTypography.bodyMuted,
           ),
@@ -236,12 +230,12 @@ class AppUpdateStatusCard extends ConsumerWidget {
     final info = result.info!;
     final progressPercent = (flowState.progress * 100).round().clamp(0, 100);
 
-    return ProfileCardSurface(
+    return AppCardSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(
-            icon: Icons.system_update_alt_rounded,
+          AppUpdateCardHeader(
+            icon: AppIcons.update,
             iconColor: AppColors.textPrimary,
             iconBackgroundColor: AppColors.bgWarm,
             title: context.l10n.profileAppUpdateTitle,
@@ -256,7 +250,7 @@ class AppUpdateStatusCard extends ConsumerWidget {
           AppSpacing.h8,
           Text(
             context.l10n.appUpdateCurrentVersionLabel(
-              _resolveCurrentVersionLabel(result),
+              AppUpdateTextResolver.resolveCurrentVersionLabel(result),
             ),
             style: AppTypography.bodyMuted,
           ),
@@ -328,12 +322,12 @@ class AppUpdateStatusCard extends ConsumerWidget {
   }) {
     final info = result.info!;
 
-    return ProfileCardSurface(
+    return AppCardSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(
-            icon: Icons.error_outline_rounded,
+          AppUpdateCardHeader(
+            icon: AppIcons.error,
             iconColor: AppColors.error,
             iconBackgroundColor: AppColors.errorBg,
             title: context.l10n.profileAppUpdateTitle,
@@ -347,7 +341,10 @@ class AppUpdateStatusCard extends ConsumerWidget {
           ),
           AppSpacing.h8,
           Text(
-            _resolveFlowErrorMessage(context, flowState.error),
+            AppUpdateTextResolver.resolveFlowErrorMessage(
+              context,
+              flowState.error,
+            ),
             style: AppTypography.bodyMuted.copyWith(color: AppColors.error),
           ),
           AppSpacing.h16,
@@ -362,59 +359,5 @@ class AppUpdateStatusCard extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  Widget _buildHeader({
-    required IconData icon,
-    required Color iconColor,
-    required Color iconBackgroundColor,
-    required String title,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 42.r,
-          height: 42.r,
-          decoration: BoxDecoration(
-            color: iconBackgroundColor,
-            borderRadius: BorderRadius.circular(14.r),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Icon(icon, color: iconColor, size: 22.r),
-        ),
-        AppSpacing.w12,
-        Expanded(
-          child: Text(
-            title,
-            style: AppTypography.titleSm,
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _resolveCurrentVersionLabel(AppUpdateCheckResult result) {
-    final currentVersion = result.currentVersionName.trim();
-    if (currentVersion.isNotEmpty) {
-      return currentVersion;
-    }
-
-    final latestVersion = result.info?.latestVersionName.trim();
-    return (latestVersion != null && latestVersion.isNotEmpty)
-        ? latestVersion
-        : '—';
-  }
-
-  String _resolveFlowErrorMessage(
-    BuildContext context,
-    AppUpdateFlowError? error,
-  ) {
-    return switch (error) {
-      AppUpdateFlowError.urlNotReady => context.l10n.appUpdateUrlNotReady,
-      AppUpdateFlowError.invalidPackage => context.l10n.appUpdateInvalidPackage,
-      AppUpdateFlowError.downloadFailed => context.l10n.appUpdateDownloadFailed,
-      AppUpdateFlowError.installFailed => context.l10n.appUpdateInstallFailed,
-      null => context.l10n.errorUnexpected,
-    };
   }
 }
