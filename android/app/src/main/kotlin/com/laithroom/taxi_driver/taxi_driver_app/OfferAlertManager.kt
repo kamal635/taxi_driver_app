@@ -1,4 +1,4 @@
-package com.yourcompany.taxi_driver.taxi_driver_app
+package com.laithroom.taxi.driver
 
 import android.app.Notification
 import android.app.PendingIntent

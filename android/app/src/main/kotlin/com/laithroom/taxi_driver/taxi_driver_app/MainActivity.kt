@@ -1,4 +1,4 @@
-package com.yourcompany.taxi_driver.taxi_driver_app
+package com.laithroom.taxi.driver
 
 import android.Manifest
 import android.app.Activity
