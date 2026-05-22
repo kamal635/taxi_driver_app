@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.yourcompany.taxi_driver.taxi_driver_app"
+    namespace = "com.laithroom.taxi.driver"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-    applicationId = "com.yourcompany.taxi_driver.taxi_driver_app"
+    applicationId = "com.laithroom.taxi.driver"
     minSdk = flutter.minSdkVersion
     targetSdk = 35
     versionCode = flutter.versionCode
