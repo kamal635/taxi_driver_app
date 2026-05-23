@@ -55,7 +55,8 @@ coverage/
 **/android/**/build/
 **/android/**/captures/
 **/android/**/.cxx/
-
+android/key.properties
+android/app/upload-keystore.jks
 # Generated app build variants (optional, but safe)
 **/android/**/app/debug/
 **/android/**/app/profile/
