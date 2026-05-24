@@ -54,6 +54,7 @@ class LoginFooter extends StatelessWidget {
               color: AppColors.iconMuted,
             ),
           ),
+          AppSpacing.h6,
         ],
       ),
     );

@@ -19,7 +19,7 @@ class LoginHeader extends StatelessWidget {
           height: 160.r,
           width: 160.r,
         ),
-        AppSpacing.h10,
+
         Text(
           context.l10n.brandName,
           textAlign: TextAlign.center,
