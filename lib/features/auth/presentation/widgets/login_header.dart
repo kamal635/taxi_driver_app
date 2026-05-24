@@ -7,7 +7,7 @@ import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 class LoginHeader extends StatelessWidget {
   const LoginHeader({super.key});
 
-  static const _logoAssetPath = 'assets/images/logo_taxi_driver.png';
+  static const _logoAssetPath = 'assets/images/app_icon_foreground.png';
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +16,10 @@ class LoginHeader extends StatelessWidget {
         AppSpacing.h18,
         Image.asset(
           _logoAssetPath,
-          height: 112.r,
-          width: 112.r,
+          height: 160.r,
+          width: 160.r,
         ),
-        AppSpacing.h14,
+
         Text(
           context.l10n.brandName,
           textAlign: TextAlign.center,
