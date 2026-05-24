@@ -4,52 +4,48 @@ import 'package:taxi_driver_app/app/theme/app_colors.dart';
 import 'package:taxi_driver_app/app/theme/app_spacing.dart';
 import 'package:taxi_driver_app/app/theme/app_typography.dart';
 import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginFooter extends StatelessWidget {
   const LoginFooter({
     super.key,
   });
 
+  static const String _privacyPolicyUrl =
+      'https://taxi-dashboard.laithroom.com/privacy-policy';
+  static const String _termsAndConditionsUrl =
+      'https://taxi-dashboard.laithroom.com/terms-conditions';
+
   @override
   Widget build(BuildContext context) {
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
     return Padding(
       padding: EdgeInsets.only(top: 26.h),
       child: Column(
         children: [
-          RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              style: AppTypography.bodySm.copyWith(
-                fontFamily: 'NotoKufiArabic',
+          Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8.w,
+            runSpacing: 4.h,
+            children: [
+              _FooterLinkButton(
+                label: isArabic ? 'سياسة الخصوصية' : 'Privacy Policy',
+                onTap: () => _openExternalUrl(_privacyPolicyUrl),
               ),
-              children: [
-                TextSpan(
-                  text: '${context.l10n.contactSupportLabel} ',
+              Text(
+                '•',
+                style: AppTypography.bodySm.copyWith(
+                  color: AppColors.iconMuted,
+                  fontFamily: 'NotoKufiArabic',
                 ),
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: InkWell(
-                    onTap: () {},
-                    borderRadius: BorderRadius.circular(6.r),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 2.w,
-                        vertical: 2.h,
-                      ),
-                      child: Text(
-                        context.l10n.contactSupportAction,
-                        style: AppTypography.bodySm.copyWith(
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                TextSpan(
-                  text: '${context.l10n.contactSupportContact} ',
-                ),
-              ],
-            ),
+              ),
+              _FooterLinkButton(
+                label: isArabic ? 'الشروط والأحكام' : 'Terms & Conditions',
+                onTap: () => _openExternalUrl(_termsAndConditionsUrl),
+              ),
+            ],
           ),
           AppSpacing.h12,
           Text(
@@ -59,6 +55,51 @@ class LoginFooter extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _openExternalUrl(String url) async {
+    final uri = Uri.parse(url);
+
+    final didLaunch = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!didLaunch) {
+      debugPrint('Could not launch $url');
+    }
+  }
+}
+
+class _FooterLinkButton extends StatelessWidget {
+  const _FooterLinkButton({
+    required this.label,
+    required this.onTap,
+  });
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6.r),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 4.w,
+          vertical: 4.h,
+        ),
+        child: Text(
+          label,
+          style: AppTypography.bodySm.copyWith(
+            color: AppColors.primary,
+            fontFamily: 'NotoKufiArabic',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }
