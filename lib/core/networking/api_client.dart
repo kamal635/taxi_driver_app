@@ -1,6 +1,6 @@
+import 'package:bawabat_al_saeq/core/errors/failure.dart';
+import 'package:bawabat_al_saeq/core/networking/dio_exception_mapper.dart';
 import 'package:dio/dio.dart';
-import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/core/networking/dio_exception_mapper.dart';
 
 class ApiClient {
   ApiClient(this._dio);

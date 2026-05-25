@@ -1,5 +1,5 @@
+import 'package:bawabat_al_saeq/core/errors/failure.dart';
 import 'package:dio/dio.dart';
-import 'package:taxi_driver_app/core/errors/failure.dart';
 
 Failure mapDioException(DioException exception) {
   if (exception.type == DioExceptionType.connectionTimeout ||

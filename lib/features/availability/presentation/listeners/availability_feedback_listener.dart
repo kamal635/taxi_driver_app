@@ -1,13 +1,13 @@
 import 'dart:async' show unawaited;
 
+import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
+import 'package:bawabat_al_saeq/core/location/location_providers.dart';
+import 'package:bawabat_al_saeq/core/location/location_result.dart';
+import 'package:bawabat_al_saeq/features/availability/presentation/controllers/availability_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
-import 'package:taxi_driver_app/core/location/location_providers.dart';
-import 'package:taxi_driver_app/core/location/location_result.dart';
-import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
 
 class AvailabilityFeedbackListener extends ConsumerStatefulWidget {
   const AvailabilityFeedbackListener({super.key});

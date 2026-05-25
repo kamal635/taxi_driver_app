@@ -1,8 +1,8 @@
 import 'dart:async' show StreamController, StreamSubscription;
 
+import 'package:bawabat_al_saeq/core/location/location_result.dart';
+import 'package:bawabat_al_saeq/features/availability/domain/repositories/location_tracker.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:taxi_driver_app/core/location/location_result.dart';
-import 'package:taxi_driver_app/features/availability/domain/repositories/location_tracker.dart';
 
 /// Listens to platform location-service
 /// changes and exposes failures to the app.

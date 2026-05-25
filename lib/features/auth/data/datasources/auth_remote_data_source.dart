@@ -1,5 +1,5 @@
-import 'package:taxi_driver_app/core/networking/api_client.dart';
-import 'package:taxi_driver_app/features/auth/data/models/sign_in_response_model.dart';
+import 'package:bawabat_al_saeq/core/networking/api_client.dart';
+import 'package:bawabat_al_saeq/features/auth/data/models/sign_in_response_model.dart';
 
 /// Contract for remote authentication operations.
 abstract interface class AuthRemoteDataSource {

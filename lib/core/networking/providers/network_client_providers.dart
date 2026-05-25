@@ -1,12 +1,12 @@
+import 'package:bawabat_al_saeq/core/networking/api_client.dart';
+import 'package:bawabat_al_saeq/core/networking/config/network_constants.dart';
+import 'package:bawabat_al_saeq/core/networking/interceptors/auth_header_interceptor.dart';
+import 'package:bawabat_al_saeq/core/networking/interceptors/session_refresh_interceptor.dart';
+import 'package:bawabat_al_saeq/core/networking/refresh/session_refresh_service.dart';
+import 'package:bawabat_al_saeq/core/session/app_sign_out_service.dart';
+import 'package:bawabat_al_saeq/core/session/session_providers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/networking/api_client.dart';
-import 'package:taxi_driver_app/core/networking/config/network_constants.dart';
-import 'package:taxi_driver_app/core/networking/interceptors/auth_header_interceptor.dart';
-import 'package:taxi_driver_app/core/networking/interceptors/session_refresh_interceptor.dart';
-import 'package:taxi_driver_app/core/networking/refresh/session_refresh_service.dart';
-import 'package:taxi_driver_app/core/session/app_sign_out_service.dart';
-import 'package:taxi_driver_app/core/session/session_providers.dart';
 
 final refreshDioProvider = Provider<Dio>((ref) {
   return Dio(

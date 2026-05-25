@@ -1,9 +1,9 @@
 import 'dart:async';
 
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_actions.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_progress_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/offers/accepted/accepted_actions.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/offers/accepted/accepted_progress_indicator.dart';
 
 /// Handles the cooldown timer before the driver can complete the trip.
 class AcceptedProgressTimer extends StatefulWidget {

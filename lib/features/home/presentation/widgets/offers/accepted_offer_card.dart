@@ -1,10 +1,10 @@
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/accept_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/complete_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/providers/offer_providers.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/offer_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/complete_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/offers/offer_card.dart';
 
 /// Card for the currently accepted offer.
 class AcceptedOfferCard extends ConsumerWidget {

@@ -1,8 +1,8 @@
-import 'package:taxi_driver_app/features/home/data/datasources/remote/offer_remote_data_source.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/complete_offer_result_entity.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
-import 'package:taxi_driver_app/features/home/domain/repositories/offer_repository.dart';
+import 'package:bawabat_al_saeq/features/home/data/datasources/remote/offer_remote_data_source.dart';
+import 'package:bawabat_al_saeq/features/home/domain/entities/complete_offer_result_entity.dart';
+import 'package:bawabat_al_saeq/features/home/domain/entities/current_and_pending_offer_entity.dart';
+import 'package:bawabat_al_saeq/features/home/domain/entities/offer_entity.dart';
+import 'package:bawabat_al_saeq/features/home/domain/repositories/offer_repository.dart';
 
 /// Repository implementation that maps remote models into domain entities.
 final class OfferRepositoryImpl implements OfferRepository {

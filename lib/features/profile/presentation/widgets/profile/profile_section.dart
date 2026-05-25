@@ -1,8 +1,8 @@
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/surfaces/app_card_surface.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/shared/presentation/widgets/surfaces/app_card_surface.dart';
 
 /// A titled group of profile actions.
 class ProfileSection extends StatelessWidget {

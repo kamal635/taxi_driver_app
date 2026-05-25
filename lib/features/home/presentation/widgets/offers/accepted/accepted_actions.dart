@@ -1,7 +1,7 @@
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/widgets/app_button.dart';
 
 /// Action button shown for an accepted offer.
 class AcceptedActions extends StatelessWidget {

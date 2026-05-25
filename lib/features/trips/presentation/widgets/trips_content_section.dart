@@ -1,11 +1,11 @@
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/widgets/completed_trip_card.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_empty_state.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_loading_state.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/core/constants/app_icons.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offer_entity.dart';
-import 'package:taxi_driver_app/features/trips/presentation/widgets/completed_trip_card.dart';
-import 'package:taxi_driver_app/features/trips/presentation/widgets/trips_empty_state.dart';
-import 'package:taxi_driver_app/features/trips/presentation/widgets/trips_loading_state.dart';
 
 class TripsContentSection extends StatelessWidget {
   const TripsContentSection({

@@ -1,13 +1,13 @@
 import 'dart:async' show FutureOr, StreamSubscription, Timer, unawaited;
 import 'dart:convert';
 
+import 'package:bawabat_al_saeq/features/availability/data/datasources/android/driver_background_service_bridge.dart';
+import 'package:bawabat_al_saeq/features/availability/presentation/providers/availability_providers.dart';
+import 'package:bawabat_al_saeq/features/home/data/models/offer_model.dart';
+import 'package:bawabat_al_saeq/features/home/domain/entities/offer_entity.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/state/new_offer_state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
-import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
-import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
-import 'package:taxi_driver_app/features/home/presentation/state/new_offer_state.dart';
 
 final newOfferControllerProvider =
     AsyncNotifierProvider<NewOfferController, NewOfferState>(

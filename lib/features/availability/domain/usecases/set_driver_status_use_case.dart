@@ -1,5 +1,5 @@
-import 'package:taxi_driver_app/features/availability/domain/entities/driver_status.dart';
-import 'package:taxi_driver_app/features/availability/domain/repositories/driver_status_repository.dart';
+import 'package:bawabat_al_saeq/features/availability/domain/entities/driver_status.dart';
+import 'package:bawabat_al_saeq/features/availability/domain/repositories/driver_status_repository.dart';
 
 /// Updates the driver's availability status on the backend.
 final class SetDriverStatusUseCase {

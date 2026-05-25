@@ -1,18 +1,18 @@
 import 'dart:async';
 
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_overlay_scaffold.dart';
+import 'package:bawabat_al_saeq/features/account_security/presentation/controllers/setup_password_controller.dart';
+import 'package:bawabat_al_saeq/features/profile/presentation/widgets/change_password/change_password_form.dart';
+import 'package:bawabat_al_saeq/shared/presentation/validation/password_form_validator.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/surfaces/app_card_surface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
-import 'package:taxi_driver_app/core/widgets/app_button.dart';
-import 'package:taxi_driver_app/core/widgets/app_overlay_scaffold.dart';
-import 'package:taxi_driver_app/features/account_security/presentation/controllers/setup_password_controller.dart';
-import 'package:taxi_driver_app/features/profile/presentation/widgets/change_password/change_password_form.dart';
-import 'package:taxi_driver_app/shared/presentation/validation/password_form_validator.dart';
-import 'package:taxi_driver_app/shared/presentation/widgets/surfaces/app_card_surface.dart';
 
 /// Password update screen shown from the profile section.
 class ChangePasswordPage extends ConsumerStatefulWidget {

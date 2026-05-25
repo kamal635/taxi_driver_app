@@ -1,5 +1,5 @@
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offers_result_entity.dart';
 import 'package:flutter/foundation.dart';
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offers_result_entity.dart';
 
 @immutable
 final class CompletedOffersState {

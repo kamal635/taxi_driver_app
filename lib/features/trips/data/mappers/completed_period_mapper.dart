@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offers_result_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offers_result_entity.dart';
 
 /// Maps backend period values to domain values and vice versa.
 CompletedPeriod completedPeriodFromJson(Object? value) {

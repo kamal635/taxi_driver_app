@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offer_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_entity.dart';
 
 /// Available filters for completed trips.
 enum CompletedPeriod {

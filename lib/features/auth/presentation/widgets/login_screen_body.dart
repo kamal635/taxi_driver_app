@@ -1,8 +1,8 @@
+import 'package:bawabat_al_saeq/features/auth/presentation/widgets/login_footer.dart';
+import 'package:bawabat_al_saeq/features/auth/presentation/widgets/login_form.dart';
+import 'package:bawabat_al_saeq/features/auth/presentation/widgets/login_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/features/auth/presentation/widgets/login_footer.dart';
-import 'package:taxi_driver_app/features/auth/presentation/widgets/login_form.dart';
-import 'package:taxi_driver_app/features/auth/presentation/widgets/login_header.dart';
 
 class LoginScreenBody extends StatelessWidget {
   const LoginScreenBody({

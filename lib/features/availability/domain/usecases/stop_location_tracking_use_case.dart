@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/features/availability/domain/repositories/location_tracker.dart';
+import 'package:bawabat_al_saeq/features/availability/domain/repositories/location_tracker.dart';
 
 /// Stops runtime location tracking.
 final class StopLocationTrackingUseCase {

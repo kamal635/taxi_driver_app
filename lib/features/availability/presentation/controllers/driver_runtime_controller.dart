@@ -1,7 +1,7 @@
+import 'package:bawabat_al_saeq/core/session/session_providers.dart';
+import 'package:bawabat_al_saeq/features/availability/data/datasources/android/driver_background_service_bridge.dart';
+import 'package:bawabat_al_saeq/features/availability/presentation/providers/availability_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/session/session_providers.dart';
-import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
-import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
 
 /// Coordinates services that must run while the driver is online.
 class DriverRuntimeController {

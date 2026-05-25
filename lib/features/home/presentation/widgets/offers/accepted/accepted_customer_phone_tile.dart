@@ -1,10 +1,10 @@
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/constants/app_icons.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Tappable phone tile for the accepted offer customer.

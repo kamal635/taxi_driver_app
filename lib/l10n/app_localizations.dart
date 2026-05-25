@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Taxi Driver App'**
+  /// **'Bawabat Al Saeq App'**
   String get appTitle;
 
   /// No description provided for @brandName.
@@ -167,7 +167,7 @@ abstract class AppLocalizations {
   /// No description provided for @copyright.
   ///
   /// In en, this message translates to:
-  /// **'© 2026 Taxi Driver App'**
+  /// **'© 2026 Bawabat Al Saeq App'**
   String get copyright;
 
   /// No description provided for @notes.

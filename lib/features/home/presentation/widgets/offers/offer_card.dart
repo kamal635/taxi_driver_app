@@ -1,12 +1,12 @@
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_customer_phone_tile.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_progress_timer.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/new/new_offer_actions.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/shared/offer_card_surface.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/shared/offer_header.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/shared/offer_notes_card.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/shared/offer_route_section.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/offers/accepted/accepted_customer_phone_tile.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/offers/accepted/accepted_progress_timer.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/offers/new/new_offer_actions.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/offers/shared/offer_card_surface.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/offers/shared/offer_header.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/offers/shared/offer_notes_card.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/offers/shared/offer_route_section.dart';
 
 /// Shared offer card shell used by both pending and accepted states.
 class OfferCard extends StatelessWidget {

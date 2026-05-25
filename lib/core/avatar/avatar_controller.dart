@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:bawabat_al_saeq/core/storage/avatar_storage_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:taxi_driver_app/core/storage/avatar_storage_provider.dart';
 
 final avatarControllerProvider =
     AsyncNotifierProvider<AvatarController, String?>(AvatarController.new);

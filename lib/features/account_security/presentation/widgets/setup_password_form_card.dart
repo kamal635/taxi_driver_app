@@ -1,10 +1,10 @@
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/shared/presentation/forms/password_fields/password_fields_group.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/surfaces/app_card_surface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/shared/presentation/forms/password_fields/password_fields_group.dart';
-import 'package:taxi_driver_app/shared/presentation/widgets/surfaces/app_card_surface.dart';
 
 class SetupPasswordFormCard extends StatelessWidget {
   const SetupPasswordFormCard({

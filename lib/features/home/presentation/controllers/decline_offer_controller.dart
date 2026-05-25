@@ -1,10 +1,10 @@
 import 'dart:async';
 
+import 'package:bawabat_al_saeq/features/home/domain/usecases/decline_offer_use_case.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/new_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/helpers/pending_offer_guard.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/providers/offer_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/decline_offer_use_case.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/helpers/pending_offer_guard.dart';
-import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
 
 final AsyncNotifierProvider<DeclineOfferController, void>
 declineOfferControllerProvider =

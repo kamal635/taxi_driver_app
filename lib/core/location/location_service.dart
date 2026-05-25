@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/core/location/location_result.dart';
+import 'package:bawabat_al_saeq/core/location/location_result.dart';
 
 abstract interface class LocationService {
   /// Ensures that location services and permissions are ready to use.

@@ -1,14 +1,14 @@
+import 'package:bawabat_al_saeq/core/networking/providers/network_client_providers.dart';
+import 'package:bawabat_al_saeq/features/home/data/datasources/remote/offer_remote_data_source.dart';
+import 'package:bawabat_al_saeq/features/home/data/repositories/offer_repository_impl.dart';
+import 'package:bawabat_al_saeq/features/home/domain/entities/offer_entity.dart';
+import 'package:bawabat_al_saeq/features/home/domain/repositories/offer_repository.dart';
+import 'package:bawabat_al_saeq/features/home/domain/usecases/accept_offer_use_case.dart';
+import 'package:bawabat_al_saeq/features/home/domain/usecases/complete_offer_use_case.dart';
+import 'package:bawabat_al_saeq/features/home/domain/usecases/decline_offer_use_case.dart';
+import 'package:bawabat_al_saeq/features/home/domain/usecases/get_current_and_pending_offer_use_case.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:taxi_driver_app/core/networking/providers/network_client_providers.dart';
-import 'package:taxi_driver_app/features/home/data/datasources/remote/offer_remote_data_source.dart';
-import 'package:taxi_driver_app/features/home/data/repositories/offer_repository_impl.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
-import 'package:taxi_driver_app/features/home/domain/repositories/offer_repository.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/accept_offer_use_case.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/complete_offer_use_case.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/decline_offer_use_case.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/get_current_and_pending_offer_use_case.dart';
 
 /// Data source provider.
 final offerRemoteDataSourceProvider = Provider<OfferRemoteDataSource>((ref) {

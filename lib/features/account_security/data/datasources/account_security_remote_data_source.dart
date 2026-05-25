@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/core/networking/api_client.dart';
+import 'package:bawabat_al_saeq/core/networking/api_client.dart';
 
 /// Contract for remote account security operations.
 abstract class AccountSecurityRemoteDataSource {

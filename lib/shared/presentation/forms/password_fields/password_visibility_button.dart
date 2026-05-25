@@ -1,6 +1,6 @@
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/core/constants/app_icons.dart';
 
 /// Shared password visibility toggle button.
 class PasswordVisibilityButton extends StatelessWidget {

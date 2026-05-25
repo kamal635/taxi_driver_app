@@ -1,16 +1,16 @@
+import 'package:bawabat_al_saeq/app/router/config/app_route_paths.dart';
+import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
+import 'package:bawabat_al_saeq/core/session/session_providers.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_overlay_scaffold.dart';
+import 'package:bawabat_al_saeq/features/account_security/presentation/controllers/setup_password_controller.dart';
+import 'package:bawabat_al_saeq/features/account_security/presentation/widgets/setup_password_content.dart';
+import 'package:bawabat_al_saeq/shared/presentation/validation/password_form_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taxi_driver_app/app/router/config/app_route_paths.dart';
-import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
-import 'package:taxi_driver_app/core/session/session_providers.dart';
-import 'package:taxi_driver_app/core/widgets/app_button.dart';
-import 'package:taxi_driver_app/core/widgets/app_overlay_scaffold.dart';
-import 'package:taxi_driver_app/features/account_security/presentation/controllers/setup_password_controller.dart';
-import 'package:taxi_driver_app/features/account_security/presentation/widgets/setup_password_content.dart';
-import 'package:taxi_driver_app/shared/presentation/validation/password_form_validator.dart';
 
 class SetupPasswordPage extends ConsumerStatefulWidget {
   const SetupPasswordPage({super.key});

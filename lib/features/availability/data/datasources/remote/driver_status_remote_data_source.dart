@@ -1,6 +1,6 @@
-import 'package:taxi_driver_app/core/networking/api_client.dart';
-import 'package:taxi_driver_app/features/availability/data/mappers/driver_status_mapper.dart';
-import 'package:taxi_driver_app/features/availability/domain/entities/driver_status.dart';
+import 'package:bawabat_al_saeq/core/networking/api_client.dart';
+import 'package:bawabat_al_saeq/features/availability/data/mappers/driver_status_mapper.dart';
+import 'package:bawabat_al_saeq/features/availability/domain/entities/driver_status.dart';
 
 abstract interface class DriverStatusRemoteDataSource {
   Future<void> setStatus({required DriverStatus status});

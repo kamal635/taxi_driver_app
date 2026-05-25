@@ -1,5 +1,5 @@
-import 'package:taxi_driver_app/features/auth/data/models/auth_session_model.dart';
-import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_result.dart';
+import 'package:bawabat_al_saeq/features/auth/data/models/auth_session_model.dart';
+import 'package:bawabat_al_saeq/features/auth/domain/entities/auth_sign_in_result.dart';
 
 /// Data model for the complete login response.
 class SignInResponseModel {

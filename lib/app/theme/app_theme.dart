@@ -1,6 +1,6 @@
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_fonts.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_fonts.dart';
 
 /// Application theme factory.
 final class AppTheme {

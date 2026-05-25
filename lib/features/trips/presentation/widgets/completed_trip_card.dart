@@ -1,13 +1,13 @@
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
+import 'package:bawabat_al_saeq/core/utils/price_formatter.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/formatters/completed_trip_time_formatter.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_card_surface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/constants/app_icons.dart';
-import 'package:taxi_driver_app/core/utils/price_formatter.dart';
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offer_entity.dart';
-import 'package:taxi_driver_app/features/trips/presentation/formatters/completed_trip_time_formatter.dart';
-import 'package:taxi_driver_app/features/trips/presentation/widgets/trips_card_surface.dart';
 
 enum TripStopType {
   pickup,

@@ -1,15 +1,15 @@
 import 'dart:io';
 
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/avatar/avatar_controller.dart';
+import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/avatar/avatar_controller.dart';
-import 'package:taxi_driver_app/core/constants/app_icons.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 
 /// Displays the current avatar and lets the user change or remove it.
 class AvatarImageEditor extends ConsumerWidget {

@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/features/account_security/domain/repositories/account_security_repository.dart';
+import 'package:bawabat_al_saeq/features/account_security/domain/repositories/account_security_repository.dart';
 
 /// Executes the set-password flow for the account security feature.
 class SetPasswordUseCase {

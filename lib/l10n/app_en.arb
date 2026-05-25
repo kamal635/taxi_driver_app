@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Taxi Driver App",
+  "appTitle": "Bawabat Al Saeq App",
   "brandName": "Syrian Taxi",
   "brandSubtitle": "Approved drivers platform",
   "emailLabel": "Email Address",
@@ -11,7 +11,7 @@
   "passwordHint": "••••••••",
   "signIn": "Sign in",
   "forgotPassword": "Forgot password?",
-  "copyright": "© 2026 Taxi Driver App",
+  "copyright": "© 2026 Bawabat Al Saeq App",
   "notes": "Notes",
   "unknown": "unknown",
   "homeGreeting": "Hello,",

@@ -1,5 +1,5 @@
+import 'package:bawabat_al_saeq/core/networking/config/network_constants.dart';
 import 'package:dio/dio.dart';
-import 'package:taxi_driver_app/core/networking/config/network_constants.dart';
 
 final class ForcedLogoutPolicy {
   const ForcedLogoutPolicy._();

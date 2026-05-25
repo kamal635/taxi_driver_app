@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/app/router/config/app_route_names.dart';
+import 'package:bawabat_al_saeq/app/router/config/app_route_names.dart';
 
 abstract final class RouteNames {
   const RouteNames._();

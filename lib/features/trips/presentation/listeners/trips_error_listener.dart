@@ -1,9 +1,9 @@
+import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/controllers/completed_offers_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
-import 'package:taxi_driver_app/features/trips/presentation/controllers/completed_offers_controller.dart';
 
 class TripsErrorListener extends ConsumerStatefulWidget {
   const TripsErrorListener({super.key});

@@ -1,10 +1,10 @@
-# Taxi Driver App
+# Bawabat Al Saeq App
 
-Android-based Flutter application for taxi drivers, built with a scalable architecture and background runtime support for real-time driver workflows.
+Android-based Flutter application for Bawabat Al Saeqs, built with a scalable architecture and background runtime support for real-time driver workflows.
 
 ## Overview
 
-**Taxi Driver App** is a driver-facing mobile application designed to support day-to-day taxi operations such as:
+**Bawabat Al Saeq App** is a driver-facing mobile application designed to support day-to-day taxi operations such as:
 
 - driver authentication
 - online/offline availability

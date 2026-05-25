@@ -1,17 +1,17 @@
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/utils/price_formatter.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offers_result_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/controllers/completed_offers_controller.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/listeners/trips_error_listener.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_content_section.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_filter_dropdown.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_section_header.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_summary_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/utils/price_formatter.dart';
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offer_entity.dart';
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offers_result_entity.dart';
-import 'package:taxi_driver_app/features/trips/presentation/controllers/completed_offers_controller.dart';
-import 'package:taxi_driver_app/features/trips/presentation/listeners/trips_error_listener.dart';
-import 'package:taxi_driver_app/features/trips/presentation/widgets/trips_content_section.dart';
-import 'package:taxi_driver_app/features/trips/presentation/widgets/trips_filter_dropdown.dart';
-import 'package:taxi_driver_app/features/trips/presentation/widgets/trips_section_header.dart';
-import 'package:taxi_driver_app/features/trips/presentation/widgets/trips_summary_card.dart';
 
 class TripsPage extends ConsumerWidget {
   const TripsPage({super.key});

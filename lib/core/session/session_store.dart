@@ -1,6 +1,6 @@
+import 'package:bawabat_al_saeq/core/session/auth_session_storage.dart';
+import 'package:bawabat_al_saeq/core/session/models/auth_session_snapshot.dart';
 import 'package:flutter/foundation.dart';
-import 'package:taxi_driver_app/core/session/auth_session_storage.dart';
-import 'package:taxi_driver_app/core/session/models/auth_session_snapshot.dart';
 
 final class AuthSession extends ChangeNotifier {
   AuthSession(this._storage);

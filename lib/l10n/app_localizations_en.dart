@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -9,7 +10,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Taxi Driver App';
+  String get appTitle => 'Bawabat Al Saeq App';
 
   @override
   String get brandName => 'Syrian Taxi';
@@ -42,7 +43,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forgotPassword => 'Forgot password?';
 
   @override
-  String get copyright => '© 2026 Taxi Driver App';
+  String get copyright => '© 2026 Bawabat Al Saeq App';
 
   @override
   String get notes => 'Notes';

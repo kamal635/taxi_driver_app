@@ -1,6 +1,6 @@
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
 
 class TripsSectionHeader extends StatelessWidget {
   const TripsSectionHeader({

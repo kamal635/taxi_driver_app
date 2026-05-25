@@ -1,13 +1,13 @@
+import 'package:bawabat_al_saeq/app/router/config/app_route_paths.dart';
+import 'package:bawabat_al_saeq/app/router/shell/widgets/app_shell_effects.dart';
+import 'package:bawabat_al_saeq/app/router/shell/widgets/app_top_bar.dart';
+import 'package:bawabat_al_saeq/app/router/shell/widgets/bottom_navigation_bar.dart';
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/features/availability/presentation/listeners/availability_feedback_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taxi_driver_app/app/router/config/app_route_paths.dart';
-import 'package:taxi_driver_app/app/router/shell/widgets/app_shell_effects.dart';
-import 'package:taxi_driver_app/app/router/shell/widgets/app_top_bar.dart';
-import 'package:taxi_driver_app/app/router/shell/widgets/bottom_navigation_bar.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/features/availability/presentation/listeners/availability_feedback_listener.dart';
 
 class AppShellPage extends StatelessWidget {
   const AppShellPage({

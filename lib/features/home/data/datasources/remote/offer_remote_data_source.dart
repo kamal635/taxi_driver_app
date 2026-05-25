@@ -1,7 +1,7 @@
-import 'package:taxi_driver_app/core/networking/api_client.dart';
-import 'package:taxi_driver_app/features/home/data/models/complete_offer_response_model.dart';
-import 'package:taxi_driver_app/features/home/data/models/current_and_pending_offer_model.dart';
-import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
+import 'package:bawabat_al_saeq/core/networking/api_client.dart';
+import 'package:bawabat_al_saeq/features/home/data/models/complete_offer_response_model.dart';
+import 'package:bawabat_al_saeq/features/home/data/models/current_and_pending_offer_model.dart';
+import 'package:bawabat_al_saeq/features/home/data/models/offer_model.dart';
 
 /// Remote contract for offer-related API calls.
 abstract interface class OfferRemoteDataSource {

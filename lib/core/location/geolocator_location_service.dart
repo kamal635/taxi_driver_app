@@ -1,6 +1,6 @@
+import 'package:bawabat_al_saeq/core/location/location_result.dart';
+import 'package:bawabat_al_saeq/core/location/location_service.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:taxi_driver_app/core/location/location_result.dart';
-import 'package:taxi_driver_app/core/location/location_service.dart';
 
 final class GeolocatorLocationService implements LocationService {
   @override

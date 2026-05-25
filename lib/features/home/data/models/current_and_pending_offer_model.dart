@@ -1,6 +1,6 @@
-import 'package:taxi_driver_app/core/utils/json_reader.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
+import 'package:bawabat_al_saeq/core/utils/json_reader.dart';
+import 'package:bawabat_al_saeq/features/home/domain/entities/current_and_pending_offer_entity.dart';
+import 'package:bawabat_al_saeq/features/home/domain/entities/offer_entity.dart';
 
 /// Combined payload that may contain the active current offer and/or a pending
 /// incoming offer.

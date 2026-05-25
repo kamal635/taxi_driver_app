@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_result.dart';
+import 'package:bawabat_al_saeq/features/auth/domain/entities/auth_sign_in_result.dart';
 
 /// Data model for the authenticated driver session returned by the backend.
 class AuthSessionModel {

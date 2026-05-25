@@ -1,9 +1,9 @@
 import 'dart:ui';
 
+import 'package:bawabat_al_saeq/app/app.dart';
+import 'package:bawabat_al_saeq/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taxi_driver_app/app/app.dart';
-import 'package:taxi_driver_app/features/auth/presentation/pages/login_page.dart';
 
 void main() {
   testWidgets('App boots without crashing', (tester) async {
@@ -17,7 +17,7 @@ void main() {
         ..resetDevicePixelRatio();
     });
 
-    await tester.pumpWidget(const ProviderScope(child: TaxiDriverApp()));
+    await tester.pumpWidget(const ProviderScope(child: BawabatAlSaeqApp()));
     await tester.pumpAndSettle();
 
     // Don’t assert localized text. Assert the first screen exists.

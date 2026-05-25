@@ -1,11 +1,11 @@
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offers_result_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/extensions/completed_period_x.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/constants/app_icons.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offers_result_entity.dart';
-import 'package:taxi_driver_app/features/trips/presentation/extensions/completed_period_x.dart';
 
 class TripsFilterDropdown extends StatelessWidget {
   const TripsFilterDropdown({

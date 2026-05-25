@@ -1,6 +1,6 @@
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/shared/presentation/forms/password_fields/password_fields_group.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/shared/presentation/forms/password_fields/password_fields_group.dart';
 
 /// Password fields used by the profile password change screen.
 class ChangePasswordForm extends StatelessWidget {

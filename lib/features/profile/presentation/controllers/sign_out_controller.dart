@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:bawabat_al_saeq/core/errors/failure.dart';
+import 'package:bawabat_al_saeq/core/session/app_sign_out_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/core/session/app_sign_out_service.dart';
 
 /// Exposes the sign-out action and its loading/error state to the UI.
 final signOutControllerProvider =

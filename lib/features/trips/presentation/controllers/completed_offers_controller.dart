@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import 'package:bawabat_al_saeq/core/errors/failure.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offers_result_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/usecases/get_completed_offers_use_case.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/providers/trips_providers.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/state/completed_offers_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offers_result_entity.dart';
-import 'package:taxi_driver_app/features/trips/domain/usecases/get_completed_offers_use_case.dart';
-import 'package:taxi_driver_app/features/trips/presentation/providers/trips_providers.dart';
-import 'package:taxi_driver_app/features/trips/presentation/state/completed_offers_state.dart';
 
 final completedOffersControllerProvider =
     NotifierProvider<CompletedOffersController, CompletedOffersState>(

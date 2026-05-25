@@ -1,8 +1,8 @@
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/features/account_security/presentation/widgets/setup_password_form_card.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/features/account_security/presentation/widgets/setup_password_form_card.dart';
 
 class SetupPasswordContent extends StatelessWidget {
   const SetupPasswordContent({

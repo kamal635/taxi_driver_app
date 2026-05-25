@@ -1,12 +1,12 @@
+import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/accept_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/complete_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/decline_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/complete_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/decline_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 
 class HomeActionFeedbackListener extends ConsumerStatefulWidget {
   const HomeActionFeedbackListener({super.key});

@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/features/home/domain/entities/complete_offer_result_entity.dart';
+import 'package:bawabat_al_saeq/features/home/domain/entities/complete_offer_result_entity.dart';
 
 /// Data model returned after completing an offer.
 final class CompleteOfferResponseModel {

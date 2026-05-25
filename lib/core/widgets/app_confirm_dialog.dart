@@ -1,10 +1,10 @@
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_text_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/widgets/app_button.dart';
-import 'package:taxi_driver_app/core/widgets/app_text_button.dart';
 
 /// Shows a shared confirm dialog and returns `true` only when confirmed.
 Future<bool> showAppConfirmDialog({

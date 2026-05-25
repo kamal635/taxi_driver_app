@@ -1,9 +1,9 @@
 import 'dart:async';
 
+import 'package:bawabat_al_saeq/core/errors/failure.dart';
+import 'package:bawabat_al_saeq/features/account_security/domain/usecases/set_password_use_case.dart';
+import 'package:bawabat_al_saeq/features/account_security/presentation/providers/account_security_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/features/account_security/domain/usecases/set_password_use_case.dart';
-import 'package:taxi_driver_app/features/account_security/presentation/providers/account_security_providers.dart';
 
 final setupPasswordControllerProvider =
     AsyncNotifierProvider<SetupPasswordController, String?>(

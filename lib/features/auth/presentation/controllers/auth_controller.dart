@@ -1,8 +1,8 @@
+import 'package:bawabat_al_saeq/core/errors/failure.dart';
+import 'package:bawabat_al_saeq/features/auth/domain/entities/auth_sign_in_result.dart';
+import 'package:bawabat_al_saeq/features/auth/domain/usecases/sign_in_use_case.dart';
+import 'package:bawabat_al_saeq/features/auth/presentation/providers/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_result.dart';
-import 'package:taxi_driver_app/features/auth/domain/usecases/sign_in_use_case.dart';
-import 'package:taxi_driver_app/features/auth/presentation/providers/auth_providers.dart';
 
 final authControllerProvider =
     AsyncNotifierProvider<AuthController, AuthSignInResult?>(

@@ -1,20 +1,20 @@
 import 'dart:async' show unawaited;
 import 'dart:io';
 
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/avatar/avatar_controller.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
+import 'package:bawabat_al_saeq/core/session/session_providers.dart';
+import 'package:bawabat_al_saeq/core/widgets/pill_switch.dart';
+import 'package:bawabat_al_saeq/features/availability/presentation/controllers/availability_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/accept_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/providers/offer_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/avatar/avatar_controller.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
-import 'package:taxi_driver_app/core/session/session_providers.dart';
-import 'package:taxi_driver_app/core/widgets/pill_switch.dart';
-import 'package:taxi_driver_app/features/availability/presentation/controllers/availability_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
 
 class AppTopBar extends ConsumerWidget {
   const AppTopBar({
