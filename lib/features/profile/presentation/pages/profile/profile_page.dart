@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Driver profile screen.
 class ProfilePage extends ConsumerStatefulWidget {
@@ -28,6 +29,11 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
+  static const String _privacyPolicyUrl =
+      'https://taxi-dashboard.laithroom.com/privacy-policy';
+  static const String _termsAndConditionsUrl =
+      'https://taxi-dashboard.laithroom.com/terms-conditions';
+
   ProviderSubscription<AsyncValue<bool>>? _signOutSubscription;
 
   @override
@@ -102,7 +108,31 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ],
           ),
           AppSpacing.h18,
-
+          ProfileSection(
+            title: _isArabic(context)
+                ? 'المعلومات القانونية'
+                : 'Legal information',
+            children: [
+              ProfileSectionItem(
+                title: _isArabic(context) ? 'سياسة الخصوصية' : 'Privacy Policy',
+                subtitle: _isArabic(context)
+                    ? 'تعرف على كيفية حماية بياناتك'
+                    : 'Learn how your data is protected',
+                icon: AppIcons.privacyPolicy,
+                onPressed: () => _openExternalUrl(_privacyPolicyUrl),
+              ),
+              ProfileSectionItem(
+                title: _isArabic(context)
+                    ? 'الشروط والأحكام'
+                    : 'Terms & Conditions',
+                subtitle: _isArabic(context)
+                    ? 'اقرأ شروط استخدام التطبيق'
+                    : 'Read the app terms of use',
+                icon: AppIcons.termsAndConditions,
+                onPressed: () => _openExternalUrl(_termsAndConditionsUrl),
+              ),
+            ],
+          ),
           AppSpacing.h18,
           ProfileSection(
             title: context.l10n.profileSectionSignOut,
@@ -119,6 +149,23 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         ],
       ),
     );
+  }
+
+  bool _isArabic(BuildContext context) {
+    return Localizations.localeOf(context).languageCode == 'ar';
+  }
+
+  Future<void> _openExternalUrl(String url) async {
+    final uri = Uri.parse(url);
+
+    final didLaunch = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!didLaunch) {
+      debugPrint('Could not launch $url');
+    }
   }
 
   Future<void> _openChangePasswordPage() async {
