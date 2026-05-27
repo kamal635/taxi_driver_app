@@ -21,14 +21,23 @@ final class AuthSession extends ChangeNotifier {
   bool get isLoggedIn => _snapshot.isLoggedIn;
 
   Future<void> load() async {
+    final values = await Future.wait<Object?>([
+      _storage.readToken(),
+      _storage.readRefreshToken(),
+      _storage.readDriverId(),
+      _storage.readDriverName(),
+      _storage.readDriverPhone(),
+      _storage.readMustChangePassword(),
+    ]);
+
     _setSnapshot(
       AuthSessionSnapshot(
-        token: await _storage.readToken(),
-        refreshToken: await _storage.readRefreshToken(),
-        driverId: await _storage.readDriverId(),
-        driverName: await _storage.readDriverName(),
-        driverPhone: await _storage.readDriverPhone(),
-        mustChangePassword: await _storage.readMustChangePassword(),
+        token: values[0] as String?,
+        refreshToken: values[1] as String?,
+        driverId: values[2] as String?,
+        driverName: values[3] as String?,
+        driverPhone: values[4] as String?,
+        mustChangePassword: values[5]! as bool,
         isReady: true,
       ),
     );
@@ -57,9 +66,7 @@ final class AuthSession extends ChangeNotifier {
   }
 
   Future<void> markPasswordCreated() async {
-    final nextSnapshot = _snapshot.copyWith(
-      mustChangePassword: false,
-    );
+    final nextSnapshot = _snapshot.copyWith(mustChangePassword: false);
 
     await _storage.writeMustChangePassword(value: false);
     _setSnapshot(nextSnapshot);
@@ -85,15 +92,7 @@ final class AuthSession extends ChangeNotifier {
   }
 
   Future<void> clear() async {
-    final clearedSnapshot = _snapshot.copyWith(
-      mustChangePassword: false,
-      clearToken: true,
-      clearRefreshToken: true,
-      clearDriverId: true,
-      clearDriverName: true,
-      clearDriverPhone: true,
-      isReady: true,
-    );
+    const clearedSnapshot = AuthSessionSnapshot.readyUnauthenticated();
 
     await _storage.clear();
     _setSnapshot(clearedSnapshot);
@@ -111,6 +110,8 @@ final class AuthSession extends ChangeNotifier {
   }
 
   void _setSnapshot(AuthSessionSnapshot snapshot) {
+    if (_snapshot == snapshot) return;
+
     _snapshot = snapshot;
     notifyListeners();
   }

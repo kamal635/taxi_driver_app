@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Remote data source provider.
 final completedOffersRemoteDataSourceProvider =
     Provider<CompletedOffersRemoteDataSource>((ref) {
-      final apiClient = ref.read(apiClientProvider);
+      final apiClient = ref.watch(apiClientProvider);
       return CompletedOffersRemoteDataSourceImpl(apiClient: apiClient);
     });
 
@@ -16,16 +16,14 @@ final completedOffersRemoteDataSourceProvider =
 final completedOffersRepositoryProvider = Provider<CompletedOffersRepository>((
   ref,
 ) {
-  final remoteDataSource = ref.read(completedOffersRemoteDataSourceProvider);
-  return CompletedOffersRepositoryImpl(
-    remoteDataSource: remoteDataSource,
-  );
+  final remoteDataSource = ref.watch(completedOffersRemoteDataSourceProvider);
+  return CompletedOffersRepositoryImpl(remoteDataSource: remoteDataSource);
 });
 
 /// Use case provider.
 final getCompletedOffersUseCaseProvider = Provider<GetCompletedOffersUseCase>((
   ref,
 ) {
-  final repository = ref.read(completedOffersRepositoryProvider);
+  final repository = ref.watch(completedOffersRepositoryProvider);
   return GetCompletedOffersUseCase(repository: repository);
 });

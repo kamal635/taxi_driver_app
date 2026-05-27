@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginScreenBody extends StatelessWidget {
   const LoginScreenBody({
+    required this.formKey,
     required this.phoneController,
     required this.passwordController,
     required this.obscurePassword,
@@ -15,6 +16,7 @@ class LoginScreenBody extends StatelessWidget {
     super.key,
   });
 
+  final GlobalKey<FormState> formKey;
   final TextEditingController phoneController;
   final TextEditingController passwordController;
   final bool obscurePassword;
@@ -27,24 +29,28 @@ class LoginScreenBody extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  children: [
-                    const LoginHeader(),
-                    LoginForm(
-                      phoneController: phoneController,
-                      passwordController: passwordController,
-                      obscurePassword: obscurePassword,
-                      onTogglePasswordVisibility: onTogglePasswordVisibility,
-                      isLoading: isLoading,
-                      onSubmit: onSubmit,
-                    ),
-                  ],
+                AutofillGroup(
+                  child: Column(
+                    children: [
+                      const LoginHeader(),
+                      LoginForm(
+                        formKey: formKey,
+                        phoneController: phoneController,
+                        passwordController: passwordController,
+                        obscurePassword: obscurePassword,
+                        onTogglePasswordVisibility: onTogglePasswordVisibility,
+                        isLoading: isLoading,
+                        onSubmit: onSubmit,
+                      ),
+                    ],
+                  ),
                 ),
                 const LoginFooter(),
               ],

@@ -14,8 +14,8 @@ class OfferCard extends StatelessWidget {
     required this.statusLabel,
     required this.totalFare,
     required this.pickup,
-    required this.dropoff,
     required this.isPendingOffer,
+    this.dropoff,
     this.notes,
     this.expiresAt,
     this.customerPhone,
@@ -33,7 +33,7 @@ class OfferCard extends StatelessWidget {
     required DateTime expiresAt,
     required String totalFare,
     required String pickup,
-    required String dropoff,
+    String? dropoff,
     String? notes,
     bool isAcceptLoading = false,
     bool isDeclineLoading = false,
@@ -59,10 +59,10 @@ class OfferCard extends StatelessWidget {
     required String statusLabel,
     required String totalFare,
     required String pickup,
-    required String dropoff,
     required String customerPhone,
     required DateTime cooldownUntil,
     required bool isCompletedLoading,
+    String? dropoff,
     String? notes,
     VoidCallback? onComplete,
   }) {
@@ -83,7 +83,7 @@ class OfferCard extends StatelessWidget {
   final String statusLabel;
   final String totalFare;
   final String pickup;
-  final String dropoff;
+  final String? dropoff;
   final String? notes;
   final bool isPendingOffer;
 
@@ -143,7 +143,7 @@ class OfferCard extends StatelessWidget {
           ),
         ),
         if (notes != null && notes!.trim().isNotEmpty)
-          OfferNotesCard(notes: notes!),
+          OfferNotesCard(notes: notes!.trim()),
         AppSpacing.h32,
       ],
     );

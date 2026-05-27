@@ -3,7 +3,7 @@ import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_e
 
 /// Data model for a single completed trip.
 final class CompletedOfferModel {
-  CompletedOfferModel({
+  const CompletedOfferModel({
     required this.offerId,
     required this.pickup,
     required this.price,
@@ -13,15 +13,72 @@ final class CompletedOfferModel {
   });
 
   factory CompletedOfferModel.fromJson(Map<String, dynamic> json) {
+    final createdAt = JsonReader.optionalAnyDateTime(json, _createdAtKeys);
+    final updatedAt = JsonReader.optionalAnyDateTime(json, _updatedAtKeys);
+    final fallbackDateTime =
+        updatedAt ??
+        createdAt ??
+        JsonReader.requireAnyDateTime(
+          json,
+          [..._updatedAtKeys, ..._createdAtKeys],
+        );
+
     return CompletedOfferModel(
-      offerId: JsonReader.requireString(json, 'id'),
-      pickup: JsonReader.requireString(json, 'pickup_text'),
-      dropoff: JsonReader.optionalString(json, 'dropoff_text'),
-      price: JsonReader.requireString(json, 'price'),
-      createdAt: JsonReader.requireDateTime(json, 'created_at'),
-      updatedAt: JsonReader.requireDateTime(json, 'updated_at'),
+      offerId: JsonReader.requireAnyString(json, _idKeys),
+      pickup: JsonReader.requireAnyString(json, _pickupKeys),
+      dropoff: JsonReader.optionalAnyString(json, _dropoffKeys),
+      price: JsonReader.requireAnyString(json, _priceKeys),
+      createdAt: createdAt ?? fallbackDateTime,
+      updatedAt: updatedAt ?? fallbackDateTime,
     );
   }
+
+  static const List<String> _idKeys = [
+    'id',
+    'order_id',
+    'orderId',
+    'offer_id',
+    'offerId',
+  ];
+
+  static const List<String> _pickupKeys = [
+    'pickup_text',
+    'pickupText',
+    'pickup_address',
+    'pickupAddress',
+    'pickup',
+  ];
+
+  static const List<String> _dropoffKeys = [
+    'dropoff_text',
+    'dropoffText',
+    'dropoff_address',
+    'dropoffAddress',
+    'dropoff',
+    'destination',
+  ];
+
+  static const List<String> _priceKeys = [
+    'price',
+    'fare',
+    'total_price',
+    'totalPrice',
+    'amount',
+  ];
+
+  static const List<String> _createdAtKeys = [
+    'created_at',
+    'createdAt',
+    'requested_at',
+    'requestedAt',
+  ];
+
+  static const List<String> _updatedAtKeys = [
+    'updated_at',
+    'updatedAt',
+    'completed_at',
+    'completedAt',
+  ];
 
   final String offerId;
   final String pickup;

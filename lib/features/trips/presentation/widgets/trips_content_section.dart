@@ -11,42 +11,39 @@ class TripsContentSection extends StatelessWidget {
   const TripsContentSection({
     required this.offers,
     required this.isInitialLoading,
-    required this.isRefreshing,
     super.key,
   });
 
   final List<CompletedOfferEntity> offers;
   final bool isInitialLoading;
-  final bool isRefreshing;
 
   @override
   Widget build(BuildContext context) {
     if (isInitialLoading) {
-      return const TripsLoadingState();
+      return const SliverToBoxAdapter(child: TripsLoadingState());
     }
 
     if (offers.isEmpty) {
-      return TripsEmptyState(
-        icon: AppIcons.car,
-        title: context.l10n.tripsEmptyTitle,
-        subtitle: context.l10n.tripsEmptySubtitle,
+      return SliverToBoxAdapter(
+        child: TripsEmptyState(
+          icon: AppIcons.car,
+          title: context.l10n.tripsEmptyTitle,
+          subtitle: context.l10n.tripsEmptySubtitle,
+        ),
       );
     }
 
-    return Column(
-      children: [
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: offers.length,
-          separatorBuilder: (_, _) => AppSpacing.h4,
-          itemBuilder: (context, index) {
-            final offer = offers[index];
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          final isSeparator = index.isOdd;
+          if (isSeparator) return AppSpacing.h4;
 
-            return CompletedTripCard(offer: offer);
-          },
-        ),
-      ],
+          final offerIndex = index ~/ 2;
+          return CompletedTripCard(offer: offers[offerIndex]);
+        },
+        childCount: offers.length * 2 - 1,
+      ),
     );
   }
 }

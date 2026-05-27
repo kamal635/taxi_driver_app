@@ -12,7 +12,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Bawabat Al Saeq App';
 
   @override
-  String get brandName => 'Syrian Taxi';
+  String get brandName => 'Bawabat Al Saeq';
 
   @override
   String get brandSubtitle => 'Approved drivers platform';
@@ -43,6 +43,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copyright => '© 2026 Bawabat Al Saeq App';
+
+  @override
+  String get legalPrivacyPolicy => 'Privacy Policy';
+
+  @override
+  String get legalTermsAndConditions => 'Terms & Conditions';
+
+  @override
+  String get validationPhoneRequired => 'Please enter your phone number.';
+
+  @override
+  String get validationPasswordRequired => 'Please enter your password.';
+
+  @override
+  String get authShowPassword => 'Show password';
+
+  @override
+  String get authHidePassword => 'Hide password';
 
   @override
   String get notes => 'Notes';
@@ -215,6 +233,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileSectionSignOut => 'Sign out';
 
   @override
+  String get profileSectionLegal => 'Legal information';
+
+  @override
+  String get profilePrivacyPolicySubtitle => 'Learn how your data is protected';
+
+  @override
+  String get profileTermsAndConditionsSubtitle => 'Read the app terms of use';
+
+  @override
+  String get profilePasswordUpdatedSuccess => 'Password updated successfully.';
+
+  @override
+  String get profilePasswordMismatch => 'Passwords do not match.';
+
+  @override
   String get profileEditTitle => 'Edit profile';
 
   @override
@@ -314,8 +347,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String tripsTotalTrips(int count) {
-    return 'total trips: ($count)';
+    return 'Total trips: ($count)';
   }
+
+  @override
+  String get tripsPickupLabel => 'From';
+
+  @override
+  String get tripsDropoffLabel => 'To';
 
   @override
   String get errorUnexpected => 'Something went wrong. Please try again.';
@@ -400,6 +439,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'No internet connection. We can\'t update your location.';
 
   @override
+  String get availabilityNotificationPermissionRequired =>
+      'Notification permission is required to receive ride requests in the background.';
+
+  @override
+  String get availabilityBackgroundServiceStartFailed =>
+      'Unable to start background request service. Please try again.';
+
+  @override
+  String get availabilityBackgroundServiceStopped =>
+      'Request receiving service stopped. You have been set offline.';
+
+  @override
+  String get availabilityRuntimeError =>
+      'Unable to start availability mode. Please try again.';
+
+  @override
   String get actionSettings => 'Settings';
 
   @override
@@ -458,6 +513,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get price => 'Price: ';
+
+  @override
+  String get currencySyrianPound => 'SYP';
 
   @override
   String get customerPhone => 'CUSTOMER PHONE';

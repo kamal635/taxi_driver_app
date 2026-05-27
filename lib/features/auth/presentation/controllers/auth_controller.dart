@@ -1,4 +1,3 @@
-import 'package:bawabat_al_saeq/core/errors/failure.dart';
 import 'package:bawabat_al_saeq/features/auth/domain/entities/auth_sign_in_result.dart';
 import 'package:bawabat_al_saeq/features/auth/domain/usecases/sign_in_use_case.dart';
 import 'package:bawabat_al_saeq/features/auth/presentation/providers/auth_providers.dart';
@@ -10,11 +9,11 @@ final authControllerProvider =
     );
 
 /// Handles the sign-in request state for the UI layer.
-class AuthController extends AsyncNotifier<AuthSignInResult?> {
+final class AuthController extends AsyncNotifier<AuthSignInResult?> {
   late final SignInUseCase _signInUseCase;
 
   @override
-  Future<AuthSignInResult?> build() async {
+  AuthSignInResult? build() {
     _signInUseCase = ref.read(signInUseCaseProvider);
     return null;
   }
@@ -25,7 +24,11 @@ class AuthController extends AsyncNotifier<AuthSignInResult?> {
     required String password,
     String? fcmToken,
   }) async {
-    state = const AsyncLoading();
+    if (state.isLoading) {
+      return;
+    }
+
+    state = const AsyncLoading<AuthSignInResult?>();
 
     try {
       final result = await _signInUseCase(
@@ -35,10 +38,8 @@ class AuthController extends AsyncNotifier<AuthSignInResult?> {
       );
 
       state = AsyncData(result);
-    } on Failure catch (failure, stackTrace) {
-      state = AsyncError(failure, stackTrace);
-    } on Exception catch (exception, stackTrace) {
-      state = AsyncError(exception, stackTrace);
+    } on Object catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
     }
   }
 }

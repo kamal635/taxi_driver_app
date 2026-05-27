@@ -21,6 +21,15 @@ class AuthSessionSnapshot {
       mustChangePassword = false,
       isReady = false;
 
+  const AuthSessionSnapshot.readyUnauthenticated()
+    : token = null,
+      refreshToken = null,
+      driverId = null,
+      driverName = null,
+      driverPhone = null,
+      mustChangePassword = false,
+      isReady = true;
+
   final String? token;
   final String? refreshToken;
   final String? driverId;
@@ -30,10 +39,7 @@ class AuthSessionSnapshot {
   final bool isReady;
 
   bool get isLoggedIn =>
-      token != null &&
-      driverId != null &&
-      token!.isNotEmpty &&
-      driverId!.isNotEmpty;
+      _hasText(token) && _hasText(refreshToken) && _hasText(driverId);
 
   AuthSessionSnapshot copyWith({
     String? token,
@@ -61,4 +67,32 @@ class AuthSessionSnapshot {
       isReady: isReady ?? this.isReady,
     );
   }
+
+  static bool _hasText(String? value) {
+    return value != null && value.trim().isNotEmpty;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is AuthSessionSnapshot &&
+            token == other.token &&
+            refreshToken == other.refreshToken &&
+            driverId == other.driverId &&
+            driverName == other.driverName &&
+            driverPhone == other.driverPhone &&
+            mustChangePassword == other.mustChangePassword &&
+            isReady == other.isReady;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    token,
+    refreshToken,
+    driverId,
+    driverName,
+    driverPhone,
+    mustChangePassword,
+    isReady,
+  );
 }

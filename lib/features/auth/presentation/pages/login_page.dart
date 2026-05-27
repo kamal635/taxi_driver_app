@@ -20,8 +20,11 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+
   late final TextEditingController _phoneTextController;
   late final TextEditingController _passwordTextController;
+
   ProviderSubscription<AsyncValue<AuthSignInResult?>>? _authSubscription;
 
   bool _isPasswordObscured = true;
@@ -29,6 +32,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   void initState() {
     super.initState();
+
     _phoneTextController = TextEditingController();
     _passwordTextController = TextEditingController();
 
@@ -52,6 +56,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   ) async {
     await next.whenOrNull(
       error: (error, _) async {
+        if (!mounted) {
+          return;
+        }
+
         final message = failureToUserMessage(
           error,
           l10n: context.l10n,
@@ -68,10 +76,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         switch (result) {
           case AuthSignedIn(:final authSession):
             await _saveSignedInSession(authSession);
-            return;
           case AuthSetupRequired(:final authSession):
             await _saveSetupRequiredSession(authSession);
-            return;
         }
       },
     );
@@ -94,14 +100,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ),
         child: SafeArea(
           child: LoginScreenBody(
+            formKey: _formKey,
             phoneController: _phoneTextController,
             passwordController: _passwordTextController,
             obscurePassword: _isPasswordObscured,
-            onTogglePasswordVisibility: () {
-              setState(() {
-                _isPasswordObscured = !_isPasswordObscured;
-              });
-            },
+            onTogglePasswordVisibility: _togglePasswordVisibility,
             isLoading: isLoading,
             onSubmit: isLoading ? null : _submitSignIn,
           ),
@@ -110,14 +113,25 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isPasswordObscured = !_isPasswordObscured;
+    });
+  }
+
   Future<void> _submitSignIn() async {
+    final formState = _formKey.currentState;
+    if (formState == null || !formState.validate()) {
+      return;
+    }
+
     TextInput.finishAutofillContext();
     FocusScope.of(context).unfocus();
 
     await ref
         .read(authControllerProvider.notifier)
         .signIn(
-          phone: _phoneTextController.text.trim(),
+          phone: _phoneTextController.text,
           password: _passwordTextController.text,
         );
   }
@@ -134,9 +148,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           mustChangePassword: false,
         );
 
-    if (mounted) {
-      context.go(AppRoutePaths.home);
+    if (!mounted) {
+      return;
     }
+
+    context.go(AppRoutePaths.home);
   }
 
   Future<void> _saveSetupRequiredSession(AuthSessionEntity session) async {
@@ -151,8 +167,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           mustChangePassword: true,
         );
 
-    if (mounted) {
-      context.go(AppRoutePaths.setupPassword, extra: session);
+    if (!mounted) {
+      return;
     }
+
+    context.go(AppRoutePaths.setupPassword, extra: session);
   }
 }

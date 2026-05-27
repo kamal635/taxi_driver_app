@@ -22,6 +22,7 @@ class NewOfferActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isBusy = isAcceptLoading || isDeclineLoading;
 
     return Row(
       children: [
@@ -32,7 +33,7 @@ class NewOfferActions extends StatelessWidget {
             labelColor: AppColors.error,
             backgroundColor: Colors.transparent,
             label: l10n.decline,
-            onPressed: onDecline,
+            onPressed: isBusy ? null : onDecline,
             isLoading: isDeclineLoading,
           ),
         ),
@@ -42,7 +43,7 @@ class NewOfferActions extends StatelessWidget {
           child: AppButton(
             isLoading: isAcceptLoading,
             label: l10n.actionAccept,
-            onPressed: onAccept,
+            onPressed: isBusy ? null : onAccept,
           ),
         ),
       ],

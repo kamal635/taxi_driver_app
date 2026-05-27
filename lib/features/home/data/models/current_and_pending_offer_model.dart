@@ -11,19 +11,8 @@ final class CurrentAndPendingOfferModel {
   });
 
   factory CurrentAndPendingOfferModel.fromJson(Map<String, dynamic> json) {
-    final currentRaw = json['currentOrder'];
-    final pendingRaw = json['pendingOffer'];
-
-    if (currentRaw != null && currentRaw is! Map<String, dynamic>) {
-      throw const FormatException('Invalid currentOrder');
-    }
-
-    if (pendingRaw != null && pendingRaw is! Map<String, dynamic>) {
-      throw const FormatException('Invalid pendingOffer');
-    }
-
-    final currentJson = currentRaw as Map<String, dynamic>?;
-    final pendingJson = pendingRaw as Map<String, dynamic>?;
+    final currentJson = JsonReader.optionalMap(json, 'currentOrder');
+    final pendingJson = JsonReader.optionalMap(json, 'pendingOffer');
 
     return CurrentAndPendingOfferModel(
       currentOffer: currentJson == null
@@ -61,14 +50,23 @@ final class CurrentOfferModel {
 
   factory CurrentOfferModel.fromJson(Map<String, dynamic> json) {
     return CurrentOfferModel(
-      offerId: JsonReader.requireString(json, 'order_id'),
-      customerPhone: JsonReader.requireString(json, 'customer_phone'),
-      pickup: JsonReader.requireString(json, 'pickup_text'),
-      dropoff: JsonReader.optionalString(json, 'dropoff_text'),
-      notes: JsonReader.optionalString(json, 'note'),
-      price: JsonReader.requireString(json, 'price'),
-      type: JsonReader.requireString(json, 'order_status'),
-      cooldownUntil: JsonReader.requireDateTime(json, 'cooldown_until'),
+      offerId: JsonReader.requireAnyString(json, _CurrentOfferJsonKeys.offerId),
+      customerPhone: JsonReader.requireAnyString(
+        json,
+        _CurrentOfferJsonKeys.customerPhone,
+      ),
+      pickup: JsonReader.requireAnyString(json, _CurrentOfferJsonKeys.pickup),
+      dropoff: JsonReader.optionalAnyString(
+        json,
+        _CurrentOfferJsonKeys.dropoff,
+      ),
+      notes: JsonReader.optionalAnyString(json, _CurrentOfferJsonKeys.notes),
+      price: JsonReader.requireAnyString(json, _CurrentOfferJsonKeys.price),
+      type: JsonReader.requireAnyString(json, _CurrentOfferJsonKeys.type),
+      cooldownUntil: JsonReader.requireAnyDateTime(
+        json,
+        _CurrentOfferJsonKeys.cooldownUntil,
+      ),
     );
   }
 
@@ -109,13 +107,19 @@ final class PendingOfferModel {
 
   factory PendingOfferModel.fromJson(Map<String, dynamic> json) {
     return PendingOfferModel(
-      offerId: JsonReader.requireString(json, 'order_id'),
-      pickup: JsonReader.requireString(json, 'pickup_text'),
-      dropoff: JsonReader.optionalString(json, 'dropoff_text'),
-      notes: JsonReader.optionalString(json, 'note'),
-      price: JsonReader.requireString(json, 'price'),
-      type: JsonReader.requireString(json, 'order_status'),
-      expiresAt: JsonReader.requireDateTime(json, 'expires_at'),
+      offerId: JsonReader.requireAnyString(json, _PendingOfferJsonKeys.offerId),
+      pickup: JsonReader.requireAnyString(json, _PendingOfferJsonKeys.pickup),
+      dropoff: JsonReader.optionalAnyString(
+        json,
+        _PendingOfferJsonKeys.dropoff,
+      ),
+      notes: JsonReader.optionalAnyString(json, _PendingOfferJsonKeys.notes),
+      price: JsonReader.requireAnyString(json, _PendingOfferJsonKeys.price),
+      type: JsonReader.requireAnyString(json, _PendingOfferJsonKeys.type),
+      expiresAt: JsonReader.requireAnyDateTime(
+        json,
+        _PendingOfferJsonKeys.expiresAt,
+      ),
     );
   }
 
@@ -138,4 +142,29 @@ final class PendingOfferModel {
       expiresAt: expiresAt,
     );
   }
+}
+
+final class _CurrentOfferJsonKeys {
+  const _CurrentOfferJsonKeys._();
+
+  static const offerId = ['order_id', 'orderId', 'id'];
+  static const customerPhone = ['customer_phone', 'customerPhone', 'phone'];
+  static const pickup = ['pickup_text', 'pickupText', 'pickup'];
+  static const dropoff = ['dropoff_text', 'dropoffText', 'dropoff'];
+  static const notes = ['note', 'notes'];
+  static const price = ['price', 'fare', 'total'];
+  static const type = ['order_status', 'type', 'status'];
+  static const cooldownUntil = ['cooldown_until', 'cooldownUntil'];
+}
+
+final class _PendingOfferJsonKeys {
+  const _PendingOfferJsonKeys._();
+
+  static const offerId = ['order_id', 'orderId', 'id'];
+  static const pickup = ['pickup_text', 'pickupText', 'pickup'];
+  static const dropoff = ['dropoff_text', 'dropoffText', 'dropoff'];
+  static const notes = ['note', 'notes'];
+  static const price = ['price', 'fare', 'total'];
+  static const type = ['order_status', 'type', 'status'];
+  static const expiresAt = ['expires_at', 'expiresAt'];
 }

@@ -5,6 +5,7 @@ import 'package:bawabat_al_saeq/core/session/app_force_logout_coordinator.dart';
 import 'package:bawabat_al_saeq/core/utils/centered_page.dart';
 import 'package:bawabat_al_saeq/core/utils/screen_util_design_size.dart';
 import 'package:bawabat_al_saeq/core/widgets/app_background.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_system_ui.dart';
 import 'package:bawabat_al_saeq/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,15 +45,17 @@ class BawabatAlSaeqApp extends ConsumerWidget {
             theme: AppTheme.light(_appLocale),
             routerConfig: router,
             builder: (context, child) {
-              return Stack(
-                children: [
-                  const AppBackground(),
-                  Positioned.fill(
-                    child: CenteredPage(
-                      child: child ?? const SizedBox.shrink(),
+              return AppSystemUi(
+                child: Stack(
+                  children: [
+                    const AppBackground(),
+                    Positioned.fill(
+                      child: CenteredPage(
+                        child: child ?? const SizedBox.shrink(),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               );
             },
           ),

@@ -4,14 +4,19 @@ import 'package:flutter/material.dart';
 final class AppColors {
   AppColors._();
 
+  // Brand colors.
   static const Color primary = Color(0xFFFFD400);
+  static const Color brandNavy = Color(0xFF062F46);
+  static const Color brandGold = primary;
 
+  // Backgrounds.
   static const Color bgWarm = Color(0xFFFFF8E1);
   static const Color bgBase = Color(0xFFF7F7F7);
+  static const Color surface = Color(0xFFFFFFFF);
 
+  // Text and borders.
   static const Color textPrimary = Color(0xFF111827);
   static const Color textSecondary = Color(0xFF6B7280);
-
   static const Color border = Color(0xFFE5E7EB);
   static const Color iconMuted = Color(0xFF9CA3AF);
 
@@ -25,5 +30,6 @@ final class AppColors {
   static const Color info = Color(0xFF1D4ED8);
   static const Color infoBg = Color(0xFFEFF6FF);
 
-  static const Color white = Color(0xFFFFFFFF);
+  // Backward-compatible alias used by existing widgets.
+  static const Color white = surface;
 }

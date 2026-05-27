@@ -1,13 +1,15 @@
-import 'dart:async';
+import 'dart:async' show unawaited;
 
 import 'package:bawabat_al_saeq/app/router/config/app_route_names.dart';
 import 'package:bawabat_al_saeq/app/router/config/app_route_paths.dart';
 import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
+import 'package:bawabat_al_saeq/core/constants/app_links.dart';
 import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
+import 'package:bawabat_al_saeq/core/services/external_url_launcher.dart';
 import 'package:bawabat_al_saeq/core/session/session_providers.dart';
 import 'package:bawabat_al_saeq/core/widgets/app_confirm_dialog.dart';
 import 'package:bawabat_al_saeq/features/profile/presentation/controllers/sign_out_controller.dart';
@@ -18,7 +20,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// Driver profile screen.
 class ProfilePage extends ConsumerStatefulWidget {
@@ -29,11 +30,6 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-  static const String _privacyPolicyUrl =
-      'https://taxi-dashboard.laithroom.com/privacy-policy';
-  static const String _termsAndConditionsUrl =
-      'https://taxi-dashboard.laithroom.com/terms-conditions';
-
   ProviderSubscription<AsyncValue<bool>>? _signOutSubscription;
 
   @override
@@ -61,12 +57,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           l10n: context.l10n,
         );
         context.showAppSnack(message, type: AppSnackType.error);
+        ref.read(signOutControllerProvider.notifier).reset();
       },
       data: (didSignOut) async {
-        if (!didSignOut || (previous?.value ?? false) || !mounted) {
+        if (!didSignOut || (previous?.asData?.value ?? false) || !mounted) {
           return;
         }
 
+        ref.read(signOutControllerProvider.notifier).reset();
         context.go(AppRoutePaths.login);
       },
     );
@@ -80,7 +78,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final authSession = ref.watch(authSessionProvider);
+    final isSigningOut = ref.watch(
+      signOutControllerProvider.select((state) => state.isLoading),
+    );
     final displayName = _safeDisplayValue(authSession.driverName);
     final phoneNumber = _safeDisplayValue(authSession.driverPhone);
 
@@ -97,11 +99,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           ),
           AppSpacing.h18,
           ProfileSection(
-            title: context.l10n.profileSectionAccount,
+            title: l10n.profileSectionAccount,
             children: [
               ProfileSectionItem(
-                title: context.l10n.profileChangePasswordTitle,
-                subtitle: context.l10n.profileChangePasswordSubtitle,
+                title: l10n.profileChangePasswordTitle,
+                subtitle: l10n.profileChangePasswordSubtitle,
                 icon: AppIcons.lock,
                 onPressed: _openChangePasswordPage,
               ),
@@ -109,63 +111,48 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           ),
           AppSpacing.h18,
           ProfileSection(
-            title: _isArabic(context)
-                ? 'المعلومات القانونية'
-                : 'Legal information',
+            title: l10n.profileSectionLegal,
             children: [
               ProfileSectionItem(
-                title: _isArabic(context) ? 'سياسة الخصوصية' : 'Privacy Policy',
-                subtitle: _isArabic(context)
-                    ? 'تعرف على كيفية حماية بياناتك'
-                    : 'Learn how your data is protected',
+                title: l10n.legalPrivacyPolicy,
+                subtitle: l10n.profilePrivacyPolicySubtitle,
                 icon: AppIcons.privacyPolicy,
-                onPressed: () => _openExternalUrl(_privacyPolicyUrl),
+                onPressed: () => unawaited(
+                  ExternalUrlLauncher.open(AppLinks.privacyPolicy),
+                ),
               ),
               ProfileSectionItem(
-                title: _isArabic(context)
-                    ? 'الشروط والأحكام'
-                    : 'Terms & Conditions',
-                subtitle: _isArabic(context)
-                    ? 'اقرأ شروط استخدام التطبيق'
-                    : 'Read the app terms of use',
+                title: l10n.legalTermsAndConditions,
+                subtitle: l10n.profileTermsAndConditionsSubtitle,
                 icon: AppIcons.termsAndConditions,
-                onPressed: () => _openExternalUrl(_termsAndConditionsUrl),
+                onPressed: () => unawaited(
+                  ExternalUrlLauncher.open(AppLinks.termsAndConditions),
+                ),
               ),
             ],
           ),
           AppSpacing.h18,
           ProfileSection(
-            title: context.l10n.profileSectionSignOut,
+            title: l10n.profileSectionSignOut,
             children: [
               ProfileSectionItem(
                 isDestructive: true,
-                title: context.l10n.profileSignOutTitle,
-                subtitle: context.l10n.profileSignOutSubtitle,
+                title: l10n.profileSignOutTitle,
+                subtitle: l10n.profileSignOutSubtitle,
                 icon: AppIcons.signOut,
-                onPressed: _handleSignOutPressed,
+                onPressed: isSigningOut ? null : _handleSignOutPressed,
+                trailing: isSigningOut
+                    ? SizedBox.square(
+                        dimension: 18.r,
+                        child: const CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : null,
               ),
             ],
           ),
         ],
       ),
     );
-  }
-
-  bool _isArabic(BuildContext context) {
-    return Localizations.localeOf(context).languageCode == 'ar';
-  }
-
-  Future<void> _openExternalUrl(String url) async {
-    final uri = Uri.parse(url);
-
-    final didLaunch = await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
-    );
-
-    if (!didLaunch) {
-      debugPrint('Could not launch $url');
-    }
   }
 
   Future<void> _openChangePasswordPage() async {

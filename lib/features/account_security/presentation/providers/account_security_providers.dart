@@ -8,19 +8,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Provides the remote data source used by the feature.
 final accountSecurityRemoteDataSourceProvider =
     Provider<AccountSecurityRemoteDataSource>((ref) {
-      return AccountSecurityRemoteDataSourceImpl(ref.read(apiClientProvider));
+      return AccountSecurityRemoteDataSourceImpl(ref.watch(apiClientProvider));
     });
 
 /// Provides the repository implementation used by the feature.
-final accountSecurityRepositoryProvider = Provider<AccountSecurityRepository>((
-  ref,
-) {
-  return AccountSecurityRepositoryImpl(
-    ref.read(accountSecurityRemoteDataSourceProvider),
-  );
-});
+final accountSecurityRepositoryProvider = Provider<AccountSecurityRepository>(
+  (ref) {
+    return AccountSecurityRepositoryImpl(
+      ref.watch(accountSecurityRemoteDataSourceProvider),
+    );
+  },
+);
 
-/// Provides the use case responsible for setting the password.
+/// Provides the use case responsible for creating the driver's password.
 final setPasswordUseCaseProvider = Provider<SetPasswordUseCase>((ref) {
-  return SetPasswordUseCase(ref.read(accountSecurityRepositoryProvider));
+  return SetPasswordUseCase(ref.watch(accountSecurityRepositoryProvider));
 });

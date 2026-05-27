@@ -18,10 +18,11 @@ class _TripsErrorListenerState extends ConsumerState<TripsErrorListener> {
   @override
   void initState() {
     super.initState();
+
     _subscription = ref.listenManual<Object?>(
       completedOffersControllerProvider.select((state) => state.error),
       (previous, next) {
-        if (next == null || identical(previous, next)) {
+        if (!mounted || next == null || identical(previous, next)) {
           return;
         }
 
@@ -34,6 +35,7 @@ class _TripsErrorListenerState extends ConsumerState<TripsErrorListener> {
   @override
   void dispose() {
     _subscription?.close();
+    _subscription = null;
     super.dispose();
   }
 

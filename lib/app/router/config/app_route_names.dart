@@ -8,5 +8,4 @@ abstract final class AppRouteNames {
   static const String trips = 'trips';
   static const String profile = 'profile';
   static const String profilePassword = 'profilePassword';
-  static const String profileAppUpdate = 'profileAppUpdate';
 }

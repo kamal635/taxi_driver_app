@@ -1,4 +1,4 @@
-import 'dart:async' show StreamSubscription, unawaited;
+import 'dart:async' show FutureOr, StreamSubscription, unawaited;
 
 import 'package:bawabat_al_saeq/app/router/config/app_route_paths.dart';
 import 'package:bawabat_al_saeq/features/availability/data/datasources/android/driver_background_service_bridge.dart';
@@ -38,8 +38,8 @@ class _AppShellEffectsState extends ConsumerState<AppShellEffects> {
 
     _setupRestoreSubscription();
     _setupOfferNotificationListener();
-    _bootstrapCurrentOfferRestore();
-    _consumePendingOfferNotificationOpen();
+    _runAfterFirstFrame(_bootstrapCurrentOfferRestore);
+    _runAfterFirstFrame(_consumePendingOfferNotificationOpen);
   }
 
   void _setupRestoreSubscription() {
@@ -48,9 +48,7 @@ class _AppShellEffectsState extends ConsumerState<AppShellEffects> {
           restoreCurrentControllerProvider,
           (previous, next) {
             final restoredData = next.asData?.value;
-            if (restoredData == null) {
-              return;
-            }
+            if (restoredData == null) return;
 
             ref.read(restoredCurrentOfferProvider.notifier).state =
                 restoredData.currentOffer;
@@ -67,32 +65,24 @@ class _AppShellEffectsState extends ConsumerState<AppShellEffects> {
   }
 
   void _bootstrapCurrentOfferRestore() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final hasBootstrapped = ref.read(hasBootstrappedCurrentRestoreProvider);
-      if (hasBootstrapped) {
-        return;
-      }
+    final hasBootstrapped = ref.read(hasBootstrappedCurrentRestoreProvider);
+    if (hasBootstrapped) return;
 
-      ref.read(hasBootstrappedCurrentRestoreProvider.notifier).state = true;
+    ref.read(hasBootstrappedCurrentRestoreProvider.notifier).state = true;
 
-      unawaited(
-        ref.read(restoreCurrentControllerProvider.notifier).restore(),
-      );
-    });
+    unawaited(
+      ref.read(restoreCurrentControllerProvider.notifier).restore(),
+    );
   }
 
-  void _consumePendingOfferNotificationOpen() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final pendingEvent = await ref
-          .read(driverBackgroundServiceBridgeProvider)
-          .consumePendingOfferNotificationOpen();
+  Future<void> _consumePendingOfferNotificationOpen() async {
+    final pendingEvent = await ref
+        .read(driverBackgroundServiceBridgeProvider)
+        .consumePendingOfferNotificationOpen();
 
-      if (!mounted || pendingEvent == null) {
-        return;
-      }
+    if (!mounted || pendingEvent == null) return;
 
-      _handleOfferNotificationOpen(pendingEvent);
-    });
+    _handleOfferNotificationOpen(pendingEvent);
   }
 
   void _handleOfferNotificationOpen(DriverOfferNotificationOpenEvent event) {
@@ -104,9 +94,7 @@ class _AppShellEffectsState extends ConsumerState<AppShellEffects> {
           .restoreFromNotificationPayload(payloadJson);
     }
 
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
 
     context.go(AppRoutePaths.home);
   }
@@ -123,16 +111,19 @@ class _AppShellEffectsState extends ConsumerState<AppShellEffects> {
     );
   }
 
+  void _runAfterFirstFrame(FutureOr<void> Function() callback) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(Future<void>.sync(callback));
+    });
+  }
+
   @override
   void dispose() {
     _restoreSubscription?.close();
-
-    unawaited(
-      _offerNotificationOpenSubscription?.cancel(),
-    );
+    unawaited(_offerNotificationOpenSubscription?.cancel());
 
     _offerNotificationOpenSubscription = null;
-
     _appLifecycleListener?.dispose();
     _appLifecycleListener = null;
 

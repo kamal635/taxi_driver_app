@@ -1,5 +1,5 @@
 import 'dart:async' show StreamController, unawaited;
-import 'dart:io';
+import 'dart:io' show Platform;
 
 import 'package:flutter/services.dart';
 
@@ -39,7 +39,11 @@ final class DriverForceLogoutEvent {
   final String? payloadJson;
 }
 
-class DriverBackgroundServiceBridge {
+/// Thin Dart bridge over the Android foreground driver service.
+///
+/// All Android-specific calls are centralized here so the rest of the app can
+/// depend on typed methods and streams instead of raw [MethodChannel] calls.
+final class DriverBackgroundServiceBridge {
   DriverBackgroundServiceBridge() {
     _channel.setMethodCallHandler(_handleNativeCall);
   }
@@ -62,6 +66,8 @@ class DriverBackgroundServiceBridge {
   final StreamController<DriverForceLogoutEvent> _forceLogoutController =
       StreamController<DriverForceLogoutEvent>.broadcast();
 
+  bool get _isAndroid => Platform.isAndroid;
+
   Stream<DriverBackgroundServiceEvent> get serviceEvents =>
       _serviceEventsController.stream;
 
@@ -75,53 +81,43 @@ class DriverBackgroundServiceBridge {
       _forceLogoutController.stream;
 
   Future<void> _handleNativeCall(MethodCall call) async {
+    final args = _argumentsAsMap(call.arguments);
+
     switch (call.method) {
       case 'serviceStopped':
-        final args = Map<Object?, Object?>.from(
-          call.arguments as Map? ?? const {},
-        );
-
-        _serviceEventsController.add(
+        _addIfOpen(
+          _serviceEventsController,
           DriverBackgroundServiceEvent(
-            reason: args['reason']?.toString() ?? 'unknown',
+            reason: _readString(args, 'reason', fallback: 'unknown'),
           ),
         );
         return;
 
       case 'offerReceived':
-        final args = Map<Object?, Object?>.from(
-          call.arguments as Map? ?? const {},
-        );
-
-        _offerEventsController.add(
+        _addIfOpen(
+          _offerEventsController,
           DriverBackgroundOfferEvent(
-            payloadJson: args['payloadJson']?.toString() ?? '{}',
+            payloadJson: _readString(args, 'payloadJson', fallback: '{}'),
           ),
         );
         return;
 
       case 'offerNotificationOpened':
-        final args = Map<Object?, Object?>.from(
-          call.arguments as Map? ?? const {},
-        );
-
-        _offerNotificationOpenController.add(
+        _addIfOpen(
+          _offerNotificationOpenController,
           DriverOfferNotificationOpenEvent(
-            offerId: args['offerId']?.toString(),
-            payloadJson: args['payloadJson']?.toString(),
+            offerId: _readNullableString(args, 'offerId'),
+            payloadJson: _readNullableString(args, 'payloadJson'),
           ),
         );
         return;
 
       case 'forceLogout':
-        final args = Map<Object?, Object?>.from(
-          call.arguments as Map? ?? const {},
-        );
-
-        _forceLogoutController.add(
+        _addIfOpen(
+          _forceLogoutController,
           DriverForceLogoutEvent(
-            reason: args['reason']?.toString() ?? 'force_logout',
-            payloadJson: args['payloadJson']?.toString(),
+            reason: _readString(args, 'reason', fallback: 'force_logout'),
+            payloadJson: _readNullableString(args, 'payloadJson'),
           ),
         );
         return;
@@ -132,6 +128,8 @@ class DriverBackgroundServiceBridge {
   }
 
   Future<bool> ensureNotificationPermission() async {
+    if (!_isAndroid) return true;
+
     final result = await _channel.invokeMethod<bool>(
       'ensureNotificationPermission',
     );
@@ -139,6 +137,8 @@ class DriverBackgroundServiceBridge {
   }
 
   Future<bool> areNotificationsEnabled() async {
+    if (!_isAndroid) return true;
+
     final result = await _channel.invokeMethod<bool>('areNotificationsEnabled');
     return result ?? false;
   }
@@ -147,7 +147,9 @@ class DriverBackgroundServiceBridge {
     required String token,
     required String driverId,
   }) async {
-    await _channel.invokeMethod(
+    if (!_isAndroid) return;
+
+    await _channel.invokeMethod<void>(
       'startService',
       {
         'token': token,
@@ -157,13 +159,17 @@ class DriverBackgroundServiceBridge {
   }
 
   Future<void> stopService() async {
-    await _channel.invokeMethod('stopService');
+    if (!_isAndroid) return;
+
+    await _channel.invokeMethod<void>('stopService');
   }
 
   Future<void> stopOfferAlert({
     bool cancelNotification = true,
   }) async {
-    await _channel.invokeMethod(
+    if (!_isAndroid) return;
+
+    await _channel.invokeMethod<void>(
       'stopOfferAlert',
       {
         'cancelNotification': cancelNotification,
@@ -173,6 +179,8 @@ class DriverBackgroundServiceBridge {
 
   Future<DriverOfferNotificationOpenEvent?>
   consumePendingOfferNotificationOpen() async {
+    if (!_isAndroid) return null;
+
     final result = await _channel.invokeMethod<Map<Object?, Object?>?>(
       'consumePendingOfferNotificationOpen',
     );
@@ -180,12 +188,14 @@ class DriverBackgroundServiceBridge {
     if (result == null) return null;
 
     return DriverOfferNotificationOpenEvent(
-      offerId: result['offerId']?.toString(),
-      payloadJson: result['payloadJson']?.toString(),
+      offerId: _readNullableString(result, 'offerId'),
+      payloadJson: _readNullableString(result, 'payloadJson'),
     );
   }
 
   Future<DriverForceLogoutEvent?> consumePendingForceLogout() async {
+    if (!_isAndroid) return null;
+
     final result = await _channel.invokeMethod<Map<Object?, Object?>?>(
       'consumePendingForceLogout',
     );
@@ -193,22 +203,26 @@ class DriverBackgroundServiceBridge {
     if (result == null) return null;
 
     return DriverForceLogoutEvent(
-      reason: result['reason']?.toString() ?? 'force_logout',
-      payloadJson: result['payloadJson']?.toString(),
+      reason: _readString(result, 'reason', fallback: 'force_logout'),
+      payloadJson: _readNullableString(result, 'payloadJson'),
     );
   }
 
   Future<bool> isServiceRunning() async {
+    if (!_isAndroid) return false;
+
     final result = await _channel.invokeMethod<bool>('isServiceRunning');
     return result ?? false;
   }
 
   Future<void> emitTestOffer() async {
-    await _channel.invokeMethod('emitTestOffer');
+    if (!_isAndroid) return;
+
+    await _channel.invokeMethod<void>('emitTestOffer');
   }
 
   Future<bool> ensureLocationSettings() async {
-    if (!Platform.isAndroid) return true;
+    if (!_isAndroid) return true;
 
     final result = await _channel.invokeMethod<bool>('ensureLocationSettings');
     return result ?? false;
@@ -221,5 +235,45 @@ class DriverBackgroundServiceBridge {
     unawaited(_offerEventsController.close());
     unawaited(_offerNotificationOpenController.close());
     unawaited(_forceLogoutController.close());
+  }
+
+  Map<Object?, Object?> _argumentsAsMap(Object? arguments) {
+    if (arguments is Map<Object?, Object?>) {
+      return arguments;
+    }
+
+    if (arguments is Map) {
+      return Map<Object?, Object?>.from(arguments);
+    }
+
+    return const <Object?, Object?>{};
+  }
+
+  String _readString(
+    Map<Object?, Object?> map,
+    String key, {
+    required String fallback,
+  }) {
+    final value = _readNullableString(map, key);
+    if (value == null || value.isEmpty) {
+      return fallback;
+    }
+
+    return value;
+  }
+
+  String? _readNullableString(Map<Object?, Object?> map, String key) {
+    final value = map[key];
+    if (value == null) return null;
+
+    final text = value.toString();
+    if (text.isEmpty || text == 'null') return null;
+
+    return text;
+  }
+
+  void _addIfOpen<T>(StreamController<T> controller, T event) {
+    if (controller.isClosed) return;
+    controller.add(event);
   }
 }

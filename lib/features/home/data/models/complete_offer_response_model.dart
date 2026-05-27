@@ -1,3 +1,4 @@
+import 'package:bawabat_al_saeq/core/utils/json_reader.dart';
 import 'package:bawabat_al_saeq/features/home/domain/entities/complete_offer_result_entity.dart';
 
 /// Data model returned after completing an offer.
@@ -9,24 +10,10 @@ final class CompleteOfferResponseModel {
   });
 
   factory CompleteOfferResponseModel.fromJson(Map<String, dynamic> json) {
-    final type = json['type']?.toString().trim();
-    final message = json['message']?.toString().trim();
-    final offerId = json['orderId']?.toString().trim();
-
-    if (type == null || type.isEmpty) {
-      throw const FormatException('Missing type');
-    }
-    if (message == null || message.isEmpty) {
-      throw const FormatException('Missing message');
-    }
-    if (offerId == null || offerId.isEmpty) {
-      throw const FormatException('Missing orderId');
-    }
-
     return CompleteOfferResponseModel(
-      type: type,
-      message: message,
-      offerId: offerId,
+      type: JsonReader.requireString(json, 'type'),
+      message: JsonReader.requireString(json, 'message'),
+      offerId: JsonReader.requireAnyString(json, const ['orderId', 'order_id']),
     );
   }
 

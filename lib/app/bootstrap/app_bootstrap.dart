@@ -7,12 +7,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 Future<ProviderContainer> bootstrapApplication() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
+  await Future.wait([
+    SystemChrome.setPreferredOrientations(const [
+      DeviceOrientation.portraitUp,
+    ]),
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge),
   ]);
+
+  _setDefaultSystemUiOverlayStyle();
 
   final container = ProviderContainer();
   await container.read(authSessionProvider).load();
 
   return container;
+}
+
+void _setDefaultSystemUiOverlayStyle() {
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarIconBrightness: Brightness.dark,
+      systemNavigationBarContrastEnforced: false,
+    ),
+  );
 }

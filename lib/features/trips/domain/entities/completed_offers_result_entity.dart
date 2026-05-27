@@ -10,7 +10,7 @@ enum CompletedPeriod {
 
 /// Domain entity for the completed trips screen payload.
 final class CompletedOffersResultEntity {
-  CompletedOffersResultEntity({
+  const CompletedOffersResultEntity({
     required this.type,
     required this.period,
     required this.count,

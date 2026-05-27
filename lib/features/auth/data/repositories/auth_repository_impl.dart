@@ -3,8 +3,8 @@ import 'package:bawabat_al_saeq/features/auth/domain/entities/auth_sign_in_resul
 import 'package:bawabat_al_saeq/features/auth/domain/repositories/auth_repository.dart';
 
 /// Repository implementation for authentication operations.
-class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl(this._remoteDataSource);
+final class AuthRepositoryImpl implements AuthRepository {
+  const AuthRepositoryImpl(this._remoteDataSource);
 
   final AuthRemoteDataSource _remoteDataSource;
 

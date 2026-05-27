@@ -33,8 +33,7 @@ class BottomNav extends StatelessWidget {
 
     return SafeArea(
       top: false,
-      child: Container(
-        padding: EdgeInsets.only(top: 4.h),
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.white,
           border: const Border(top: BorderSide(color: AppColors.border)),
@@ -46,58 +45,87 @@ class BottomNav extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          children: List.generate(items.length, (itemIndex) {
-            final item = items[itemIndex];
-            final isSelected = itemIndex == index;
+        child: Padding(
+          padding: EdgeInsets.only(top: 4.h),
+          child: Row(
+            children: List.generate(items.length, (itemIndex) {
+              final item = items[itemIndex];
+              final isSelected = itemIndex == index;
 
-            return Expanded(
-              child: InkWell(
-                onTap: () => onChanged(itemIndex),
-                child: SizedBox(
-                  height: 54.h,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            item.icon,
-                            size: 24.r,
-                            color: isSelected ? _activeColor : _inactiveColor,
-                          ),
-                          SizedBox(height: 6.h),
-                          Text(
-                            item.label,
-                            style: AppTypography.labelSm.copyWith(
-                              color: isSelected ? _activeColor : _inactiveColor,
-                              fontWeight: isSelected
-                                  ? FontWeight.w800
-                                  : FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          curve: Curves.easeOutCubic,
-                          height: 2.h,
-                          width: isSelected ? 36.w : 0,
-                          decoration: BoxDecoration(
-                            color: _indicatorColor,
-                            borderRadius: BorderRadius.circular(999.r),
-                          ),
-                        ),
-                      ),
-                    ],
+              return Expanded(
+                child: _BottomNavItem(
+                  data: item,
+                  isSelected: isSelected,
+                  onTap: isSelected ? null : () => onChanged(itemIndex),
+                ),
+              );
+            }),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomNavItem extends StatelessWidget {
+  const _BottomNavItem({
+    required this.data,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final _NavItemData data;
+  final bool isSelected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isSelected
+        ? BottomNav._activeColor
+        : BottomNav._inactiveColor;
+
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: data.label,
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          height: 54.h,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(data.icon, size: 24.r, color: color),
+                  SizedBox(height: 6.h),
+                  Text(
+                    data.label,
+                    style: AppTypography.labelSm.copyWith(
+                      color: color,
+                      fontWeight: isSelected
+                          ? FontWeight.w800
+                          : FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOutCubic,
+                  height: 2.h,
+                  width: isSelected ? 36.w : 0,
+                  decoration: BoxDecoration(
+                    color: BottomNav._indicatorColor,
+                    borderRadius: BorderRadius.circular(999.r),
                   ),
                 ),
               ),
-            );
-          }),
+            ],
+          ),
         ),
       ),
     );

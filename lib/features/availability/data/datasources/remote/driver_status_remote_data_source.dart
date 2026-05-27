@@ -12,12 +12,14 @@ final class DriverStatusRemoteDataSourceImpl
   DriverStatusRemoteDataSourceImpl({required ApiClient apiClient})
     : _apiClient = apiClient;
 
+  static const String _driverStatusPath = '/api/admin/drivers/status';
+
   final ApiClient _apiClient;
 
   @override
   Future<void> setStatus({required DriverStatus status}) async {
     await _apiClient.putVoid(
-      '/api/admin/drivers/status',
+      _driverStatusPath,
       body: {
         'status': driverStatusToApi(status),
       },

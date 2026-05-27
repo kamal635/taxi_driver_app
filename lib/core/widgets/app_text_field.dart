@@ -94,7 +94,12 @@ class AppTextField extends StatelessWidget {
                     data: const IconThemeData(color: AppColors.iconMuted),
                     child: prefixIcon!,
                   ),
-            suffixIcon: suffixIcon,
+            suffixIcon: suffixIcon == null
+                ? null
+                : IconTheme(
+                    data: const IconThemeData(color: AppColors.iconMuted),
+                    child: suffixIcon!,
+                  ),
             border: _border(),
             enabledBorder: _border(),
             focusedBorder: _border(

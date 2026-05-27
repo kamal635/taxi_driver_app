@@ -9,14 +9,22 @@ final class AvailabilityState {
     this.serverError,
   });
 
+  const AvailabilityState.initial()
+    : isOnline = false,
+      isBusy = false,
+      locationError = null,
+      serverError = null;
+
   final bool isOnline;
   final bool isBusy;
 
-  /// Stores location-related errors that should be shown in the UI.
+  /// Location-related error that should be shown once in the UI.
   final LocationFailureReason? locationError;
 
-  /// Stores API/runtime errors that should be shown in the UI.
+  /// API/runtime error that should be shown once in the UI.
   final Object? serverError;
+
+  bool get canToggleAvailability => !isBusy;
 
   static const Object _unset = Object();
 

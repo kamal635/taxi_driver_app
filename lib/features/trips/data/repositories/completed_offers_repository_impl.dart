@@ -4,7 +4,7 @@ import 'package:bawabat_al_saeq/features/trips/domain/repositories/completed_off
 
 /// Repository implementation that maps remote models into domain entities.
 final class CompletedOffersRepositoryImpl implements CompletedOffersRepository {
-  CompletedOffersRepositoryImpl({
+  const CompletedOffersRepositoryImpl({
     required this.remoteDataSource,
   });
 

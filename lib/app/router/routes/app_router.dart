@@ -3,9 +3,10 @@ import 'package:bawabat_al_saeq/app/router/guards/app_route_guard.dart';
 import 'package:bawabat_al_saeq/app/router/keys/app_router_keys.dart';
 import 'package:bawabat_al_saeq/app/router/routes/auth_routes.dart';
 import 'package:bawabat_al_saeq/app/router/routes/shell_routes.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/session/session_store.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_error_page.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 final class AppRouter {
@@ -23,10 +24,9 @@ final class AppRouter {
           state: state,
         );
       },
-      errorBuilder: (context, state) => Scaffold(
-        body: Center(
-          child: Text(state.error?.toString() ?? 'Unknown routing error'),
-        ),
+      errorBuilder: (context, state) => AppErrorPage(
+        title: context.l10n.errorUnexpected,
+        message: state.error?.toString(),
       ),
       routes: <RouteBase>[
         ...buildAuthRoutes(),

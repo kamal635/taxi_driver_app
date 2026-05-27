@@ -2,7 +2,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Persists the driver's local availability intent.
 ///
-/// This value is used only to restore or reconcile UI/runtime state.
+/// This value is not a source of truth for backend status. It only tells the
+/// app whether the driver wanted to stay online before app/process recreation.
 final class AvailabilityLocalDataSource {
   AvailabilityLocalDataSource({
     required Future<SharedPreferences> preferencesFuture,
@@ -20,5 +21,10 @@ final class AvailabilityLocalDataSource {
   Future<bool> getOnlineRequested() async {
     final preferences = await _preferencesFuture;
     return preferences.getBool(_onlineRequestedKey) ?? false;
+  }
+
+  Future<void> clearOnlineRequested() async {
+    final preferences = await _preferencesFuture;
+    await preferences.remove(_onlineRequestedKey);
   }
 }

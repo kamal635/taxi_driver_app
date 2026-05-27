@@ -32,7 +32,7 @@ class AcceptedOfferCard extends ConsumerWidget {
       statusLabel: context.l10n.homeRequestCurrentTitle,
       totalFare: acceptedOffer.price,
       pickup: acceptedOffer.pickup,
-      dropoff: acceptedOffer.dropoff ?? '',
+      dropoff: acceptedOffer.dropoff,
       customerPhone: acceptedOffer.customerPhone,
       cooldownUntil: acceptedOffer.cooldownUntil,
       notes: acceptedOffer.notes,

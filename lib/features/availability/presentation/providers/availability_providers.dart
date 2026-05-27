@@ -28,13 +28,11 @@ final driverBackgroundServiceBridgeProvider =
 
 /// Provides local persistence for availability intent.
 final availabilityLocalDataSourceProvider =
-    Provider<AvailabilityLocalDataSource>(
-      (ref) {
-        return AvailabilityLocalDataSource(
-          preferencesFuture: SharedPreferences.getInstance(),
-        );
-      },
-    );
+    Provider<AvailabilityLocalDataSource>((ref) {
+      return AvailabilityLocalDataSource(
+        preferencesFuture: SharedPreferences.getInstance(),
+      );
+    });
 
 /// Provides a tracker that listens to runtime location-service failures.
 final locationTrackerProvider = Provider<LocationTracker>((ref) {
@@ -86,7 +84,7 @@ final stopLocationTrackingUseCaseProvider =
       );
     });
 
-/// Provides the runtime controller for the online driver mode.
+/// Provides the runtime controller for online driver mode.
 final driverRuntimeControllerProvider = Provider<DriverRuntimeController>(
   DriverRuntimeController.new,
 );

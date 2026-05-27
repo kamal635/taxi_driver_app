@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
   "appTitle": "Bawabat Al Saeq App",
-  "brandName": "Syrian Taxi",
+  "brandName": "Bawabat Al Saeq",
   "brandSubtitle": "Approved drivers platform",
   "emailLabel": "Email Address",
   "emailHint": "example@example.com",
@@ -12,6 +12,12 @@
   "signIn": "Sign in",
   "forgotPassword": "Forgot password?",
   "copyright": "© 2026 Bawabat Al Saeq App",
+  "legalPrivacyPolicy": "Privacy Policy",
+  "legalTermsAndConditions": "Terms & Conditions",
+  "validationPhoneRequired": "Please enter your phone number.",
+  "validationPasswordRequired": "Please enter your password.",
+  "authShowPassword": "Show password",
+  "authHidePassword": "Hide password",
   "notes": "Notes",
   "unknown": "unknown",
   "homeGreeting": "Hello,",
@@ -76,6 +82,26 @@
   "profileSectionAccount": "Account settings",
   "profileSectionSupport": "Support",
   "profileSectionSignOut": "Sign out",
+  "profileSectionLegal": "Legal information",
+  "@profileSectionLegal": {
+    "description": "Title for the legal links section on the profile page"
+  },
+  "profilePrivacyPolicySubtitle": "Learn how your data is protected",
+  "@profilePrivacyPolicySubtitle": {
+    "description": "Subtitle for the privacy policy link on the profile page"
+  },
+  "profileTermsAndConditionsSubtitle": "Read the app terms of use",
+  "@profileTermsAndConditionsSubtitle": {
+    "description": "Subtitle for the terms and conditions link on the profile page"
+  },
+  "profilePasswordUpdatedSuccess": "Password updated successfully.",
+  "@profilePasswordUpdatedSuccess": {
+    "description": "Success message shown after changing password"
+  },
+  "profilePasswordMismatch": "Passwords do not match.",
+  "@profilePasswordMismatch": {
+    "description": "Validation message when password confirmation does not match"
+  },
   "profileEditTitle": "Edit profile",
   "profileEditSubtitle": "Update your personal info",
   "profileChangePasswordTitle": "Change password",
@@ -108,13 +134,21 @@
   "vehicleTypePublic": "Public",
   "vehicleTypePrivate": "Private",
   "vehicleInfoNote": "This vehicle information is registered in the system. If any details change or appear incorrect, please contact the office.",
-  "tripsTotalTrips": "total trips: ({count})",
+  "tripsTotalTrips": "Total trips: ({count})",
   "@tripsTotalTrips": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
+  },
+  "tripsPickupLabel": "From",
+  "@tripsPickupLabel": {
+    "description": "Pickup label inside a completed trip card"
+  },
+  "tripsDropoffLabel": "To",
+  "@tripsDropoffLabel": {
+    "description": "Dropoff label inside a completed trip card"
   },
   "errorUnexpected": "Something went wrong. Please try again.",
   "errorNoInternet": "No internet connection. Check your network and try again.",
@@ -140,6 +174,10 @@
   "locationPermissionDeniedForever": "Location permission is permanently denied. Please enable it from Settings.",
   "locationPermissionUnableToDetermine": "Unable to determine location permission. Please try again.",
   "locationNetworkError": "No internet connection. We can't update your location.",
+  "availabilityNotificationPermissionRequired": "Notification permission is required to receive ride requests in the background.",
+  "availabilityBackgroundServiceStartFailed": "Unable to start background request service. Please try again.",
+  "availabilityBackgroundServiceStopped": "Request receiving service stopped. You have been set offline.",
+  "availabilityRuntimeError": "Unable to start availability mode. Please try again.",
   "actionSettings": "Settings",
   "todayLabel": "Today",
   "@todayLabel": {
@@ -193,6 +231,7 @@
   "profileAvatarTakePhoto": "Take a photo",
   "homeOfferExpiresIn": "Expires in:",
   "price": "Price: ",
+  "currencySyrianPound": "SYP",
   "customerPhone": "CUSTOMER PHONE",
   "decline": "Decline",
   "tripCompleted": "Trip is Completed",
@@ -203,8 +242,8 @@
   "timeRemaining": "Time remaining to start",
   "contactSupportLabel": "Need help?",
   "contactSupportAction": "Tap here",
-  "contactSupportContact":  "Contact support.",
-    "appUpdateTitle": "New update available",
+  "contactSupportContact": "Contact support.",
+  "appUpdateTitle": "New update available",
   "@appUpdateTitle": {
     "description": "Title of the app update dialog"
   },
@@ -256,9 +295,8 @@
   },
   "appUpdateInstalling": "Opening installer...",
   "appUpdateBackgroundStarted": "Update download started in the background",
-"appUpdateInstallerOpening": "Update downloaded. Opening installer now",
-"appUpdateInvalidPackage": "The downloaded file is not a valid APK"
-,
+  "appUpdateInstallerOpening": "Update downloaded. Opening installer now",
+  "appUpdateInvalidPackage": "The downloaded file is not a valid APK",
   "profileSectionApp": "App",
   "profileAppUpdateTitle": "App update",
   "profileAppUpdateSubtitleChecking": "Checking for the latest version...",
@@ -303,8 +341,8 @@
     }
   },
   "appUpdateInstallerOpenedHint": "The installer has been opened. Complete the update from the system installer screen.",
-"appUpdateCancel": "Cancel update",
-"appUpdateReadyToDownload": "An update is ready to download",
-"appUpdateDownloadCancelled": "Update download was cancelled",
-"profileAppUpdateEntrySubtitle": "Check the current version and available updates"
+  "appUpdateCancel": "Cancel update",
+  "appUpdateReadyToDownload": "An update is ready to download",
+  "appUpdateDownloadCancelled": "Update download was cancelled",
+  "profileAppUpdateEntrySubtitle": "Check the current version and available updates"
 }

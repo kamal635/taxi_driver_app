@@ -56,7 +56,9 @@ class AppTopBar extends ConsumerWidget {
     }
 
     ref
-            .read(hasRequestedRestoreForCurrentOnlineSessionProvider.notifier)
+            .read(
+              hasRequestedRestoreForCurrentOnlineSessionProvider.notifier,
+            )
             .state =
         false;
   }
@@ -77,8 +79,11 @@ class AppTopBar extends ConsumerWidget {
     final avatarAsync = ref.watch(avatarControllerProvider);
     final avatarPath = avatarAsync.value;
 
-    final session = ref.watch(authSessionProvider);
-    final displayName = session.driverName?.trim() ?? '';
+    final displayName = ref.watch(
+      authSessionSnapshotProvider.select(
+        (snapshot) => snapshot.driverName?.trim() ?? '',
+      ),
+    );
     final initial = displayName.isNotEmpty ? displayName[0] : '—';
     final hasAvatar = avatarPath != null && avatarPath.isNotEmpty;
 

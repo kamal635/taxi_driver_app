@@ -107,7 +107,7 @@ abstract class AppLocalizations {
   /// No description provided for @brandName.
   ///
   /// In en, this message translates to:
-  /// **'Syrian Taxi'**
+  /// **'Bawabat Al Saeq'**
   String get brandName;
 
   /// No description provided for @brandSubtitle.
@@ -169,6 +169,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'© 2026 Bawabat Al Saeq App'**
   String get copyright;
+
+  /// No description provided for @legalPrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get legalPrivacyPolicy;
+
+  /// No description provided for @legalTermsAndConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms & Conditions'**
+  String get legalTermsAndConditions;
+
+  /// No description provided for @validationPhoneRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your phone number.'**
+  String get validationPhoneRequired;
+
+  /// No description provided for @validationPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password.'**
+  String get validationPasswordRequired;
+
+  /// No description provided for @authShowPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get authShowPassword;
+
+  /// No description provided for @authHidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get authHidePassword;
 
   /// No description provided for @notes.
   ///
@@ -494,6 +530,36 @@ abstract class AppLocalizations {
   /// **'Sign out'**
   String get profileSectionSignOut;
 
+  /// Title for the legal links section on the profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Legal information'**
+  String get profileSectionLegal;
+
+  /// Subtitle for the privacy policy link on the profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Learn how your data is protected'**
+  String get profilePrivacyPolicySubtitle;
+
+  /// Subtitle for the terms and conditions link on the profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Read the app terms of use'**
+  String get profileTermsAndConditionsSubtitle;
+
+  /// Success message shown after changing password
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated successfully.'**
+  String get profilePasswordUpdatedSuccess;
+
+  /// Validation message when password confirmation does not match
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get profilePasswordMismatch;
+
   /// No description provided for @profileEditTitle.
   ///
   /// In en, this message translates to:
@@ -689,8 +755,20 @@ abstract class AppLocalizations {
   /// No description provided for @tripsTotalTrips.
   ///
   /// In en, this message translates to:
-  /// **'total trips: ({count})'**
+  /// **'Total trips: ({count})'**
   String tripsTotalTrips(int count);
+
+  /// Pickup label inside a completed trip card
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get tripsPickupLabel;
+
+  /// Dropoff label inside a completed trip card
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get tripsDropoffLabel;
 
   /// No description provided for @errorUnexpected.
   ///
@@ -836,6 +914,30 @@ abstract class AppLocalizations {
   /// **'No internet connection. We can\'t update your location.'**
   String get locationNetworkError;
 
+  /// No description provided for @availabilityNotificationPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification permission is required to receive ride requests in the background.'**
+  String get availabilityNotificationPermissionRequired;
+
+  /// No description provided for @availabilityBackgroundServiceStartFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to start background request service. Please try again.'**
+  String get availabilityBackgroundServiceStartFailed;
+
+  /// No description provided for @availabilityBackgroundServiceStopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Request receiving service stopped. You have been set offline.'**
+  String get availabilityBackgroundServiceStopped;
+
+  /// No description provided for @availabilityRuntimeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to start availability mode. Please try again.'**
+  String get availabilityRuntimeError;
+
   /// No description provided for @actionSettings.
   ///
   /// In en, this message translates to:
@@ -955,6 +1057,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Price: '**
   String get price;
+
+  /// No description provided for @currencySyrianPound.
+  ///
+  /// In en, this message translates to:
+  /// **'SYP'**
+  String get currencySyrianPound;
 
   /// No description provided for @customerPhone.
   ///

@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:async' show unawaited;
 
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
@@ -8,6 +8,7 @@ import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
 import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
 import 'package:bawabat_al_saeq/core/widgets/app_overlay_scaffold.dart';
 import 'package:bawabat_al_saeq/features/account_security/presentation/controllers/setup_password_controller.dart';
+import 'package:bawabat_al_saeq/features/account_security/presentation/controllers/setup_password_result.dart';
 import 'package:bawabat_al_saeq/features/profile/presentation/widgets/change_password/change_password_form.dart';
 import 'package:bawabat_al_saeq/shared/presentation/validation/password_form_validator.dart';
 import 'package:bawabat_al_saeq/shared/presentation/widgets/surfaces/app_card_surface.dart';
@@ -23,12 +24,14 @@ class ChangePasswordPage extends ConsumerStatefulWidget {
 }
 
 class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
+  final _formKey = GlobalKey<FormState>();
+
   late final TextEditingController _newPasswordController;
   late final TextEditingController _confirmPasswordController;
   late final FocusNode _newPasswordFocusNode;
   late final FocusNode _confirmPasswordFocusNode;
 
-  ProviderSubscription<AsyncValue<String?>>? _submitSubscription;
+  ProviderSubscription<AsyncValue<SetupPasswordResult?>>? _submitSubscription;
 
   bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
@@ -42,15 +45,15 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
     _newPasswordFocusNode = FocusNode();
     _confirmPasswordFocusNode = FocusNode();
 
-    _submitSubscription = ref.listenManual<AsyncValue<String?>>(
+    _submitSubscription = ref.listenManual<AsyncValue<SetupPasswordResult?>>(
       setupPasswordControllerProvider,
       _handleSubmitStateChanged,
     );
   }
 
   Future<void> _handleSubmitStateChanged(
-    AsyncValue<String?>? previous,
-    AsyncValue<String?> next,
+    AsyncValue<SetupPasswordResult?>? previous,
+    AsyncValue<SetupPasswordResult?> next,
   ) async {
     await next.whenOrNull(
       error: (error, _) async {
@@ -64,8 +67,9 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
         );
         context.showAppSnack(message, type: AppSnackType.error);
       },
-      data: (message) async {
-        if (message == null || message.isEmpty || message == previous?.value) {
+      data: (result) async {
+        if (result == null ||
+            result.submissionId == previous?.asData?.value?.submissionId) {
           return;
         }
 
@@ -73,7 +77,10 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
           return;
         }
 
-        context.showAppSnack(message, type: AppSnackType.success);
+        context.showAppSnack(
+          result.message ?? context.l10n.profilePasswordUpdatedSuccess,
+          type: AppSnackType.success,
+        );
         ref.read(setupPasswordControllerProvider.notifier).reset();
         Navigator.of(context).pop();
       },
@@ -104,58 +111,80 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
         onPressed: isSubmitting ? null : _submit,
       ),
       child: AppCardSurface(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ChangePasswordForm(
-              newPasswordController: _newPasswordController,
-              confirmPasswordController: _confirmPasswordController,
-              newPasswordFocusNode: _newPasswordFocusNode,
-              confirmPasswordFocusNode: _confirmPasswordFocusNode,
-              obscureNewPassword: _obscureNewPassword,
-              obscureConfirmPassword: _obscureConfirmPassword,
-              onToggleNewPasswordVisibility: () {
-                setState(() {
-                  _obscureNewPassword = !_obscureNewPassword;
-                });
-              },
-              onToggleConfirmPasswordVisibility: () {
-                setState(() {
-                  _obscureConfirmPassword = !_obscureConfirmPassword;
-                });
-              },
-              onPasswordSubmitted: () {
-                _confirmPasswordFocusNode.requestFocus();
-              },
-              onConfirmPasswordSubmitted: _submit,
-              enabled: !isSubmitting,
-            ),
-            AppSpacing.h12,
-            Text(
-              context.l10n.profilePasswordHint,
-              style: AppTypography.subtitleSm,
-            ),
-          ],
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ChangePasswordForm(
+                newPasswordController: _newPasswordController,
+                confirmPasswordController: _confirmPasswordController,
+                newPasswordFocusNode: _newPasswordFocusNode,
+                confirmPasswordFocusNode: _confirmPasswordFocusNode,
+                obscureNewPassword: _obscureNewPassword,
+                obscureConfirmPassword: _obscureConfirmPassword,
+                onToggleNewPasswordVisibility: _toggleNewPasswordVisibility,
+                onToggleConfirmPasswordVisibility:
+                    _toggleConfirmPasswordVisibility,
+                onPasswordSubmitted: (_) {
+                  _confirmPasswordFocusNode.requestFocus();
+                },
+                onConfirmPasswordSubmitted: (_) {
+                  unawaited(_submit());
+                },
+                onValidateNewPassword: _validateNewPassword,
+                onValidateConfirmPassword: _validateConfirmPassword,
+                enabled: !isSubmitting,
+              ),
+              AppSpacing.h12,
+              Text(
+                context.l10n.profilePasswordHint,
+                style: AppTypography.subtitleSm,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Future<void> _submit() async {
-    final validationMessage = PasswordFormValidator.validate(
-      password: _newPasswordController.text,
-      confirmPassword: _confirmPasswordController.text,
-      tooShortMessage: context.l10n.authPasswordRulesHint,
-      mismatchMessage: context.l10n.errorValidation,
-    );
+  void _toggleNewPasswordVisibility() {
+    setState(() {
+      _obscureNewPassword = !_obscureNewPassword;
+    });
+  }
 
-    if (validationMessage != null) {
-      context.showAppSnack(
-        validationMessage,
-        type: AppSnackType.error,
-      );
+  void _toggleConfirmPasswordVisibility() {
+    setState(() {
+      _obscureConfirmPassword = !_obscureConfirmPassword;
+    });
+  }
+
+  String? _validateNewPassword(String? value) {
+    return PasswordFormValidator.validatePassword(
+      value: value,
+      requiredMessage: context.l10n.validationPasswordRequired,
+      tooShortMessage: context.l10n.authPasswordRulesHint,
+    );
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    return PasswordFormValidator.validateConfirmation(
+      value: value,
+      password: _newPasswordController.text,
+      requiredMessage: context.l10n.validationPasswordRequired,
+      tooShortMessage: context.l10n.authPasswordRulesHint,
+      mismatchMessage: context.l10n.profilePasswordMismatch,
+    );
+  }
+
+  Future<void> _submit() async {
+    final formState = _formKey.currentState;
+    if (formState == null || !formState.validate()) {
       return;
     }
+
+    FocusScope.of(context).unfocus();
 
     await ref
         .read(setupPasswordControllerProvider.notifier)

@@ -36,12 +36,13 @@ final class DeclineOfferController extends AsyncNotifier<void> {
 
     state = const AsyncLoading();
 
-    state = await AsyncValue.guard(
+    final result = await AsyncValue.guard(
       () => _declineOfferUseCase(offerId: offerId),
     );
-    ref.read(newOfferControllerProvider.notifier).clearCurrent();
 
-    if (!state.hasError) {
+    state = result;
+
+    if (!result.hasError) {
       ref.read(newOfferControllerProvider.notifier).clearCurrent();
     }
   }

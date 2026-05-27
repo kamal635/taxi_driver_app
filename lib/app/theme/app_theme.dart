@@ -12,7 +12,7 @@ final class AppTheme {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppColors.primary,
       primary: AppColors.primary,
-      surface: AppColors.white,
+      surface: AppColors.surface,
       error: AppColors.error,
     );
 
@@ -22,17 +22,20 @@ final class AppTheme {
       scaffoldBackgroundColor: AppColors.bgBase,
       fontFamily: fonts.primary,
       fontFamilyFallback: fonts.fallback,
+      splashFactory: NoSplash.splashFactory,
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
       dividerColor: AppColors.border,
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
+        surfaceTintColor: Colors.transparent,
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.surface,
         surfaceTintColor: Colors.transparent,
       ),
       snackBarTheme: const SnackBarThemeData(

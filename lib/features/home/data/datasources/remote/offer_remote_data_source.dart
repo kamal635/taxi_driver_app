@@ -13,17 +13,15 @@ abstract interface class OfferRemoteDataSource {
 
 /// HTTP implementation of [OfferRemoteDataSource].
 final class OfferRemoteDataSourceImpl implements OfferRemoteDataSource {
-  OfferRemoteDataSourceImpl({
-    required this.apiClient,
-  });
+  OfferRemoteDataSourceImpl({required this.apiClient});
 
   final ApiClient apiClient;
 
   @override
   Future<AcceptedOfferModel> acceptOffer({required String offerId}) async {
     final data = await apiClient.postJson(
-      '/api/admin/orders/accept',
-      body: {'orderId': offerId},
+      _OfferApiPaths.accept,
+      body: _orderBody(offerId),
     );
 
     return AcceptedOfferModel.fromJson(data);
@@ -32,14 +30,17 @@ final class OfferRemoteDataSourceImpl implements OfferRemoteDataSource {
   @override
   Future<void> declineOffer({required String offerId}) async {
     await apiClient.postJson(
-      '/api/admin/orders/decline',
-      body: {'orderId': offerId},
+      _OfferApiPaths.decline,
+      body: _orderBody(offerId),
     );
   }
 
   @override
   Future<CurrentAndPendingOfferModel?> getCurrentAndPendingOffer() async {
-    final data = await apiClient.getJson('/api/admin/orders/current');
+    final data = await apiClient.getJson(_OfferApiPaths.current);
+
+    if (data.isEmpty) return null;
+
     return CurrentAndPendingOfferModel.fromJson(data);
   }
 
@@ -47,7 +48,21 @@ final class OfferRemoteDataSourceImpl implements OfferRemoteDataSource {
   Future<CompleteOfferResponseModel> completeOffer({
     required String offerId,
   }) async {
-    final data = await apiClient.postJson('/api/admin/orders/$offerId/done');
+    final data = await apiClient.postJson(_OfferApiPaths.complete(offerId));
     return CompleteOfferResponseModel.fromJson(data);
   }
+
+  Map<String, dynamic> _orderBody(String offerId) {
+    return {'orderId': offerId};
+  }
+}
+
+final class _OfferApiPaths {
+  const _OfferApiPaths._();
+
+  static const accept = '/api/admin/orders/accept';
+  static const decline = '/api/admin/orders/decline';
+  static const current = '/api/admin/orders/current';
+
+  static String complete(String offerId) => '/api/admin/orders/$offerId/done';
 }

@@ -33,7 +33,7 @@ class NewOfferCard extends ConsumerWidget {
       expiresAt: pendingOffer.expiresAt,
       totalFare: pendingOffer.price,
       pickup: pendingOffer.pickup,
-      dropoff: pendingOffer.dropoff ?? '',
+      dropoff: pendingOffer.dropoff,
       notes: pendingOffer.notes,
       isAcceptLoading: isAcceptLoading,
       isDeclineLoading: isDeclineLoading,

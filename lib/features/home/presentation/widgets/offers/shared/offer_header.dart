@@ -6,6 +6,7 @@ import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/utils/price_formatter.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/utils/offer_time_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -51,15 +52,12 @@ class _OfferHeaderState extends State<OfferHeader> {
     _timer?.cancel();
     _timer = null;
 
-    if (!widget.showExpiryChip || widget.expiresAt == null) {
-      return;
-    }
+    if (!widget.showExpiryChip || widget.expiresAt == null) return;
 
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
 
-      final remaining = widget.expiresAt!.difference(DateTime.now());
-      if (remaining <= Duration.zero) {
+      if (remainingUntil(widget.expiresAt!) == Duration.zero) {
         _timer?.cancel();
         _timer = null;
       }
@@ -68,25 +66,12 @@ class _OfferHeaderState extends State<OfferHeader> {
     });
   }
 
-  String _formatRemainingTime(Duration duration) {
-    final safeDuration = duration.isNegative ? Duration.zero : duration;
-    final minutes = safeDuration.inMinutes
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
-    final seconds = safeDuration.inSeconds
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
-    return '$minutes:$seconds';
-  }
-
-  String _buildExpiryText() {
+  String _buildExpiryText(BuildContext context) {
     final expiresAt = widget.expiresAt;
     if (expiresAt == null) return '';
 
-    final remaining = expiresAt.difference(DateTime.now());
-    return 'ينتهي في: ${_formatRemainingTime(remaining)}';
+    return '${context.l10n.homeOfferExpiresIn} '
+        '${formatOfferCountdown(remainingUntil(expiresAt))}';
   }
 
   @override
@@ -132,23 +117,21 @@ class _OfferHeaderState extends State<OfferHeader> {
                     ),
                     AppSpacing.w4,
                     Text(
-                      _buildExpiryText(),
+                      _buildExpiryText(context),
                       style: AppTypography.labelSm.copyWith(
                         color: AppColors.error,
                       ),
                     ),
                   ],
                 ),
-              )
-            else
-              const SizedBox.shrink(),
+              ),
           ],
         ),
         AppSpacing.h18,
         Text(l10n.totalFare, style: AppTypography.subtitleSm),
         AppSpacing.h4,
         Text(
-          '${formatOrderPrice(widget.totalFare)} ل.س',
+          '${formatOrderPrice(widget.totalFare)} ${l10n.currencySyrianPound}',
           style: AppTypography.titleMd,
         ),
       ],

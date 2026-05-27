@@ -34,20 +34,24 @@ class _ProfileSignOutListenerState
   ) async {
     await next.whenOrNull(
       error: (error, _) async {
+        if (!mounted) {
+          return;
+        }
+
         final message = failureToUserMessage(
           error,
           l10n: context.l10n,
         );
         context.showAppSnack(message, type: AppSnackType.error);
+        ref.read(signOutControllerProvider.notifier).reset();
       },
       data: (didSignOut) async {
-        if (!didSignOut || (previous?.value ?? false)) {
+        if (!didSignOut || (previous?.asData?.value ?? false) || !mounted) {
           return;
         }
 
-        if (mounted) {
-          context.go(AppRoutePaths.login);
-        }
+        ref.read(signOutControllerProvider.notifier).reset();
+        context.go(AppRoutePaths.login);
       },
     );
   }

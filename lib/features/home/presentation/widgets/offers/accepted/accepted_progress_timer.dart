@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/utils/offer_time_formatter.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_actions.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_progress_indicator.dart';
 import 'package:flutter/material.dart';
@@ -27,22 +28,15 @@ class _AcceptedProgressTimerState extends State<AcceptedProgressTimer> {
 
   Timer? _timer;
 
-  Duration get _remaining {
-    final difference = widget.cooldownUntil.difference(DateTime.now());
-    return difference.isNegative ? Duration.zero : difference;
-  }
+  Duration get _remaining => remainingUntil(widget.cooldownUntil);
 
   bool get _canComplete => _remaining == Duration.zero;
 
   double get _progress {
     final totalMilliseconds = _totalDuration.inMilliseconds;
-    final remainingMilliseconds = _remaining.inMilliseconds.clamp(
-      0,
-      totalMilliseconds,
-    );
-    return totalMilliseconds == 0
-        ? 0.0
-        : remainingMilliseconds / totalMilliseconds;
+    final elapsedMilliseconds = totalMilliseconds - _remaining.inMilliseconds;
+
+    return (elapsedMilliseconds / totalMilliseconds).clamp(0.0, 1.0);
   }
 
   @override

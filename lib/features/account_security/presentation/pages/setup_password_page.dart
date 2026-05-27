@@ -6,6 +6,7 @@ import 'package:bawabat_al_saeq/core/session/session_providers.dart';
 import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
 import 'package:bawabat_al_saeq/core/widgets/app_overlay_scaffold.dart';
 import 'package:bawabat_al_saeq/features/account_security/presentation/controllers/setup_password_controller.dart';
+import 'package:bawabat_al_saeq/features/account_security/presentation/controllers/setup_password_result.dart';
 import 'package:bawabat_al_saeq/features/account_security/presentation/widgets/setup_password_content.dart';
 import 'package:bawabat_al_saeq/shared/presentation/validation/password_form_validator.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +21,13 @@ class SetupPasswordPage extends ConsumerStatefulWidget {
 }
 
 class _SetupPasswordPageState extends ConsumerState<SetupPasswordPage> {
+  final _formKey = GlobalKey<FormState>();
+
   late final TextEditingController _newPasswordController;
   late final TextEditingController _confirmPasswordController;
-  ProviderSubscription<AsyncValue<String?>>? _submitSubscription;
+  late final FocusNode _newPasswordFocusNode;
+  late final FocusNode _confirmPasswordFocusNode;
+  ProviderSubscription<AsyncValue<SetupPasswordResult?>>? _submitSubscription;
 
   bool _isNewPasswordObscured = true;
   bool _isConfirmPasswordObscured = true;
@@ -30,9 +35,13 @@ class _SetupPasswordPageState extends ConsumerState<SetupPasswordPage> {
   @override
   void initState() {
     super.initState();
+
     _newPasswordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
-    _submitSubscription = ref.listenManual<AsyncValue<String?>>(
+    _newPasswordFocusNode = FocusNode();
+    _confirmPasswordFocusNode = FocusNode();
+
+    _submitSubscription = ref.listenManual<AsyncValue<SetupPasswordResult?>>(
       setupPasswordControllerProvider,
       _handleSubmitStateChanged,
     );
@@ -43,15 +52,19 @@ class _SetupPasswordPageState extends ConsumerState<SetupPasswordPage> {
     _submitSubscription?.close();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
+    _newPasswordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
     super.dispose();
   }
 
   Future<void> _handleSubmitStateChanged(
-    AsyncValue<String?>? previous,
-    AsyncValue<String?> next,
+    AsyncValue<SetupPasswordResult?>? previous,
+    AsyncValue<SetupPasswordResult?> next,
   ) async {
     await next.whenOrNull(
       error: (error, _) async {
+        if (!mounted) return;
+
         final message = failureToUserMessage(
           error,
           l10n: context.l10n,
@@ -59,8 +72,13 @@ class _SetupPasswordPageState extends ConsumerState<SetupPasswordPage> {
 
         context.showAppSnack(message, type: AppSnackType.error);
       },
-      data: (message) async {
-        if (message == null || message == previous?.value) {
+      data: (result) async {
+        if (result == null) {
+          return;
+        }
+
+        final previousResult = previous?.asData?.value;
+        if (previousResult?.submissionId == result.submissionId) {
           return;
         }
 
@@ -70,7 +88,11 @@ class _SetupPasswordPageState extends ConsumerState<SetupPasswordPage> {
           return;
         }
 
-        context.showAppSnack(message, type: AppSnackType.success);
+        final message = result.message;
+        if (message != null && message.isNotEmpty) {
+          context.showAppSnack(message, type: AppSnackType.success);
+        }
+
         ref.read(setupPasswordControllerProvider.notifier).reset();
         context.go(AppRoutePaths.home);
       },
@@ -90,46 +112,71 @@ class _SetupPasswordPageState extends ConsumerState<SetupPasswordPage> {
         label: context.l10n.authCreatePasswordAction,
         onPressed: isSubmitting ? null : _submit,
       ),
-      child: SetupPasswordContent(
-        newPasswordController: _newPasswordController,
-        confirmPasswordController: _confirmPasswordController,
-        isNewPasswordObscured: _isNewPasswordObscured,
-        isConfirmPasswordObscured: _isConfirmPasswordObscured,
-        onToggleNewPasswordVisibility: () {
-          setState(() {
-            _isNewPasswordObscured = !_isNewPasswordObscured;
-          });
-        },
-        onToggleConfirmPasswordVisibility: () {
-          setState(() {
-            _isConfirmPasswordObscured = !_isConfirmPasswordObscured;
-          });
-        },
+      child: Form(
+        key: _formKey,
+        child: SetupPasswordContent(
+          newPasswordController: _newPasswordController,
+          confirmPasswordController: _confirmPasswordController,
+          newPasswordFocusNode: _newPasswordFocusNode,
+          confirmPasswordFocusNode: _confirmPasswordFocusNode,
+          isSubmitting: isSubmitting,
+          isNewPasswordObscured: _isNewPasswordObscured,
+          isConfirmPasswordObscured: _isConfirmPasswordObscured,
+          onNewPasswordSubmitted: (_) {
+            _confirmPasswordFocusNode.requestFocus();
+          },
+          onConfirmPasswordSubmitted: (_) async {
+            if (!isSubmitting) {
+              await _submit();
+            }
+          },
+          onValidatePassword: _validatePassword,
+          onValidateConfirmPassword: _validateConfirmPassword,
+          onToggleNewPasswordVisibility: () {
+            setState(() {
+              _isNewPasswordObscured = !_isNewPasswordObscured;
+            });
+          },
+          onToggleConfirmPasswordVisibility: () {
+            setState(() {
+              _isConfirmPasswordObscured = !_isConfirmPasswordObscured;
+            });
+          },
+        ),
       ),
     );
   }
 
-  Future<void> _submit() async {
-    final newPassword = _newPasswordController.text.trim();
-    final confirmPassword = _confirmPasswordController.text.trim();
+  String? _validatePassword(String? value) {
+    return PasswordFormValidator.validatePassword(
+      value: value,
+      requiredMessage: context.l10n.validationPasswordRequired,
+      tooShortMessage: context.l10n.authPasswordRulesHint,
+    );
+  }
 
-    final validationMessage = PasswordFormValidator.validate(
-      password: newPassword,
-      confirmPassword: confirmPassword,
+  String? _validateConfirmPassword(String? value) {
+    return PasswordFormValidator.validateConfirmation(
+      value: value,
+      password: _newPasswordController.text,
+      requiredMessage: context.l10n.validationPasswordRequired,
       tooShortMessage: context.l10n.authPasswordRulesHint,
       mismatchMessage: context.l10n.errorValidation,
     );
+  }
 
-    if (validationMessage != null) {
-      context.showAppSnack(
-        validationMessage,
-        type: AppSnackType.warning,
-      );
+  Future<void> _submit() async {
+    FocusScope.of(context).unfocus();
+
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if (!isValid) {
       return;
     }
 
     await ref
         .read(setupPasswordControllerProvider.notifier)
-        .submit(newPassword: newPassword);
+        .submit(
+          newPassword: _newPasswordController.text.trim(),
+        );
   }
 }

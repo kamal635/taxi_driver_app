@@ -5,11 +5,14 @@ import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
 import 'package:bawabat_al_saeq/core/location/location_providers.dart';
 import 'package:bawabat_al_saeq/core/location/location_result.dart';
+import 'package:bawabat_al_saeq/features/availability/domain/failures/availability_runtime_failure.dart';
 import 'package:bawabat_al_saeq/features/availability/presentation/controllers/availability_controller.dart';
+import 'package:bawabat_al_saeq/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AvailabilityFeedbackListener extends ConsumerStatefulWidget {
+/// Shows one-shot availability errors produced by [AvailabilityController].
+final class AvailabilityFeedbackListener extends ConsumerStatefulWidget {
   const AvailabilityFeedbackListener({super.key});
 
   @override
@@ -17,7 +20,7 @@ class AvailabilityFeedbackListener extends ConsumerStatefulWidget {
       _AvailabilityFeedbackListenerState();
 }
 
-class _AvailabilityFeedbackListenerState
+final class _AvailabilityFeedbackListenerState
     extends ConsumerState<AvailabilityFeedbackListener> {
   ProviderSubscription<LocationFailureReason?>? _locationErrorSubscription;
   ProviderSubscription<Object?>? _serverErrorSubscription;
@@ -28,65 +31,108 @@ class _AvailabilityFeedbackListenerState
 
     _serverErrorSubscription = ref.listenManual<Object?>(
       availabilityProvider.select((state) => state.serverError),
-      (previous, next) {
-        if (next == null || identical(previous, next)) {
-          return;
-        }
-
-        final message = failureToUserMessage(next, l10n: context.l10n);
-        context.showAppSnack(message, type: AppSnackType.error);
-
-        ref.read(availabilityProvider.notifier).clearServerError();
-      },
+      _handleServerErrorChanged,
     );
 
     _locationErrorSubscription = ref.listenManual<LocationFailureReason?>(
       availabilityProvider.select((state) => state.locationError),
-      (previous, next) {
-        if (next == null || next == previous) {
-          return;
-        }
-
-        final l10n = context.l10n;
-        final locationService = ref.read(locationServiceProvider);
-
-        final message = switch (next) {
-          LocationFailureReason.serviceDisabled => l10n.locationServiceDisabled,
-          LocationFailureReason.permissionDenied =>
-            l10n.locationPermissionRequired,
-          LocationFailureReason.permissionDeniedForever =>
-            l10n.locationPermissionDeniedForever,
-          LocationFailureReason.unableToDetermine =>
-            l10n.locationPermissionUnableToDetermine,
-          LocationFailureReason.networkError => l10n.locationNetworkError,
-        };
-
-        final actionLabel = switch (next) {
-          LocationFailureReason.serviceDisabled ||
-          LocationFailureReason.permissionDeniedForever => l10n.actionSettings,
-          _ => null,
-        };
-
-        final onAction = switch (next) {
-          LocationFailureReason.serviceDisabled => () => unawaited(
-            locationService.openLocationSettings(),
-          ),
-          LocationFailureReason.permissionDeniedForever => () => unawaited(
-            locationService.openAppSettings(),
-          ),
-          _ => null,
-        };
-
-        context.showAppSnack(
-          message,
-          type: AppSnackType.error,
-          actionLabel: actionLabel,
-          onAction: onAction,
-        );
-
-        ref.read(availabilityProvider.notifier).clearLocationError();
-      },
+      _handleLocationErrorChanged,
     );
+  }
+
+  void _handleServerErrorChanged(Object? previous, Object? next) {
+    if (next == null || identical(previous, next)) {
+      return;
+    }
+
+    final message = _availabilityErrorToUserMessage(
+      next,
+      l10n: context.l10n,
+    );
+
+    context.showAppSnack(message, type: AppSnackType.error);
+    ref.read(availabilityProvider.notifier).clearServerError();
+  }
+
+  void _handleLocationErrorChanged(
+    LocationFailureReason? previous,
+    LocationFailureReason? next,
+  ) {
+    if (next == null || next == previous) {
+      return;
+    }
+
+    final l10n = context.l10n;
+    final locationService = ref.read(locationServiceProvider);
+
+    final message = _locationFailureToUserMessage(next, l10n: l10n);
+    final actionLabel = _locationFailureActionLabel(next, l10n: l10n);
+    final onAction = switch (next) {
+      LocationFailureReason.serviceDisabled => () => unawaited(
+        locationService.openLocationSettings(),
+      ),
+      LocationFailureReason.permissionDeniedForever => () => unawaited(
+        locationService.openAppSettings(),
+      ),
+      _ => null,
+    };
+
+    context.showAppSnack(
+      message,
+      type: AppSnackType.error,
+      actionLabel: actionLabel,
+      onAction: onAction,
+    );
+
+    ref.read(availabilityProvider.notifier).clearLocationError();
+  }
+
+  String _availabilityErrorToUserMessage(
+    Object error, {
+    required AppLocalizations l10n,
+  }) {
+    if (error is AvailabilityRuntimeFailure) {
+      return switch (error.reason) {
+        AvailabilityRuntimeFailureReason.missingAuthSession =>
+          l10n.errorSessionExpired,
+        AvailabilityRuntimeFailureReason.notificationPermissionDenied =>
+          l10n.availabilityNotificationPermissionRequired,
+        AvailabilityRuntimeFailureReason.backgroundServiceStartFailed =>
+          l10n.availabilityBackgroundServiceStartFailed,
+        AvailabilityRuntimeFailureReason.backgroundServiceStopped =>
+          l10n.availabilityBackgroundServiceStopped,
+        AvailabilityRuntimeFailureReason.nativeRuntimeFailure =>
+          l10n.availabilityRuntimeError,
+      };
+    }
+
+    return failureToUserMessage(error, l10n: l10n);
+  }
+
+  String _locationFailureToUserMessage(
+    LocationFailureReason reason, {
+    required AppLocalizations l10n,
+  }) {
+    return switch (reason) {
+      LocationFailureReason.serviceDisabled => l10n.locationServiceDisabled,
+      LocationFailureReason.permissionDenied => l10n.locationPermissionRequired,
+      LocationFailureReason.permissionDeniedForever =>
+        l10n.locationPermissionDeniedForever,
+      LocationFailureReason.unableToDetermine =>
+        l10n.locationPermissionUnableToDetermine,
+      LocationFailureReason.networkError => l10n.locationNetworkError,
+    };
+  }
+
+  String? _locationFailureActionLabel(
+    LocationFailureReason reason, {
+    required AppLocalizations l10n,
+  }) {
+    return switch (reason) {
+      LocationFailureReason.serviceDisabled ||
+      LocationFailureReason.permissionDeniedForever => l10n.actionSettings,
+      _ => null,
+    };
   }
 
   @override

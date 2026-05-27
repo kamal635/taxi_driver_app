@@ -13,9 +13,11 @@ abstract interface class CompletedOffersRemoteDataSource {
 /// Remote implementation backed by [ApiClient].
 final class CompletedOffersRemoteDataSourceImpl
     implements CompletedOffersRemoteDataSource {
-  CompletedOffersRemoteDataSourceImpl({
+  const CompletedOffersRemoteDataSourceImpl({
     required this.apiClient,
   });
+
+  static const String _completedOrdersEndpoint = '/api/admin/orders/completed';
 
   final ApiClient apiClient;
 
@@ -24,7 +26,7 @@ final class CompletedOffersRemoteDataSourceImpl
     required CompletedPeriod period,
   }) async {
     final data = await apiClient.getJson(
-      '/api/admin/orders/completed',
+      _completedOrdersEndpoint,
       query: {
         'period': completedPeriodToQuery(period),
       },

@@ -12,8 +12,10 @@ abstract interface class AuthRemoteDataSource {
 }
 
 /// API-based implementation of [AuthRemoteDataSource].
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  AuthRemoteDataSourceImpl(this._apiClient);
+final class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+  const AuthRemoteDataSourceImpl(this._apiClient);
+
+  static const String _loginPath = '/api/auth/login';
 
   final ApiClient _apiClient;
 
@@ -23,12 +25,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     String? fcmToken,
   }) async {
+    final normalizedPhone = phone.trim();
+    final normalizedFcmToken = fcmToken?.trim();
+
     final response = await _apiClient.postJson(
-      '/api/auth/login',
+      _loginPath,
       body: {
-        'phone': phone,
+        'phone': normalizedPhone,
         'password': password,
-        if (fcmToken != null && fcmToken.isNotEmpty) 'fcmToken': fcmToken,
+        if (normalizedFcmToken != null && normalizedFcmToken.isNotEmpty)
+          'fcmToken': normalizedFcmToken,
       },
     );
 

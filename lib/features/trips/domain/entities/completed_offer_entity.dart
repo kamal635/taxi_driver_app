@@ -1,6 +1,6 @@
 /// Domain entity representing one completed trip.
 final class CompletedOfferEntity {
-  CompletedOfferEntity({
+  const CompletedOfferEntity({
     required this.offerId,
     required this.pickup,
     required this.price,

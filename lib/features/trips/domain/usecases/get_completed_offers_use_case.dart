@@ -3,7 +3,7 @@ import 'package:bawabat_al_saeq/features/trips/domain/repositories/completed_off
 
 /// Loads completed trips for the selected period.
 final class GetCompletedOffersUseCase {
-  GetCompletedOffersUseCase({
+  const GetCompletedOffersUseCase({
     required this.repository,
   });
 
