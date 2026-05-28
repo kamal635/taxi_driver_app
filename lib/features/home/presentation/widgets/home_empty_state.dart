@@ -3,6 +3,7 @@ import 'dart:async' show unawaited;
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -13,6 +14,9 @@ class HomeEmptyState extends StatelessWidget {
     required this.title,
     required this.subtitle,
     this.animateIcon = true,
+    this.actionLabel,
+    this.onActionPressed,
+    this.isActionLoading = false,
     super.key,
   });
 
@@ -26,8 +30,17 @@ class HomeEmptyState extends StatelessWidget {
   /// searching is running in that state.
   final bool animateIcon;
 
+  /// Optional action shown below the subtitle.
+  ///
+  /// Used for the offline state to let the driver enable availability directly.
+  final String? actionLabel;
+  final VoidCallback? onActionPressed;
+  final bool isActionLoading;
+
   @override
   Widget build(BuildContext context) {
+    final hasAction = actionLabel != null;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -50,6 +63,17 @@ class HomeEmptyState extends StatelessWidget {
             style: AppTypography.bodyMuted,
           ),
         ),
+        if (hasAction) ...[
+          AppSpacing.h24,
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 42.w),
+            child: AppButton(
+              label: actionLabel!,
+              onPressed: onActionPressed,
+              isLoading: isActionLoading,
+            ),
+          ),
+        ],
       ],
     );
   }

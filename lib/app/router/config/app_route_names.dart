@@ -9,4 +9,7 @@ abstract final class AppRouteNames {
   static const String profile = 'profile';
   static const String profilePassword = 'profilePassword';
   static const String profileLanguage = 'profileLanguage';
+  static const String profileAppearance = 'profileAppearance';
+  static const String profileLocationStatus = 'profileLocationStatus';
+  static const String profileAbout = 'profileAbout';
 }

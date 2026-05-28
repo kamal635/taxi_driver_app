@@ -14,7 +14,9 @@ final class StartLocationTrackingUseCase {
   final LocationService _locationService;
 
   Future<LocationReadyResult> call() async {
-    final readyResult = await _locationService.ensureReady();
+    final readyResult = await _locationService.ensureReady(
+      requireBackground: true,
+    );
 
     if (!readyResult.isSuccess) {
       return readyResult;

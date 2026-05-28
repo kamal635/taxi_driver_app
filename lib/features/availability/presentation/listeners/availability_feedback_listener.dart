@@ -71,7 +71,8 @@ final class _AvailabilityFeedbackListenerState
       LocationFailureReason.serviceDisabled => () => unawaited(
         locationService.openLocationSettings(),
       ),
-      LocationFailureReason.permissionDeniedForever => () => unawaited(
+      LocationFailureReason.permissionDeniedForever ||
+      LocationFailureReason.backgroundPermissionRequired => () => unawaited(
         locationService.openAppSettings(),
       ),
       _ => null,
@@ -118,6 +119,8 @@ final class _AvailabilityFeedbackListenerState
       LocationFailureReason.permissionDenied => l10n.locationPermissionRequired,
       LocationFailureReason.permissionDeniedForever =>
         l10n.locationPermissionDeniedForever,
+      LocationFailureReason.backgroundPermissionRequired =>
+        l10n.locationBackgroundPermissionRequired,
       LocationFailureReason.unableToDetermine =>
         l10n.locationPermissionUnableToDetermine,
       LocationFailureReason.networkError => l10n.locationNetworkError,
@@ -130,7 +133,8 @@ final class _AvailabilityFeedbackListenerState
   }) {
     return switch (reason) {
       LocationFailureReason.serviceDisabled ||
-      LocationFailureReason.permissionDeniedForever => l10n.actionSettings,
+      LocationFailureReason.permissionDeniedForever ||
+      LocationFailureReason.backgroundPermissionRequired => l10n.actionSettings,
       _ => null,
     };
   }

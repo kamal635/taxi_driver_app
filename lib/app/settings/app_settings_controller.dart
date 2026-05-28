@@ -37,6 +37,18 @@ class AppSettingsController extends ChangeNotifier {
     await _storage.writeThemeMode(value);
   }
 
+  Future<void> useSystemTheme() {
+    return setThemeMode(ThemeMode.system);
+  }
+
+  Future<void> useLightTheme() {
+    return setThemeMode(ThemeMode.light);
+  }
+
+  Future<void> useDarkTheme() {
+    return setThemeMode(ThemeMode.dark);
+  }
+
   Future<void> toggleDarkMode() {
     return setThemeMode(_state.isDarkMode ? ThemeMode.light : ThemeMode.dark);
   }

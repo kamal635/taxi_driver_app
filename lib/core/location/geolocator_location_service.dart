@@ -1,10 +1,24 @@
 import 'package:bawabat_al_saeq/core/location/location_result.dart';
 import 'package:bawabat_al_saeq/core/location/location_service.dart';
+import 'package:bawabat_al_saeq/core/location/location_status.dart';
 import 'package:geolocator/geolocator.dart';
 
 final class GeolocatorLocationService implements LocationService {
   @override
-  Future<LocationReadyResult> ensureReady() async {
+  Future<LocationStatus> checkStatus() async {
+    final isServiceEnabled = await Geolocator.isLocationServiceEnabled();
+    final permission = await Geolocator.checkPermission();
+
+    return LocationStatus(
+      isServiceEnabled: isServiceEnabled,
+      permissionStatus: _statusFromPermission(permission),
+    );
+  }
+
+  @override
+  Future<LocationReadyResult> ensureReady({
+    bool requireBackground = false,
+  }) async {
     final isServiceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!isServiceEnabled) {
       return _failure(LocationFailureReason.serviceDisabled);
@@ -15,7 +29,12 @@ final class GeolocatorLocationService implements LocationService {
         ? await Geolocator.requestPermission()
         : currentPermission;
 
-    return _resultFromPermission(effectivePermission);
+    final status = LocationStatus(
+      isServiceEnabled: isServiceEnabled,
+      permissionStatus: _statusFromPermission(effectivePermission),
+    );
+
+    return status.toReadyResult(requireBackground: requireBackground);
   }
 
   @override
@@ -28,19 +47,17 @@ final class GeolocatorLocationService implements LocationService {
     return Geolocator.openAppSettings();
   }
 
-  LocationReadyResult _resultFromPermission(LocationPermission permission) {
+  AppLocationPermissionStatus _statusFromPermission(
+    LocationPermission permission,
+  ) {
     return switch (permission) {
-      LocationPermission.always ||
-      LocationPermission.whileInUse => LocationReadyResult.success(),
-      LocationPermission.denied => _failure(
-        LocationFailureReason.permissionDenied,
-      ),
-      LocationPermission.deniedForever => _failure(
-        LocationFailureReason.permissionDeniedForever,
-      ),
-      LocationPermission.unableToDetermine => _failure(
-        LocationFailureReason.unableToDetermine,
-      ),
+      LocationPermission.denied => AppLocationPermissionStatus.denied,
+      LocationPermission.deniedForever =>
+        AppLocationPermissionStatus.deniedForever,
+      LocationPermission.whileInUse => AppLocationPermissionStatus.whileInUse,
+      LocationPermission.always => AppLocationPermissionStatus.always,
+      LocationPermission.unableToDetermine =>
+        AppLocationPermissionStatus.unableToDetermine,
     };
   }
 

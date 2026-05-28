@@ -92,6 +92,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'فعّل وضع التوفر لتبدأ باستقبال طلبات الركاب القريبة منك';
 
   @override
+  String get homeEnableAvailabilityAction => 'تفعيل التوفر';
+
+  @override
   String get actionConfirm => 'تأكيد';
 
   @override
@@ -199,10 +202,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tripsSummaryEarningsLabel => 'الأرباح';
 
   @override
+  String get tripsSummaryAverageFareLabel => 'متوسط قيمة الرحلة';
+
+  @override
   String get tripsFilterAll => 'الكل';
 
   @override
   String get tripsFilterToday => 'اليوم';
+
+  @override
+  String get tripsFilterLast7Days => 'آخر 7 أيام';
+
+  @override
+  String get tripsFilterThisMonth => 'هذا الشهر';
 
   @override
   String get tripsFilterWeek => 'الأسبوع';
@@ -271,27 +283,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'غير مفعّل حالياً، اضغط للتبديل إلى الوضع الداكن';
 
   @override
-  String get profileLanguageTitle => 'اللغة';
-
-  @override
-  String get profileLanguageArabicSubtitle => 'العربية';
-
-  @override
-  String get profileLanguageEnglishSubtitle => 'الإنكليزية';
-
-  @override
-  String get profileLanguagePageSubtitle =>
-      'اختر اللغة التي تريد استخدامها داخل التطبيق.';
-
-  @override
-  String get profileLanguageArabicOptionSubtitle =>
-      'استخدم التطبيق باللغة العربية';
-
-  @override
-  String get profileLanguageEnglishOptionSubtitle =>
-      'استخدم التطبيق باللغة الإنكليزية';
-
-  @override
   String get profileMyVehiclesTitle => 'مركباتي';
 
   @override
@@ -311,7 +302,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get signOutConfirmMessage =>
-      'هل أنت متأكد أنك تريد تسجيل الخروج من هذا الحساب؟';
+      'لن تستقبل طلبات جديدة بعد تسجيل الخروج. هل تريد المتابعة؟';
+
+  @override
+  String get signOutOnlineConfirmMessage =>
+      'أنت متاح حالياً لاستقبال الطلبات. سيتم إيقاف التوفر أولاً، ثم تسجيل خروجك. هل تريد المتابعة؟';
 
   @override
   String get signOutConfirmTitle => 'تسجيل الخروج؟';
@@ -687,4 +682,179 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get profileAppUpdateEntrySubtitle =>
       'تحقق من الإصدار الحالي والتحديثات المتاحة';
+
+  @override
+  String get connectionOfflineTitle => 'لا يوجد اتصال بالإنترنت';
+
+  @override
+  String get connectionOfflineSubtitle =>
+      'سيتم تحديث الطلبات عند عودة الاتصال.';
+
+  @override
+  String get connectionRestoredTitle => 'تمت استعادة الاتصال';
+
+  @override
+  String get connectionRestoredSubtitle =>
+      'يمكنك الآن استقبال التحديثات من جديد.';
+
+  @override
+  String get profileAppearanceTitle => 'المظهر';
+
+  @override
+  String get profileAppearancePageSubtitle =>
+      'اختر طريقة عرض التطبيق المناسبة لك.';
+
+  @override
+  String get profileAppearanceSystemTitle => 'حسب إعدادات النظام';
+
+  @override
+  String get profileAppearanceSystemSubtitle =>
+      'يتبع التطبيق مظهر جهازك تلقائيًا.';
+
+  @override
+  String get profileAppearanceLightTitle => 'الوضع الفاتح';
+
+  @override
+  String get profileAppearanceLightSubtitle => 'استخدام المظهر الفاتح دائمًا.';
+
+  @override
+  String get profileAppearanceDarkTitle => 'الوضع الداكن';
+
+  @override
+  String get profileAppearanceDarkSubtitle => 'استخدام المظهر الداكن دائمًا.';
+
+  @override
+  String get profileLanguageTitle => 'اللغة';
+
+  @override
+  String get profileLanguagePageSubtitle =>
+      'اختر اللغة التي تريد استخدامها في التطبيق.';
+
+  @override
+  String get profileLanguageArabicSubtitle => 'العربية';
+
+  @override
+  String get profileLanguageArabicOptionSubtitle =>
+      'استخدام اللغة العربية واتجاه الواجهة من اليمين إلى اليسار.';
+
+  @override
+  String get profileLanguageEnglishSubtitle => 'English';
+
+  @override
+  String get profileLanguageEnglishOptionSubtitle =>
+      'Use English and left-to-right layout.';
+
+  @override
+  String get profileLocationStatusTitle => 'حالة الموقع';
+
+  @override
+  String get profileLocationStatusSubtitle =>
+      'تحقق من صلاحيات الموقع المطلوبة لاستقبال الطلبات.';
+
+  @override
+  String get profileLocationStatusPageSubtitle =>
+      'الموقع ضروري لاستقبال الطلبات القريبة منك وتتبع الرحلات أثناء عملك.';
+
+  @override
+  String get locationStatusServiceTitle => 'خدمة الموقع';
+
+  @override
+  String get locationStatusServiceEnabled => 'خدمة الموقع مفعّلة على الجهاز.';
+
+  @override
+  String get locationStatusServiceDisabled =>
+      'خدمة الموقع غير مفعّلة. فعّلها حتى يتمكن التطبيق من تحديد موقعك.';
+
+  @override
+  String get locationStatusPermissionTitle => 'صلاحية الموقع';
+
+  @override
+  String get locationStatusPermissionAlways => 'الصلاحية ممنوحة دائمًا.';
+
+  @override
+  String get locationStatusPermissionWhileInUse =>
+      'الصلاحية ممنوحة أثناء استخدام التطبيق فقط.';
+
+  @override
+  String get locationStatusPermissionDenied => 'صلاحية الموقع غير ممنوحة.';
+
+  @override
+  String get locationStatusPermissionDeniedForever =>
+      'صلاحية الموقع مرفوضة دائمًا. افتح إعدادات التطبيق لتفعيلها.';
+
+  @override
+  String get locationStatusPermissionUnable => 'تعذر تحديد حالة صلاحية الموقع.';
+
+  @override
+  String get locationStatusBackgroundTitle => 'الموقع في الخلفية';
+
+  @override
+  String get locationStatusBackgroundGranted =>
+      'الموقع في الخلفية متاح وجاهز للعمل.';
+
+  @override
+  String get locationStatusBackgroundMissing =>
+      'يحتاج التطبيق إلى صلاحية الموقع دائمًا للعمل أثناء الخلفية.';
+
+  @override
+  String get locationStatusReadyTitle => 'الموقع جاهز';
+
+  @override
+  String get locationStatusNeedsAttentionTitle => 'الموقع يحتاج إلى انتباه';
+
+  @override
+  String get locationStatusWhyMessage =>
+      'نحتاج إلى الموقع لتحديد الطلبات القريبة منك وتتبع الرحلة بدقة عند التوفر.';
+
+  @override
+  String get locationStatusRefreshAction => 'تحديث الحالة';
+
+  @override
+  String get locationStatusRequestPermissionAction => 'طلب صلاحية الموقع';
+
+  @override
+  String get locationStatusOpenAppSettingsAction => 'فتح إعدادات التطبيق';
+
+  @override
+  String get locationStatusOpenLocationSettingsAction => 'فتح إعدادات الموقع';
+
+  @override
+  String get locationStatusChecking => 'يتم فحص حالة الموقع...';
+
+  @override
+  String get locationStatusCheckFailedTitle => 'تعذر فحص حالة الموقع';
+
+  @override
+  String get locationStatusCheckFailedSubtitle =>
+      'حدث خطأ أثناء فحص إعدادات الموقع. حاول التحديث مرة أخرى.';
+
+  @override
+  String get locationBackgroundPermissionRequired =>
+      'صلاحية الموقع في الخلفية مطلوبة لتفعيل التوفر واستقبال الطلبات.';
+
+  @override
+  String get profileAboutTitle => 'حول التطبيق';
+
+  @override
+  String get profileAboutSubtitle => 'معلومات التطبيق والروابط المهمة';
+
+  @override
+  String get aboutSupportTitle => 'تواصل مع الدعم';
+
+  @override
+  String get aboutSupportSubtitle =>
+      'احصل على المساعدة أو أرسل استفسارك لفريق الدعم';
+
+  @override
+  String get aboutVersionLabel => 'رقم الإصدار';
+
+  @override
+  String get aboutVersionUnavailable => 'غير متوفر';
+
+  @override
+  String get profileAboutPageSubtitle =>
+      'تعرّف على معلومات التطبيق وروابط المساعدة والسياسات.';
+
+  @override
+  String get aboutLinksSectionTitle => 'الروابط المهمة';
 }

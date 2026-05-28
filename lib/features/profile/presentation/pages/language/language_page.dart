@@ -42,12 +42,8 @@ class LanguagePage extends ConsumerWidget {
                 ProfileSectionItem(
                   title: l10n.profileLanguageArabicSubtitle,
                   subtitle: l10n.profileLanguageArabicOptionSubtitle,
-                  icon: Icons.translate_rounded,
-                  onPressed: () => _selectLocale(
-                    context,
-                    ref,
-                    const Locale('ar'),
-                  ),
+                  icon: Icons.format_textdirection_r_to_l_rounded,
+                  onPressed: () => _selectArabicLocale(context, ref),
                   trailing: isArabicLocale
                       ? const _SelectedLanguageIcon()
                       : const _LanguageCodeBadge(label: 'AR'),
@@ -55,12 +51,8 @@ class LanguagePage extends ConsumerWidget {
                 ProfileSectionItem(
                   title: l10n.profileLanguageEnglishSubtitle,
                   subtitle: l10n.profileLanguageEnglishOptionSubtitle,
-                  icon: Icons.language_rounded,
-                  onPressed: () => _selectLocale(
-                    context,
-                    ref,
-                    const Locale('en'),
-                  ),
+                  icon: Icons.format_textdirection_l_to_r_rounded,
+                  onPressed: () => _selectEnglishLocale(context, ref),
                   trailing: !isArabicLocale
                       ? const _SelectedLanguageIcon()
                       : const _LanguageCodeBadge(label: 'EN'),
@@ -73,16 +65,18 @@ class LanguagePage extends ConsumerWidget {
     );
   }
 
-  Future<void> _selectLocale(
-    BuildContext context,
-    WidgetRef ref,
-    Locale locale,
-  ) async {
-    await ref.read(appSettingsControllerProvider).setLocale(locale);
+  Future<void> _selectArabicLocale(BuildContext context, WidgetRef ref) async {
+    await ref.read(appSettingsControllerProvider).setArabicLocale();
 
-    if (!context.mounted) {
-      return;
-    }
+    if (!context.mounted) return;
+
+    Navigator.of(context).pop();
+  }
+
+  Future<void> _selectEnglishLocale(BuildContext context, WidgetRef ref) async {
+    await ref.read(appSettingsControllerProvider).setEnglishLocale();
+
+    if (!context.mounted) return;
 
     Navigator.of(context).pop();
   }

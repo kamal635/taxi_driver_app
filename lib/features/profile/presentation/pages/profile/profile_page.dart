@@ -86,8 +86,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       signOutControllerProvider.select((state) => state.isLoading),
     );
     final appSettings = ref.watch(appSettingsProvider);
-    final isDarkMode = appSettings.isDarkMode;
-    final isArabicLocale = appSettings.locale.languageCode == 'ar';
+    final isArabicLocale = appSettings.isArabic;
     final displayName = _safeDisplayValue(authSession.driverName);
     final phoneNumber = _safeDisplayValue(authSession.driverPhone);
 
@@ -113,22 +112,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 onPressed: _openChangePasswordPage,
               ),
               ProfileSectionItem(
-                title: l10n.profileDarkModeTitle,
-                subtitle: isDarkMode
-                    ? l10n.profileDarkModeEnabledSubtitle
-                    : l10n.profileDarkModeDisabledSubtitle,
-                icon: isDarkMode
-                    ? Icons.dark_mode_rounded
-                    : Icons.light_mode_rounded,
-                onPressed: () => unawaited(_toggleDarkMode()),
-                trailing: Switch.adaptive(
-                  value: isDarkMode,
-                  activeThumbColor: context.colors.primary,
-                  activeTrackColor: context.colors.primary.withValues(
-                    alpha: 0.35,
-                  ),
-                  onChanged: (_) => unawaited(_toggleDarkMode()),
-                ),
+                title: l10n.profileAppearanceTitle,
+                subtitle: _themeModeSubtitle(context, appSettings.themeMode),
+                icon: _themeModeIcon(appSettings.themeMode),
+                onPressed: _openAppearancePage,
               ),
               ProfileSectionItem(
                 title: l10n.profileLanguageTitle,
@@ -141,12 +128,24 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   label: isArabicLocale ? 'AR' : 'EN',
                 ),
               ),
+              ProfileSectionItem(
+                title: l10n.profileLocationStatusTitle,
+                subtitle: l10n.profileLocationStatusSubtitle,
+                icon: Icons.location_on_rounded,
+                onPressed: _openLocationStatusPage,
+              ),
             ],
           ),
           AppSpacing.h18,
           ProfileSection(
             title: l10n.profileSectionLegal,
             children: [
+              ProfileSectionItem(
+                title: l10n.profileAboutTitle,
+                subtitle: l10n.profileAboutSubtitle,
+                icon: Icons.info_outline_rounded,
+                onPressed: _openAboutPage,
+              ),
               ProfileSectionItem(
                 title: l10n.legalPrivacyPolicy,
                 subtitle: l10n.profilePrivacyPolicySubtitle,
@@ -189,16 +188,42 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  Future<void> _toggleDarkMode() async {
-    await ref.read(appSettingsControllerProvider).toggleDarkMode();
-  }
-
   Future<void> _openChangePasswordPage() async {
     await context.pushNamed(AppRouteNames.profilePassword);
   }
 
   Future<void> _openLanguagePage() async {
     await context.pushNamed(AppRouteNames.profileLanguage);
+  }
+
+  Future<void> _openAppearancePage() async {
+    await context.pushNamed(AppRouteNames.profileAppearance);
+  }
+
+  Future<void> _openLocationStatusPage() async {
+    await context.pushNamed(AppRouteNames.profileLocationStatus);
+  }
+
+  Future<void> _openAboutPage() async {
+    await context.pushNamed(AppRouteNames.profileAbout);
+  }
+
+  String _themeModeSubtitle(BuildContext context, ThemeMode themeMode) {
+    final l10n = context.l10n;
+
+    return switch (themeMode) {
+      ThemeMode.system => l10n.profileAppearanceSystemTitle,
+      ThemeMode.light => l10n.profileAppearanceLightTitle,
+      ThemeMode.dark => l10n.profileAppearanceDarkTitle,
+    };
+  }
+
+  IconData _themeModeIcon(ThemeMode themeMode) {
+    return switch (themeMode) {
+      ThemeMode.system => Icons.brightness_auto_rounded,
+      ThemeMode.light => Icons.light_mode_rounded,
+      ThemeMode.dark => Icons.dark_mode_rounded,
+    };
   }
 
   Future<void> _handleSignOutPressed() async {

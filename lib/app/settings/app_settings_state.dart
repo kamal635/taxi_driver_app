@@ -8,7 +8,7 @@ class AppSettingsState {
 
   const AppSettingsState.initial()
     : locale = const Locale('ar'),
-      themeMode = ThemeMode.light;
+      themeMode = ThemeMode.system;
 
   final Locale locale;
   final ThemeMode themeMode;
@@ -24,6 +24,10 @@ class AppSettingsState {
   }
 
   bool get isDarkMode => themeMode == ThemeMode.dark;
+
+  bool get isLightMode => themeMode == ThemeMode.light;
+
+  bool get isSystemThemeMode => themeMode == ThemeMode.system;
 
   bool get isArabic => locale.languageCode == 'ar';
 

@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/features/availability/presentation/controllers/availability_controller.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/controllers/accept_offer_controller.dart';
@@ -13,12 +15,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class HomeOfferSection extends ConsumerWidget {
   const HomeOfferSection({super.key});
 
+  Future<void> _enableAvailability(WidgetRef ref) async {
+    await ref.read(availabilityProvider.notifier).requestSetOnline(value: true);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
 
-    final isOnline = ref.watch(
-      availabilityProvider.select((state) => state.isOnline),
+    final (:isOnline, :isBusy) = ref.watch(
+      availabilityProvider.select(
+        (state) => (
+          isOnline: state.isOnline,
+          isBusy: state.isBusy,
+        ),
+      ),
     );
     final pendingOffer = ref.watch(
       newOfferControllerProvider.select(
@@ -46,6 +57,11 @@ class HomeOfferSection extends ConsumerWidget {
         title: l10n.homeAvailabilityOffTitle,
         subtitle: l10n.homeAvailabilityOffSubtitle,
         animateIcon: false,
+        actionLabel: l10n.homeEnableAvailabilityAction,
+        onActionPressed: isBusy
+            ? null
+            : () => unawaited(_enableAvailability(ref)),
+        isActionLoading: isBusy,
       );
     }
 

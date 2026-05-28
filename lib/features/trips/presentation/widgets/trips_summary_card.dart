@@ -8,14 +8,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class TripsSummaryCard extends StatelessWidget {
   const TripsSummaryCard({
     required this.title,
+    required this.tripsCountLabel,
+    required this.tripsCountText,
     required this.earningsLabel,
     required this.earningsText,
+    required this.averageFareLabel,
+    required this.averageFareText,
     super.key,
   });
 
   final String title;
+  final String tripsCountLabel;
+  final String tripsCountText;
   final String earningsLabel;
   final String earningsText;
+  final String averageFareLabel;
+  final String averageFareText;
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +36,44 @@ class TripsSummaryCard extends StatelessWidget {
             style: AppTypography.titleSm,
           ),
           AppSpacing.h12,
-          _TripsSummaryStat(
-            icon: Icons.payments_rounded,
-            label: earningsLabel,
-            value: earningsText,
-            valueColor: context.colors.success,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final itemWidth = constraints.maxWidth >= 340.w
+                  ? (constraints.maxWidth - 10.w) / 2
+                  : constraints.maxWidth;
+
+              return Wrap(
+                spacing: 10.w,
+                runSpacing: 10.h,
+                children: [
+                  SizedBox(
+                    width: itemWidth,
+                    child: _TripsSummaryStat(
+                      icon: Icons.local_taxi_rounded,
+                      label: tripsCountLabel,
+                      value: tripsCountText,
+                    ),
+                  ),
+                  SizedBox(
+                    width: itemWidth,
+                    child: _TripsSummaryStat(
+                      icon: Icons.payments_rounded,
+                      label: earningsLabel,
+                      value: earningsText,
+                      valueColor: context.colors.success,
+                    ),
+                  ),
+                  SizedBox(
+                    width: itemWidth,
+                    child: _TripsSummaryStat(
+                      icon: Icons.query_stats_rounded,
+                      label: averageFareLabel,
+                      value: averageFareText,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -63,7 +104,6 @@ class _TripsSummaryStat extends StatelessWidget {
         border: Border.all(color: context.colors.border),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: 38.r,
@@ -80,17 +120,21 @@ class _TripsSummaryStat extends StatelessWidget {
             ),
           ),
           AppSpacing.w12,
-          Flexible(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: AppTypography.subtitleSm,
                 ),
                 AppSpacing.h4,
                 Text(
                   value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: AppTypography.labelMd.copyWith(
                     fontWeight: FontWeight.w900,
                     color: valueColor ?? context.colors.textPrimary,

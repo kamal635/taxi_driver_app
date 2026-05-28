@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 @immutable
 final class CompletedOffersState {
   const CompletedOffersState({
-    this.selectedPeriod = CompletedPeriod.all,
+    this.selectedPeriod = CompletedPeriod.day,
     this.result,
     this.isLoading = false,
     this.isRefreshing = false,

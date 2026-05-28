@@ -21,7 +21,18 @@ class TripsPage extends ConsumerWidget {
     final tripsState = ref.watch(completedOffersControllerProvider);
     final result = tripsState.result;
     final offers = result?.offers ?? const <CompletedOfferEntity>[];
-    final totalProfits = formatOrderPrice(result?.totalProfits ?? '0');
+    final tripsCount = result?.count ?? offers.length;
+    final totalProfitsValue = _parsePriceValue(result?.totalProfits ?? '0');
+    final totalProfitsText = formatOrderPrice(
+      _formatNumberForPrice(totalProfitsValue),
+    );
+    final averageFareValue = tripsCount == 0
+        ? 0
+        : totalProfitsValue / tripsCount;
+    final averageFareText = formatOrderPrice(
+      _formatNumberForPrice(averageFareValue),
+    );
+    final currency = context.l10n.currencySyrianPound;
 
     return Stack(
       children: [
@@ -40,31 +51,30 @@ class TripsPage extends ConsumerWidget {
                   delegate: SliverChildListDelegate.fixed([
                     TripsSummaryCard(
                       title: context.l10n.tripsSummaryTitle,
+                      tripsCountLabel: context.l10n.tripsSummaryTripsLabel,
+                      tripsCountText: context.l10n.tripsTotalTrips(tripsCount),
                       earningsLabel: context.l10n.tripsSummaryEarningsLabel,
-                      earningsText:
-                          '${context.l10n.currencySyrianPound} $totalProfits',
+                      earningsText: '$currency $totalProfitsText',
+                      averageFareLabel:
+                          context.l10n.tripsSummaryAverageFareLabel,
+                      averageFareText: '$currency $averageFareText',
                     ),
-                    AppSpacing.h12,
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: TripsFilterDropdown(
-                        value: tripsState.selectedPeriod,
-                        enabled: tripsState.canChangePeriod,
-                        onChanged: (value) async {
-                          if (value == null) return;
+                    AppSpacing.h14,
+                    TripsFilterDropdown(
+                      value: tripsState.selectedPeriod,
+                      enabled: tripsState.canChangePeriod,
+                      onChanged: (value) async {
+                        if (value == null) return;
 
-                          await ref
-                              .read(completedOffersControllerProvider.notifier)
-                              .changePeriod(value);
-                        },
-                      ),
+                        await ref
+                            .read(completedOffersControllerProvider.notifier)
+                            .changePeriod(value);
+                      },
                     ),
                     AppSpacing.h18,
                     TripsSectionHeader(
                       title: context.l10n.tripsRecentTitle,
-                      subtitle: context.l10n.tripsTotalTrips(
-                        result?.count ?? 0,
-                      ),
+                      subtitle: context.l10n.tripsTotalTrips(tripsCount),
                     ),
                     AppSpacing.h12,
                   ]),
@@ -96,4 +106,27 @@ class TripsPage extends ConsumerWidget {
       ],
     );
   }
+}
+
+num _parsePriceValue(String rawValue) {
+  final trimmed = rawValue.trim();
+  if (trimmed.isEmpty) return 0;
+
+  final directValue = num.tryParse(trimmed.replaceAll(',', ''));
+  if (directValue != null) return directValue;
+
+  final cleaned = trimmed.replaceAll(RegExp('[^0-9,.-]'), '');
+  if (cleaned.isEmpty) return 0;
+
+  final normalized = cleaned.contains(',') && cleaned.contains('.')
+      ? cleaned.replaceAll(',', '')
+      : cleaned.replaceAll(',', '.');
+
+  return num.tryParse(normalized) ?? 0;
+}
+
+String _formatNumberForPrice(num value) {
+  if (value.isNaN || value.isInfinite) return '0';
+
+  return value.round().toString();
 }
