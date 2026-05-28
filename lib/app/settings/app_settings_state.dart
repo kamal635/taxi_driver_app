@@ -24,4 +24,10 @@ class AppSettingsState {
   }
 
   bool get isDarkMode => themeMode == ThemeMode.dark;
+
+  bool get isArabic => locale.languageCode == 'ar';
+
+  bool get isEnglish => locale.languageCode == 'en';
+
+  bool get isRtl => isArabic;
 }

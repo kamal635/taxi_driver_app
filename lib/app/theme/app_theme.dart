@@ -38,6 +38,14 @@ final class AppTheme {
       error: colors.error,
     );
 
+    final baseTheme = ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
+      fontFamily: fonts.primary,
+      fontFamilyFallback: fonts.fallback,
+      colorScheme: colorScheme,
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
@@ -52,7 +60,11 @@ final class AppTheme {
       visualDensity: VisualDensity.adaptivePlatformDensity,
       dividerColor: colors.border,
       iconTheme: IconThemeData(color: colors.textPrimary),
-      textTheme: ThemeData(brightness: brightness).textTheme.apply(
+      textTheme: baseTheme.textTheme.apply(
+        bodyColor: colors.textPrimary,
+        displayColor: colors.textPrimary,
+      ),
+      primaryTextTheme: baseTheme.primaryTextTheme.apply(
         bodyColor: colors.textPrimary,
         displayColor: colors.textPrimary,
       ),

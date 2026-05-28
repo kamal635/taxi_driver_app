@@ -14,4 +14,5 @@ abstract final class RouteNames {
   static const String trips = AppRouteNames.trips;
   static const String profile = AppRouteNames.profile;
   static const String profilePassword = AppRouteNames.profilePassword;
+  static const String profileLanguage = AppRouteNames.profileLanguage;
 }

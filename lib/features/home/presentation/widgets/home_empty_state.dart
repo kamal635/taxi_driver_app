@@ -12,6 +12,7 @@ class HomeEmptyState extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.animateIcon = true,
     super.key,
   });
 
@@ -19,12 +20,21 @@ class HomeEmptyState extends StatelessWidget {
   final String title;
   final String subtitle;
 
+  /// Whether the icon should pulse to indicate active request searching.
+  ///
+  /// This should be false when the driver is offline, because no request
+  /// searching is running in that state.
+  final bool animateIcon;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _PulsingEmptyStateIcon(icon: icon),
+        if (animateIcon)
+          _PulsingEmptyStateIcon(icon: icon)
+        else
+          _StaticEmptyStateIcon(icon: icon),
         AppSpacing.h18,
         Text(
           title,
@@ -153,6 +163,58 @@ class _PulsingEmptyStateIconState extends State<_PulsingEmptyStateIcon>
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+/// Static indicator used when the driver is offline and no search is running.
+class _StaticEmptyStateIcon extends StatelessWidget {
+  const _StaticEmptyStateIcon({
+    required this.icon,
+  });
+
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final outerSize = 190.r;
+    final baseSize = 136.r;
+    final innerSize = 86.r;
+
+    return SizedBox.square(
+      dimension: outerSize,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          _CircleLayer(
+            size: baseSize,
+            color: colors.surfaceMuted.withValues(alpha: 0.72),
+            borderColor: colors.border,
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: colors.surface.withValues(alpha: 0.90),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.shadow,
+                  blurRadius: 18.r,
+                  offset: Offset(0, 8.h),
+                ),
+              ],
+            ),
+            child: SizedBox.square(
+              dimension: innerSize,
+              child: Icon(
+                icon,
+                size: 38.r,
+                color: colors.iconMuted,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

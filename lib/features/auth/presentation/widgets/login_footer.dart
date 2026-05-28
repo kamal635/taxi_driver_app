@@ -35,7 +35,6 @@ class LoginFooter extends StatelessWidget {
                 '•',
                 style: AppTypography.bodySm.copyWith(
                   color: colors.iconMuted,
-                  fontFamily: 'NotoKufiArabic',
                 ),
               ),
               _FooterLinkButton(
@@ -87,7 +86,6 @@ class _FooterLinkButton extends StatelessWidget {
           label,
           style: AppTypography.bodySm.copyWith(
             color: colors.primary,
-            fontFamily: 'NotoKufiArabic',
             fontWeight: FontWeight.w600,
           ),
         ),

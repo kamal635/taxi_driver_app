@@ -271,6 +271,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'Disabled now, tap to switch to dark mode';
 
   @override
+  String get profileLanguageTitle => 'Language';
+
+  @override
+  String get profileLanguageArabicSubtitle => 'Arabic';
+
+  @override
+  String get profileLanguageEnglishSubtitle => 'English';
+
+  @override
+  String get profileLanguagePageSubtitle =>
+      'Choose the language you want to use in the app.';
+
+  @override
+  String get profileLanguageArabicOptionSubtitle => 'Use the app in Arabic';
+
+  @override
+  String get profileLanguageEnglishOptionSubtitle => 'Use the app in English';
+
+  @override
   String get profileMyVehiclesTitle => 'My vehicles';
 
   @override

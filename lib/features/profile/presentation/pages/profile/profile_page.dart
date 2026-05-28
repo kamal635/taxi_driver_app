@@ -5,6 +5,7 @@ import 'package:bawabat_al_saeq/app/router/config/app_route_paths.dart';
 import 'package:bawabat_al_saeq/app/settings/app_settings_providers.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:bawabat_al_saeq/core/constants/app_links.dart';
 import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
@@ -86,6 +87,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
     final appSettings = ref.watch(appSettingsProvider);
     final isDarkMode = appSettings.isDarkMode;
+    final isArabicLocale = appSettings.locale.languageCode == 'ar';
     final displayName = _safeDisplayValue(authSession.driverName);
     final phoneNumber = _safeDisplayValue(authSession.driverPhone);
 
@@ -126,6 +128,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     alpha: 0.35,
                   ),
                   onChanged: (_) => unawaited(_toggleDarkMode()),
+                ),
+              ),
+              ProfileSectionItem(
+                title: l10n.profileLanguageTitle,
+                subtitle: isArabicLocale
+                    ? l10n.profileLanguageArabicSubtitle
+                    : l10n.profileLanguageEnglishSubtitle,
+                icon: Icons.language_rounded,
+                onPressed: _openLanguagePage,
+                trailing: _LanguageCodeBadge(
+                  label: isArabicLocale ? 'AR' : 'EN',
                 ),
               ),
             ],
@@ -184,6 +197,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     await context.pushNamed(AppRouteNames.profilePassword);
   }
 
+  Future<void> _openLanguagePage() async {
+    await context.pushNamed(AppRouteNames.profileLanguage);
+  }
+
   Future<void> _handleSignOutPressed() async {
     final confirmed = await _showSignOutConfirmation();
 
@@ -213,5 +230,31 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   String _safeDisplayValue(String? value) {
     final trimmed = value?.trim();
     return (trimmed != null && trimmed.isNotEmpty) ? trimmed : '—';
+  }
+}
+
+class _LanguageCodeBadge extends StatelessWidget {
+  const _LanguageCodeBadge({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: context.colors.backgroundDecorative,
+        borderRadius: BorderRadius.circular(999.r),
+        border: Border.all(color: context.colors.border),
+      ),
+      child: Text(
+        label,
+        textDirection: TextDirection.ltr,
+        style: AppTypography.labelSm.copyWith(
+          color: context.colors.textPrimary,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
   }
 }

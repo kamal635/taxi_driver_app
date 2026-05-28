@@ -9,6 +9,9 @@ class AppSettingsController extends ChangeNotifier {
     unawaited(_load());
   }
 
+  static const Locale arabicLocale = Locale('ar');
+  static const Locale englishLocale = Locale('en');
+
   final AppSettingsStorage _storage;
 
   AppSettingsState _state = const AppSettingsState.initial();
@@ -39,10 +42,30 @@ class AppSettingsController extends ChangeNotifier {
   }
 
   Future<void> setLocale(Locale value) async {
-    if (_state.locale == value) return;
+    final normalizedLocale = _normalizeLocale(value);
+    if (_state.locale == normalizedLocale) return;
 
-    _state = _state.copyWith(locale: value);
+    _state = _state.copyWith(locale: normalizedLocale);
     notifyListeners();
-    await _storage.writeLocale(value);
+    await _storage.writeLocale(normalizedLocale);
+  }
+
+  Future<void> setArabicLocale() {
+    return setLocale(arabicLocale);
+  }
+
+  Future<void> setEnglishLocale() {
+    return setLocale(englishLocale);
+  }
+
+  Future<void> toggleLocale() {
+    return setLocale(_state.isArabic ? englishLocale : arabicLocale);
+  }
+
+  Locale _normalizeLocale(Locale value) {
+    return switch (value.languageCode) {
+      'en' => englishLocale,
+      _ => arabicLocale,
+    };
   }
 }

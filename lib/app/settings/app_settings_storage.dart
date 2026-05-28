@@ -31,8 +31,13 @@ class AppSettingsStorage {
 
   Future<Locale?> readLocale() async {
     final raw = await _storage.read(key: _localeKey);
-    if (raw == null || raw.trim().isEmpty) return null;
-    return Locale(raw);
+    final languageCode = raw?.trim().toLowerCase();
+
+    return switch (languageCode) {
+      'ar' => const Locale('ar'),
+      'en' => const Locale('en'),
+      _ => null,
+    };
   }
 
   Future<void> writeLocale(Locale value) {

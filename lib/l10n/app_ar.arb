@@ -118,6 +118,30 @@
   "@profileDarkModeDisabledSubtitle": {
     "description": "وصف خيار الوضع الليلي عندما يكون غير مفعّل"
   },
+  "profileLanguageTitle": "اللغة",
+  "@profileLanguageTitle": {
+    "description": "عنوان خيار تبديل اللغة في صفحة الملف الشخصي"
+  },
+  "profileLanguageArabicSubtitle": "العربية",
+  "@profileLanguageArabicSubtitle": {
+    "description": "وصف يظهر عندما تكون اللغة الحالية عربية"
+  },
+  "profileLanguageEnglishSubtitle": "الإنكليزية",
+  "@profileLanguageEnglishSubtitle": {
+    "description": "وصف يظهر عندما تكون اللغة الحالية إنكليزية"
+  },
+  "profileLanguagePageSubtitle": "اختر اللغة التي تريد استخدامها داخل التطبيق.",
+  "@profileLanguagePageSubtitle": {
+    "description": "نص توضيحي داخل صفحة اختيار اللغة"
+  },
+  "profileLanguageArabicOptionSubtitle": "استخدم التطبيق باللغة العربية",
+  "@profileLanguageArabicOptionSubtitle": {
+    "description": "وصف خيار اللغة العربية"
+  },
+  "profileLanguageEnglishOptionSubtitle": "استخدم التطبيق باللغة الإنكليزية",
+  "@profileLanguageEnglishOptionSubtitle": {
+    "description": "وصف خيار اللغة الإنكليزية"
+  },
   "profileMyVehiclesTitle": "مركباتي",
   "profileMyVehiclesSubtitle": "إدارة السيارات المسجلة",
   "profileHelpCenterTitle": "مركز المساعدة",

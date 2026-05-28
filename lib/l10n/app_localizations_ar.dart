@@ -271,6 +271,27 @@ class AppLocalizationsAr extends AppLocalizations {
       'غير مفعّل حالياً، اضغط للتبديل إلى الوضع الداكن';
 
   @override
+  String get profileLanguageTitle => 'اللغة';
+
+  @override
+  String get profileLanguageArabicSubtitle => 'العربية';
+
+  @override
+  String get profileLanguageEnglishSubtitle => 'الإنكليزية';
+
+  @override
+  String get profileLanguagePageSubtitle =>
+      'اختر اللغة التي تريد استخدامها داخل التطبيق.';
+
+  @override
+  String get profileLanguageArabicOptionSubtitle =>
+      'استخدم التطبيق باللغة العربية';
+
+  @override
+  String get profileLanguageEnglishOptionSubtitle =>
+      'استخدم التطبيق باللغة الإنكليزية';
+
+  @override
   String get profileMyVehiclesTitle => 'مركباتي';
 
   @override

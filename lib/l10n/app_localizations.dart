@@ -602,6 +602,42 @@ abstract class AppLocalizations {
   /// **'Disabled now, tap to switch to dark mode'**
   String get profileDarkModeDisabledSubtitle;
 
+  /// Title for the language switch option on the profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get profileLanguageTitle;
+
+  /// Subtitle shown for Arabic language
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get profileLanguageArabicSubtitle;
+
+  /// Subtitle shown for English language
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get profileLanguageEnglishSubtitle;
+
+  /// Helper text shown on the language selection page
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the language you want to use in the app.'**
+  String get profileLanguagePageSubtitle;
+
+  /// Subtitle for the Arabic language option
+  ///
+  /// In en, this message translates to:
+  /// **'Use the app in Arabic'**
+  String get profileLanguageArabicOptionSubtitle;
+
+  /// Subtitle for the English language option
+  ///
+  /// In en, this message translates to:
+  /// **'Use the app in English'**
+  String get profileLanguageEnglishOptionSubtitle;
+
   /// No description provided for @profileMyVehiclesTitle.
   ///
   /// In en, this message translates to:

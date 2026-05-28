@@ -118,6 +118,30 @@
   "@profileDarkModeDisabledSubtitle": {
     "description": "Subtitle shown when dark mode is currently disabled"
   },
+  "profileLanguageTitle": "Language",
+  "@profileLanguageTitle": {
+    "description": "Title for the language switch option on the profile page"
+  },
+  "profileLanguageArabicSubtitle": "Arabic",
+  "@profileLanguageArabicSubtitle": {
+    "description": "Subtitle shown for Arabic language"
+  },
+  "profileLanguageEnglishSubtitle": "English",
+  "@profileLanguageEnglishSubtitle": {
+    "description": "Subtitle shown for English language"
+  },
+  "profileLanguagePageSubtitle": "Choose the language you want to use in the app.",
+  "@profileLanguagePageSubtitle": {
+    "description": "Helper text shown on the language selection page"
+  },
+  "profileLanguageArabicOptionSubtitle": "Use the app in Arabic",
+  "@profileLanguageArabicOptionSubtitle": {
+    "description": "Subtitle for the Arabic language option"
+  },
+  "profileLanguageEnglishOptionSubtitle": "Use the app in English",
+  "@profileLanguageEnglishOptionSubtitle": {
+    "description": "Subtitle for the English language option"
+  },
   "profileMyVehiclesTitle": "My vehicles",
   "profileMyVehiclesSubtitle": "Manage your registered cars",
   "profileHelpCenterTitle": "Help center",

@@ -1,4 +1,5 @@
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/features/availability/presentation/controllers/availability_controller.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/providers/offer_providers.dart';
@@ -16,6 +17,9 @@ class HomeOfferSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
 
+    final isOnline = ref.watch(
+      availabilityProvider.select((state) => state.isOnline),
+    );
     final pendingOffer = ref.watch(
       newOfferControllerProvider.select(
         (state) => state.asData?.value.currentOffer,
@@ -34,6 +38,15 @@ class HomeOfferSection extends ConsumerWidget {
 
     if (acceptedOffer != null || restoredAcceptedOffer != null) {
       return const AcceptedOfferCard();
+    }
+
+    if (!isOnline) {
+      return HomeEmptyState(
+        icon: Icons.power_settings_new_rounded,
+        title: l10n.homeAvailabilityOffTitle,
+        subtitle: l10n.homeAvailabilityOffSubtitle,
+        animateIcon: false,
+      );
     }
 
     return HomeEmptyState(
