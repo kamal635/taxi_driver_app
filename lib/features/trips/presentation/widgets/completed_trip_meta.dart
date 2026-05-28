@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/utils/price_formatter.dart';
@@ -30,7 +30,7 @@ class CompletedTripMeta extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTypography.subtitleSm.copyWith(
-              color: AppColors.iconMuted,
+              color: context.colors.iconMuted,
               fontSize: 10.sp,
             ),
           ),
@@ -40,7 +40,7 @@ class CompletedTripMeta extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTypography.subtitleMd.copyWith(
-              color: AppColors.success,
+              color: context.colors.success,
               fontWeight: FontWeight.bold,
               fontSize: 12.sp,
             ),

@@ -260,6 +260,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileChangePasswordSubtitle => 'تأمين حسابك بكلمة مرور جديدة';
 
   @override
+  String get profileDarkModeTitle => 'الوضع الليلي';
+
+  @override
+  String get profileDarkModeEnabledSubtitle =>
+      'مفعّل حالياً، اضغط للتبديل إلى الوضع الفاتح';
+
+  @override
+  String get profileDarkModeDisabledSubtitle =>
+      'غير مفعّل حالياً، اضغط للتبديل إلى الوضع الداكن';
+
+  @override
   String get profileMyVehiclesTitle => 'مركباتي';
 
   @override

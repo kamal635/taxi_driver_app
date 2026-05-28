@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -83,7 +83,7 @@ class AppTextField extends StatelessWidget {
             hintText: hintText,
             hintStyle: AppTypography.bodyMuted,
             filled: true,
-            fillColor: Colors.white,
+            fillColor: context.colors.surface,
             contentPadding: EdgeInsets.symmetric(
               horizontal: 14.w,
               vertical: 14.h,
@@ -91,24 +91,26 @@ class AppTextField extends StatelessWidget {
             prefixIcon: prefixIcon == null
                 ? null
                 : IconTheme(
-                    data: const IconThemeData(color: AppColors.iconMuted),
+                    data: IconThemeData(color: context.colors.iconMuted),
                     child: prefixIcon!,
                   ),
             suffixIcon: suffixIcon == null
                 ? null
                 : IconTheme(
-                    data: const IconThemeData(color: AppColors.iconMuted),
+                    data: IconThemeData(color: context.colors.iconMuted),
                     child: suffixIcon!,
                   ),
-            border: _border(),
-            enabledBorder: _border(),
+            border: _border(context),
+            enabledBorder: _border(context),
             focusedBorder: _border(
-              color: AppColors.primary,
+              context,
+              color: context.colors.primary,
               width: 1.6,
             ),
-            errorBorder: _border(color: AppColors.error),
+            errorBorder: _border(context, color: context.colors.error),
             focusedErrorBorder: _border(
-              color: AppColors.error,
+              context,
+              color: context.colors.error,
               width: 1.6,
             ),
           ),
@@ -117,13 +119,17 @@ class AppTextField extends StatelessWidget {
     );
   }
 
-  OutlineInputBorder _border({
-    Color color = AppColors.border,
+  OutlineInputBorder _border(
+    BuildContext context, {
+    Color? color,
     double width = 1,
   }) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(14.r),
-      borderSide: BorderSide(color: color, width: width),
+      borderSide: BorderSide(
+        color: color ?? context.colors.border,
+        width: width,
+      ),
     );
   }
 }

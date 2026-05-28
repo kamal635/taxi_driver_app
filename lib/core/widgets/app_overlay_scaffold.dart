@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,7 @@ class AppOverlayScaffold extends StatelessWidget {
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: AppColors.textPrimary,
+        foregroundColor: context.colors.textPrimary,
         leading: IconButton(
           icon: const Icon(AppIcons.arrowBack),
           onPressed: () => context.pop(),

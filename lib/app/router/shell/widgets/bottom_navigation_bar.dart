@@ -1,4 +1,4 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,12 +19,10 @@ class BottomNav extends StatelessWidget {
   final String tripsLabel;
   final String profileLabel;
 
-  static const Color _inactiveColor = AppColors.iconMuted;
-  static const Color _activeColor = AppColors.primary;
-  static const Color _indicatorColor = AppColors.primary;
-
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     final items = <_NavItemData>[
       _NavItemData(icon: Icons.home_rounded, label: homeLabel),
       _NavItemData(icon: Icons.directions_car_rounded, label: tripsLabel),
@@ -35,13 +33,13 @@ class BottomNav extends StatelessWidget {
       top: false,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.white,
-          border: const Border(top: BorderSide(color: AppColors.border)),
+          color: colors.surface,
+          border: Border(top: BorderSide(color: colors.border)),
           boxShadow: [
             BoxShadow(
               blurRadius: 18,
               offset: const Offset(0, -8),
-              color: Colors.black.withValues(alpha: 0.06),
+              color: colors.shadow,
             ),
           ],
         ),
@@ -80,9 +78,8 @@ class _BottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected
-        ? BottomNav._activeColor
-        : BottomNav._inactiveColor;
+    final colors = context.colors;
+    final color = isSelected ? colors.primary : colors.iconMuted;
 
     return Semantics(
       button: true,
@@ -119,7 +116,7 @@ class _BottomNavItem extends StatelessWidget {
                   height: 2.h,
                   width: isSelected ? 36.w : 0,
                   decoration: BoxDecoration(
-                    color: BottomNav._indicatorColor,
+                    color: colors.primary,
                     borderRadius: BorderRadius.circular(999.r),
                   ),
                 ),

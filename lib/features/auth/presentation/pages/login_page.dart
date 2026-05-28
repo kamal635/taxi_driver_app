@@ -1,5 +1,5 @@
 import 'package:bawabat_al_saeq/app/router/config/app_route_paths.dart';
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
@@ -89,13 +89,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       authControllerProvider.select((state) => state.isLoading),
     );
 
+    final colors = context.colors;
+
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: RadialGradient(
             center: Alignment.topCenter,
             radius: 1.5,
-            colors: [AppColors.bgWarm, AppColors.bgBase],
+            colors: [colors.backgroundDecorative, colors.background],
           ),
         ),
         child: SafeArea(

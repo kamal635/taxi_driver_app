@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +22,7 @@ class NewOfferActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colors = context.colors;
     final isBusy = isAcceptLoading || isDeclineLoading;
 
     return Row(
@@ -29,8 +30,8 @@ class NewOfferActions extends StatelessWidget {
         Expanded(
           flex: 2,
           child: AppButton(
-            borderColor: AppColors.error,
-            labelColor: AppColors.error,
+            borderColor: colors.error,
+            labelColor: colors.error,
             backgroundColor: Colors.transparent,
             label: l10n.decline,
             onPressed: isBusy ? null : onDecline,

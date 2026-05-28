@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
@@ -83,6 +83,7 @@ class _OfferHeaderState extends State<OfferHeader> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colors = context.colors;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,19 +94,19 @@ class _OfferHeaderState extends State<OfferHeader> {
             Container(
               padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 14.w),
               decoration: BoxDecoration(
-                color: AppColors.infoBg,
+                color: colors.infoBg,
                 borderRadius: BorderRadius.circular(999.r),
               ),
               child: Text(
                 widget.statusLabel,
-                style: AppTypography.labelMd.copyWith(color: AppColors.info),
+                style: AppTypography.labelMd.copyWith(color: colors.info),
               ),
             ),
             if (widget.showExpiryChip)
               Container(
                 padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
                 decoration: BoxDecoration(
-                  color: AppColors.errorBg.withValues(alpha: 0.4),
+                  color: colors.errorBg.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(999.r),
                 ),
                 child: Row(
@@ -113,13 +114,13 @@ class _OfferHeaderState extends State<OfferHeader> {
                     Icon(
                       AppIcons.timer,
                       size: 18.r,
-                      color: AppColors.error,
+                      color: colors.error,
                     ),
                     AppSpacing.w4,
                     Text(
                       _buildExpiryText(context),
                       style: AppTypography.labelSm.copyWith(
-                        color: AppColors.error,
+                        color: colors.error,
                       ),
                     ),
                   ],

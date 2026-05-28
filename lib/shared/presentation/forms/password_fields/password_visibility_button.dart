@@ -1,4 +1,4 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ class PasswordVisibilityButton extends StatelessWidget {
     final l10n = context.l10n;
 
     return IconButton(
-      color: AppColors.iconMuted,
+      color: context.colors.iconMuted,
       tooltip: isObscured ? l10n.authShowPassword : l10n.authHidePassword,
       onPressed: onPressed,
       icon: Icon(

@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_entity.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/widgets/completed_trip_meta.dart';
@@ -25,7 +25,7 @@ class CompletedTripCard extends StatelessWidget {
           Icon(
             AppIcons.history,
             size: 26.r,
-            color: AppColors.iconMuted,
+            color: context.colors.iconMuted,
           ),
           AppSpacing.w8,
           Expanded(child: CompletedTripRouteSection(offer: offer)),

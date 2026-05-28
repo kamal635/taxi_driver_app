@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
 import 'package:bawabat_al_saeq/core/widgets/app_text_button.dart';
@@ -23,6 +23,8 @@ Future<bool> showAppConfirmDialog({
     barrierDismissible: barrierDismissible,
     builder: (dialogContext) {
       return Dialog(
+        backgroundColor: context.colors.surface,
+        surfaceTintColor: Colors.transparent,
         insetPadding: EdgeInsets.symmetric(horizontal: 18.w),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18.r),
@@ -39,13 +41,13 @@ Future<bool> showAppConfirmDialog({
                     width: 40.r,
                     height: 40.r,
                     decoration: BoxDecoration(
-                      color: backgroundColorIcon ?? AppColors.bgWarm,
+                      color: backgroundColorIcon ?? context.colors.surfaceMuted,
                       borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: context.colors.border),
                     ),
                     child: Icon(
                       icon,
-                      color: iconColor ?? AppColors.textPrimary,
+                      color: iconColor ?? context.colors.textPrimary,
                     ),
                   ),
                   AppSpacing.w12,

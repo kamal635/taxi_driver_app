@@ -1,4 +1,4 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
@@ -23,9 +23,9 @@ class TripsFilterDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.colors.border),
       ),
       child: Padding(
         padding: EdgeInsetsDirectional.only(
@@ -37,18 +37,19 @@ class TripsFilterDropdown extends StatelessWidget {
           child: DropdownButtonHideUnderline(
             child: DropdownButton<CompletedPeriod>(
               value: value,
-              dropdownColor: AppColors.white,
+              dropdownColor: context.colors.surface,
               borderRadius: BorderRadius.circular(14.r),
               icon: Icon(
                 AppIcons.arrowDown,
                 size: 22.r,
+                color: context.colors.iconMuted,
               ),
               style: AppTypography.labelMd.copyWith(
+                color: context.colors.textPrimary,
                 height: 1.2,
               ),
               alignment: AlignmentDirectional.center,
               onChanged: enabled ? onChanged : null,
-
               items: CompletedPeriod.values.map((period) {
                 return DropdownMenuItem<CompletedPeriod>(
                   value: period,

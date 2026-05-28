@@ -584,6 +584,24 @@ abstract class AppLocalizations {
   /// **'Secure your account'**
   String get profileChangePasswordSubtitle;
 
+  /// Title for the dark mode toggle option on the profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode'**
+  String get profileDarkModeTitle;
+
+  /// Subtitle shown when dark mode is currently enabled
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled now, tap to switch to light mode'**
+  String get profileDarkModeEnabledSubtitle;
+
+  /// Subtitle shown when dark mode is currently disabled
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled now, tap to switch to dark mode'**
+  String get profileDarkModeDisabledSubtitle;
+
   /// No description provided for @profileMyVehiclesTitle.
   ///
   /// In en, this message translates to:

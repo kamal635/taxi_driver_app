@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
@@ -18,35 +18,36 @@ class OfferNotesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colors = context.colors;
 
     return Container(
       padding: EdgeInsets.all(16.r),
       margin: EdgeInsets.only(top: 10.r),
-      decoration: const BoxDecoration(
-        color: AppColors.errorBg,
+      decoration: BoxDecoration(
+        color: colors.errorBg,
         boxShadow: [
           BoxShadow(
-            color: AppColors.errorBg,
-            offset: Offset(0, 2),
+            color: colors.errorBg.withValues(alpha: 0.55),
+            offset: const Offset(0, 2),
             blurRadius: 4,
           ),
         ],
         border: Border(
-          left: BorderSide(color: AppColors.error),
-          right: BorderSide(color: AppColors.error),
-          bottom: BorderSide(color: AppColors.error),
+          left: BorderSide(color: colors.error),
+          right: BorderSide(color: colors.error),
+          bottom: BorderSide(color: colors.error),
         ),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(12),
-          bottomRight: Radius.circular(12),
+          bottomLeft: Radius.circular(12.r),
+          bottomRight: Radius.circular(12.r),
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
+          Icon(
             AppIcons.note,
-            color: AppColors.error,
+            color: colors.error,
           ),
           AppSpacing.w12,
           Expanded(
@@ -56,7 +57,7 @@ class OfferNotesCard extends StatelessWidget {
                 Text(
                   l10n.tripNotes,
                   style: AppTypography.titleSm.copyWith(
-                    color: AppColors.error,
+                    color: colors.error,
                     fontSize: 16.sp,
                   ),
                 ),

@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/utils/offer_time_formatter.dart';
@@ -20,6 +20,7 @@ class AcceptedProgressIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colors = context.colors;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,7 +37,7 @@ class AcceptedProgressIndicator extends StatelessWidget {
               formatOfferCountdown(remaining),
               style: AppTypography.titleSm.copyWith(
                 fontSize: 16.sp,
-                color: AppColors.error,
+                color: colors.error,
               ),
             ),
           ],
@@ -47,8 +48,8 @@ class AcceptedProgressIndicator extends StatelessWidget {
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 10.h,
-            backgroundColor: AppColors.error.withValues(alpha: 0.22),
-            valueColor: const AlwaysStoppedAnimation(AppColors.error),
+            backgroundColor: colors.error.withValues(alpha: 0.22),
+            valueColor: AlwaysStoppedAnimation(colors.error),
           ),
         ),
       ],

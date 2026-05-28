@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -137,11 +137,11 @@ class _PillSwitchState extends State<PillSwitch>
         _maxLabelWidth + (horizontalPadding * 2) + gap + ringSize + safety;
 
     Color backgroundFor({required bool value}) {
-      return value ? AppColors.successBg : AppColors.errorBg;
+      return value ? context.colors.successBg : context.colors.errorBg;
     }
 
     Color accentFor({required bool value}) {
-      return value ? AppColors.success : AppColors.error;
+      return value ? context.colors.success : context.colors.error;
     }
 
     Widget buildRing({
@@ -154,7 +154,7 @@ class _PillSwitchState extends State<PillSwitch>
         width: ringSize,
         height: ringSize,
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: context.colors.surface,
           shape: BoxShape.circle,
           border: Border.all(
             color: accent,
@@ -253,14 +253,14 @@ class _PillSwitchState extends State<PillSwitch>
                 color: baseBackground,
                 borderRadius: radius,
                 border: Border.all(
-                  color: AppColors.white,
+                  color: context.colors.surface,
                   width: 2.r,
                 ),
                 boxShadow: [
                   BoxShadow(
                     blurRadius: 10,
                     offset: const Offset(0, 4),
-                    color: Colors.black.withValues(alpha: 0.10),
+                    color: context.colors.shadow,
                   ),
                 ],
               ),

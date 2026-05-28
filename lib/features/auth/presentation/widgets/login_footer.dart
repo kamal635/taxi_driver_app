@@ -1,7 +1,7 @@
 import 'dart:async' show unawaited;
 
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/constants/app_links.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
@@ -15,6 +15,7 @@ class LoginFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colors = context.colors;
 
     return Padding(
       padding: EdgeInsets.only(top: 26.h),
@@ -33,7 +34,7 @@ class LoginFooter extends StatelessWidget {
               Text(
                 '•',
                 style: AppTypography.bodySm.copyWith(
-                  color: AppColors.iconMuted,
+                  color: colors.iconMuted,
                   fontFamily: 'NotoKufiArabic',
                 ),
               ),
@@ -47,7 +48,7 @@ class LoginFooter extends StatelessWidget {
           Text(
             l10n.copyright,
             style: AppTypography.subtitleSm.copyWith(
-              color: AppColors.iconMuted,
+              color: colors.iconMuted,
             ),
           ),
           AppSpacing.h6,
@@ -72,6 +73,8 @@ class _FooterLinkButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(6.r),
@@ -83,7 +86,7 @@ class _FooterLinkButton extends StatelessWidget {
         child: Text(
           label,
           style: AppTypography.bodySm.copyWith(
-            color: AppColors.primary,
+            color: colors.primary,
             fontFamily: 'NotoKufiArabic',
             fontWeight: FontWeight.w600,
           ),

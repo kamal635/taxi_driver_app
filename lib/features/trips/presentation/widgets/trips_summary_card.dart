@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_card_surface.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +32,7 @@ class TripsSummaryCard extends StatelessWidget {
             icon: Icons.payments_rounded,
             label: earningsLabel,
             value: earningsText,
-            valueColor: AppColors.success,
+            valueColor: context.colors.success,
           ),
         ],
       ),
@@ -58,9 +58,9 @@ class _TripsSummaryStat extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(12.r),
       decoration: BoxDecoration(
-        color: AppColors.bgBase,
+        color: context.colors.surfaceMuted,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.colors.border),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -69,14 +69,14 @@ class _TripsSummaryStat extends StatelessWidget {
             width: 38.r,
             height: 38.r,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.18),
+              color: context.colors.primary.withValues(alpha: 0.18),
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: context.colors.border),
             ),
             child: Icon(
               icon,
               size: 20.r,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           AppSpacing.w12,
@@ -93,7 +93,7 @@ class _TripsSummaryStat extends StatelessWidget {
                   value,
                   style: AppTypography.labelMd.copyWith(
                     fontWeight: FontWeight.w900,
-                    color: valueColor ?? AppColors.textPrimary,
+                    color: valueColor ?? context.colors.textPrimary,
                   ),
                 ),
               ],

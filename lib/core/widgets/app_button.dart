@@ -1,4 +1,5 @@
 import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -37,9 +38,9 @@ class AppButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? AppColors.primary,
+          backgroundColor: backgroundColor ?? context.colors.primary,
           foregroundColor: effectiveLabelColor,
-          disabledBackgroundColor: (backgroundColor ?? AppColors.primary)
+          disabledBackgroundColor: (backgroundColor ?? context.colors.primary)
               .withValues(alpha: 0.55),
           disabledForegroundColor: effectiveLabelColor.withValues(alpha: 0.70),
           elevation: 0,

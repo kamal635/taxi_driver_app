@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/avatar/avatar_controller.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
@@ -53,7 +54,7 @@ class AvatarImageEditor extends ConsumerWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColors.primary,
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.colors.border),
               ),
               child: isBusy
                   ? Padding(
@@ -102,13 +103,13 @@ class AvatarImageEditor extends ConsumerWidget {
               ),
               ListTile(
                 enabled: hasAvatar,
-                leading: const Icon(
+                leading: Icon(
                   AppIcons.delete,
-                  color: AppColors.error,
+                  color: context.colors.error,
                 ),
                 title: Text(
                   l10n.profileAvatarRemovePhoto,
-                  style: const TextStyle(color: AppColors.error),
+                  style: TextStyle(color: context.colors.error),
                 ),
                 onTap: hasAvatar
                     ? () async {
@@ -188,10 +189,10 @@ class _AvatarPreview extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.55),
+          color: context.colors.primary.withValues(alpha: 0.55),
           width: 3,
         ),
-        color: AppColors.bgBase,
+        color: context.colors.surfaceMuted,
       ),
       child: hasAvatar
           ? ClipOval(

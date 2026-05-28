@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
@@ -35,13 +35,15 @@ class ProfileSectionItem extends StatelessWidget {
     final isEnabled = onPressed != null;
     final resolvedAccentColor =
         accentColor ??
-        (isDestructive ? AppColors.error : AppColors.textPrimary);
+        (isDestructive ? context.colors.error : context.colors.textPrimary);
     final resolvedIconBackgroundColor =
         iconBackgroundColor ??
-        (isDestructive ? AppColors.errorBg : AppColors.bgWarm);
+        (isDestructive
+            ? context.colors.errorBg
+            : context.colors.backgroundDecorative);
     final resolvedSubtitleColor =
         subtitleColor ??
-        (isDestructive ? AppColors.error : AppColors.textSecondary);
+        (isDestructive ? context.colors.error : context.colors.textSecondary);
 
     return Opacity(
       opacity: isEnabled ? 1 : 0.58,
@@ -60,7 +62,7 @@ class ProfileSectionItem extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: resolvedIconBackgroundColor,
                     borderRadius: BorderRadius.circular(14.r),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: context.colors.border),
                   ),
                   child: Icon(
                     icon,
@@ -98,7 +100,7 @@ class ProfileSectionItem extends StatelessWidget {
                     Icon(
                       AppIcons.arrowForward,
                       size: 14.r,
-                      color: AppColors.iconMuted,
+                      color: context.colors.iconMuted,
                     ),
               ],
             ),

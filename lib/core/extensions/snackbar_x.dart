@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +23,7 @@ extension SnackBarX on BuildContext {
 
     final messenger = ScaffoldMessenger.of(this)..hideCurrentSnackBar();
 
-    final style = _snackStyleFor(type);
+    final style = _snackStyleFor(type, colors);
 
     messenger.showSnackBar(
       SnackBar(
@@ -67,26 +67,27 @@ extension SnackBarX on BuildContext {
 
 ({Color backgroundColor, Color foregroundColor, IconData icon}) _snackStyleFor(
   AppSnackType type,
+  AppThemeColors colors,
 ) {
   return switch (type) {
     AppSnackType.success => (
-      backgroundColor: AppColors.success,
-      foregroundColor: AppColors.successBg,
+      backgroundColor: colors.success,
+      foregroundColor: colors.successBg,
       icon: AppIcons.success,
     ),
     AppSnackType.error => (
-      backgroundColor: AppColors.error,
-      foregroundColor: AppColors.errorBg,
+      backgroundColor: colors.error,
+      foregroundColor: colors.errorBg,
       icon: AppIcons.error,
     ),
     AppSnackType.warning => (
-      backgroundColor: AppColors.warning,
-      foregroundColor: AppColors.warningBg,
+      backgroundColor: colors.warning,
+      foregroundColor: colors.warningBg,
       icon: AppIcons.warning,
     ),
     AppSnackType.info => (
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.textPrimary,
+      backgroundColor: colors.primary,
+      foregroundColor: colors.textPrimary,
       icon: AppIcons.info,
     ),
   };

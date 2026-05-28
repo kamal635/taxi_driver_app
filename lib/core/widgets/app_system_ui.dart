@@ -1,4 +1,4 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -12,29 +12,34 @@ class AppSystemUi extends StatelessWidget {
   const AppSystemUi({
     required this.child,
     super.key,
-    this.backgroundColor = AppColors.bgBase,
-    this.statusBarIconBrightness = Brightness.dark,
-    this.navigationBarIconBrightness = Brightness.dark,
+    this.backgroundColor,
+    this.statusBarIconBrightness,
+    this.navigationBarIconBrightness,
   });
 
   final Widget child;
-  final Color backgroundColor;
-  final Brightness statusBarIconBrightness;
-  final Brightness navigationBarIconBrightness;
+  final Color? backgroundColor;
+  final Brightness? statusBarIconBrightness;
+  final Brightness? navigationBarIconBrightness;
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final overlayIconBrightness = isDark ? Brightness.light : Brightness.dark;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         systemNavigationBarColor: Colors.transparent,
         systemNavigationBarDividerColor: Colors.transparent,
-        statusBarIconBrightness: statusBarIconBrightness,
-        systemNavigationBarIconBrightness: navigationBarIconBrightness,
+        statusBarIconBrightness:
+            statusBarIconBrightness ?? overlayIconBrightness,
+        systemNavigationBarIconBrightness:
+            navigationBarIconBrightness ?? overlayIconBrightness,
         systemNavigationBarContrastEnforced: false,
       ),
       child: ColoredBox(
-        color: backgroundColor,
+        color: backgroundColor ?? context.colors.background,
         child: child,
       ),
     );

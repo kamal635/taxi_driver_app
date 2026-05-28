@@ -1,7 +1,7 @@
 import 'dart:async' show unawaited;
 
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -97,6 +97,7 @@ class _PulsingEmptyStateIconState extends State<_PulsingEmptyStateIcon>
         child: AnimatedBuilder(
           animation: _pulse,
           builder: (context, child) {
+            final colors = context.colors;
             final progress = _pulse.value;
             final pulseScale = 0.68 + (progress * 0.58);
             final pulseOpacity = 0.10 + (progress * 0.24);
@@ -111,8 +112,8 @@ class _PulsingEmptyStateIconState extends State<_PulsingEmptyStateIcon>
                     scale: pulseScale,
                     child: _CircleLayer(
                       size: baseSize,
-                      color: AppColors.primary.withValues(alpha: 0.20),
-                      borderColor: AppColors.primary.withValues(alpha: 0.32),
+                      color: colors.primary.withValues(alpha: 0.20),
+                      borderColor: colors.primary.withValues(alpha: 0.32),
                     ),
                   ),
                 ),
@@ -120,8 +121,8 @@ class _PulsingEmptyStateIconState extends State<_PulsingEmptyStateIcon>
                   scale: centerScale,
                   child: _CircleLayer(
                     size: baseSize,
-                    color: AppColors.primary.withValues(alpha: 0.10),
-                    borderColor: AppColors.primary.withValues(alpha: 0.22),
+                    color: colors.primary.withValues(alpha: 0.10),
+                    borderColor: colors.primary.withValues(alpha: 0.22),
                   ),
                 ),
                 Transform.scale(
@@ -129,10 +130,10 @@ class _PulsingEmptyStateIconState extends State<_PulsingEmptyStateIcon>
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.white.withValues(alpha: 0.84),
+                      color: colors.surface.withValues(alpha: 0.84),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.textPrimary.withValues(alpha: 0.07),
+                          color: colors.shadow,
                           blurRadius: 24.r,
                           offset: Offset(0, 10.h),
                         ),
@@ -143,7 +144,7 @@ class _PulsingEmptyStateIconState extends State<_PulsingEmptyStateIcon>
                       child: Icon(
                         widget.icon,
                         size: 38.r,
-                        color: AppColors.textPrimary.withValues(alpha: 0.88),
+                        color: colors.textPrimary.withValues(alpha: 0.88),
                       ),
                     ),
                   ),

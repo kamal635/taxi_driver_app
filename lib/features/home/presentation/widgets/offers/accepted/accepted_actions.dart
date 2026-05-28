@@ -1,4 +1,5 @@
 import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
 import 'package:flutter/material.dart';
@@ -19,11 +20,12 @@ class AcceptedActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colors = context.colors;
 
     return AppButton(
       isLoading: isCompletedLoading,
-      backgroundColor: canComplete ? AppColors.primary : AppColors.border,
-      labelColor: canComplete ? AppColors.textPrimary : AppColors.iconMuted,
+      backgroundColor: canComplete ? colors.primary : colors.border,
+      labelColor: canComplete ? AppColors.textPrimary : colors.iconMuted,
       label: canComplete ? l10n.tripCompleted : l10n.tripProgress,
       onPressed: canComplete ? onComplete : null,
     );

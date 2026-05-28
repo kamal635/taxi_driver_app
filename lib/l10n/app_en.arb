@@ -106,6 +106,18 @@
   "profileEditSubtitle": "Update your personal info",
   "profileChangePasswordTitle": "Change password",
   "profileChangePasswordSubtitle": "Secure your account",
+  "profileDarkModeTitle": "Dark mode",
+  "@profileDarkModeTitle": {
+    "description": "Title for the dark mode toggle option on the profile page"
+  },
+  "profileDarkModeEnabledSubtitle": "Enabled now, tap to switch to light mode",
+  "@profileDarkModeEnabledSubtitle": {
+    "description": "Subtitle shown when dark mode is currently enabled"
+  },
+  "profileDarkModeDisabledSubtitle": "Disabled now, tap to switch to dark mode",
+  "@profileDarkModeDisabledSubtitle": {
+    "description": "Subtitle shown when dark mode is currently disabled"
+  },
   "profileMyVehiclesTitle": "My vehicles",
   "profileMyVehiclesSubtitle": "Manage your registered cars",
   "profileHelpCenterTitle": "Help center",

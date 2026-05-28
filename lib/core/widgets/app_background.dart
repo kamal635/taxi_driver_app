@@ -1,4 +1,4 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -8,10 +8,10 @@ class AppBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const RepaintBoundary(
+    return RepaintBoundary(
       child: ColoredBox(
-        color: AppColors.bgWarm,
-        child: Stack(
+        color: context.colors.backgroundDecorative,
+        child: const Stack(
           children: [
             _BackgroundCircle(
               top: -40,
@@ -65,7 +65,7 @@ class _BackgroundCircle extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppColors.primary.withValues(alpha: opacity),
+          color: context.colors.primary.withValues(alpha: opacity),
         ),
         child: SizedBox.square(dimension: size.r),
       ),

@@ -1,4 +1,4 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -30,15 +30,15 @@ class AppCardSurface extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.surface,
+        color: backgroundColor ?? context.colors.surface,
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: borderColor ?? AppColors.border),
+        border: Border.all(color: borderColor ?? context.colors.border),
         boxShadow: enableShadow
             ? [
                 BoxShadow(
                   blurRadius: 16.r,
                   offset: Offset(0, 8.h),
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: context.colors.shadow,
                 ),
               ]
             : null,

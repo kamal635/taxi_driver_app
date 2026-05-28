@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/utils/price_formatter.dart';
 import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_entity.dart';
@@ -88,8 +88,8 @@ class TripsPage extends ConsumerWidget {
             right: 0,
             child: LinearProgressIndicator(
               minHeight: 2,
-              color: AppColors.primary,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.18),
+              color: context.colors.primary,
+              backgroundColor: context.colors.primary.withValues(alpha: 0.18),
             ),
           ),
         const TripsErrorListener(),

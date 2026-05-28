@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -250,7 +250,7 @@ class _TripRouteMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = _TripRoutePalette.fromType(type);
+    final palette = _TripRoutePalette.fromType(context, type);
 
     return Container(
       width: size,
@@ -283,10 +283,10 @@ class _TripRouteConnector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = AppColors.iconMuted.withValues(alpha: 0.42);
+    final color = context.colors.iconMuted.withValues(alpha: 0.42);
 
     if (!dotted) {
-      return Container(width: width, color: AppColors.border);
+      return Container(width: width, color: context.colors.border);
     }
 
     return CustomPaint(
@@ -334,15 +334,18 @@ class _TripRoutePalette {
     required this.backgroundColor,
   });
 
-  factory _TripRoutePalette.fromType(TripRouteStopType type) {
+  factory _TripRoutePalette.fromType(
+    BuildContext context,
+    TripRouteStopType type,
+  ) {
     return switch (type) {
       TripRouteStopType.pickup => _TripRoutePalette(
-        dotColor: AppColors.info,
-        backgroundColor: AppColors.info.withValues(alpha: 0.12),
+        dotColor: context.colors.info,
+        backgroundColor: context.colors.infoBg,
       ),
       TripRouteStopType.dropoff => _TripRoutePalette(
-        dotColor: AppColors.error,
-        backgroundColor: AppColors.error.withValues(alpha: 0.12),
+        dotColor: context.colors.error,
+        backgroundColor: context.colors.errorBg,
       ),
     };
   }

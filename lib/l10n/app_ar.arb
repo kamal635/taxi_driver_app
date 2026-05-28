@@ -106,6 +106,18 @@
   "profileEditSubtitle": "تحديث معلوماتك الشخصية",
   "profileChangePasswordTitle": "تغيير كلمة المرور",
   "profileChangePasswordSubtitle": "تأمين حسابك بكلمة مرور جديدة",
+  "profileDarkModeTitle": "الوضع الليلي",
+  "@profileDarkModeTitle": {
+    "description": "عنوان خيار تبديل الوضع الليلي في صفحة الملف الشخصي"
+  },
+  "profileDarkModeEnabledSubtitle": "مفعّل حالياً، اضغط للتبديل إلى الوضع الفاتح",
+  "@profileDarkModeEnabledSubtitle": {
+    "description": "وصف خيار الوضع الليلي عندما يكون مفعلاً"
+  },
+  "profileDarkModeDisabledSubtitle": "غير مفعّل حالياً، اضغط للتبديل إلى الوضع الداكن",
+  "@profileDarkModeDisabledSubtitle": {
+    "description": "وصف خيار الوضع الليلي عندما يكون غير مفعّل"
+  },
   "profileMyVehiclesTitle": "مركباتي",
   "profileMyVehiclesSubtitle": "إدارة السيارات المسجلة",
   "profileHelpCenterTitle": "مركز المساعدة",

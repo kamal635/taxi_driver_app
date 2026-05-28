@@ -1,5 +1,5 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
@@ -29,12 +29,13 @@ class AcceptedCustomerPhoneTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colors = context.colors;
     final hasPhone = customerPhone.trim().isNotEmpty;
 
     return Column(
       children: [
-        const Divider(
-          color: AppColors.iconMuted,
+        Divider(
+          color: colors.iconMuted,
           height: 1,
         ),
         AppSpacing.h12,
@@ -50,12 +51,12 @@ class AcceptedCustomerPhoneTile extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(8.r),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: colors.primary.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       AppIcons.phone,
-                      color: AppColors.primary,
+                      color: colors.primary,
                       size: 28.r,
                     ),
                   ),
@@ -79,7 +80,7 @@ class AcceptedCustomerPhoneTile extends StatelessWidget {
                   ),
                   Icon(
                     AppIcons.arrowForward,
-                    color: AppColors.iconMuted,
+                    color: colors.iconMuted,
                     size: 18.r,
                   ),
                 ],

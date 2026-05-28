@@ -2,8 +2,9 @@ import 'dart:async' show unawaited;
 
 import 'package:bawabat_al_saeq/app/router/config/app_route_names.dart';
 import 'package:bawabat_al_saeq/app/router/config/app_route_paths.dart';
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/settings/app_settings_providers.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:bawabat_al_saeq/core/constants/app_links.dart';
 import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
@@ -83,6 +84,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final isSigningOut = ref.watch(
       signOutControllerProvider.select((state) => state.isLoading),
     );
+    final appSettings = ref.watch(appSettingsProvider);
+    final isDarkMode = appSettings.isDarkMode;
     final displayName = _safeDisplayValue(authSession.driverName);
     final phoneNumber = _safeDisplayValue(authSession.driverPhone);
 
@@ -106,6 +109,24 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 subtitle: l10n.profileChangePasswordSubtitle,
                 icon: AppIcons.lock,
                 onPressed: _openChangePasswordPage,
+              ),
+              ProfileSectionItem(
+                title: l10n.profileDarkModeTitle,
+                subtitle: isDarkMode
+                    ? l10n.profileDarkModeEnabledSubtitle
+                    : l10n.profileDarkModeDisabledSubtitle,
+                icon: isDarkMode
+                    ? Icons.dark_mode_rounded
+                    : Icons.light_mode_rounded,
+                onPressed: () => unawaited(_toggleDarkMode()),
+                trailing: Switch.adaptive(
+                  value: isDarkMode,
+                  activeThumbColor: context.colors.primary,
+                  activeTrackColor: context.colors.primary.withValues(
+                    alpha: 0.35,
+                  ),
+                  onChanged: (_) => unawaited(_toggleDarkMode()),
+                ),
               ),
             ],
           ),
@@ -155,6 +176,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
+  Future<void> _toggleDarkMode() async {
+    await ref.read(appSettingsControllerProvider).toggleDarkMode();
+  }
+
   Future<void> _openChangePasswordPage() async {
     await context.pushNamed(AppRouteNames.profilePassword);
   }
@@ -180,8 +205,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       cancelLabel: l10n.actionCancel,
       barrierDismissible: true,
       icon: AppIcons.signOut,
-      iconColor: AppColors.error,
-      backgroundColorIcon: AppColors.error.withValues(alpha: 0.10),
+      iconColor: context.colors.error,
+      backgroundColorIcon: context.colors.errorBg,
     );
   }
 

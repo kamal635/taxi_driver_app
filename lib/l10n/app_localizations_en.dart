@@ -260,6 +260,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileChangePasswordSubtitle => 'Secure your account';
 
   @override
+  String get profileDarkModeTitle => 'Dark mode';
+
+  @override
+  String get profileDarkModeEnabledSubtitle =>
+      'Enabled now, tap to switch to light mode';
+
+  @override
+  String get profileDarkModeDisabledSubtitle =>
+      'Disabled now, tap to switch to dark mode';
+
+  @override
   String get profileMyVehiclesTitle => 'My vehicles';
 
   @override
