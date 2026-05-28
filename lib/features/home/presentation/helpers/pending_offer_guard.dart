@@ -1,6 +1,6 @@
+import 'package:bawabat_al_saeq/features/home/domain/entities/offer_entity.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
 
 /// Reads the active pending offer and validates that it is still actionable.
 NewOfferEntity? readActivePendingOffer({

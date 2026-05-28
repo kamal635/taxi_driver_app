@@ -1,24 +1,20 @@
+import 'dart:async' show unawaited;
+
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/constants/app_links.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/services/external_url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LoginFooter extends StatelessWidget {
-  const LoginFooter({
-    super.key,
-  });
-
-  static const String _privacyPolicyUrl =
-      'https://taxi-dashboard.laithroom.com/privacy-policy';
-  static const String _termsAndConditionsUrl =
-      'https://taxi-dashboard.laithroom.com/terms-conditions';
+  const LoginFooter({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final l10n = context.l10n;
 
     return Padding(
       padding: EdgeInsets.only(top: 26.h),
@@ -31,8 +27,8 @@ class LoginFooter extends StatelessWidget {
             runSpacing: 4.h,
             children: [
               _FooterLinkButton(
-                label: isArabic ? 'سياسة الخصوصية' : 'Privacy Policy',
-                onTap: () => _openExternalUrl(_privacyPolicyUrl),
+                label: l10n.legalPrivacyPolicy,
+                onTap: () => _openExternalUrl(AppLinks.privacyPolicy),
               ),
               Text(
                 '•',
@@ -42,14 +38,14 @@ class LoginFooter extends StatelessWidget {
                 ),
               ),
               _FooterLinkButton(
-                label: isArabic ? 'الشروط والأحكام' : 'Terms & Conditions',
-                onTap: () => _openExternalUrl(_termsAndConditionsUrl),
+                label: l10n.legalTermsAndConditions,
+                onTap: () => _openExternalUrl(AppLinks.termsAndConditions),
               ),
             ],
           ),
           AppSpacing.h12,
           Text(
-            context.l10n.copyright,
+            l10n.copyright,
             style: AppTypography.subtitleSm.copyWith(
               color: AppColors.iconMuted,
             ),
@@ -60,17 +56,8 @@ class LoginFooter extends StatelessWidget {
     );
   }
 
-  Future<void> _openExternalUrl(String url) async {
-    final uri = Uri.parse(url);
-
-    final didLaunch = await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
-    );
-
-    if (!didLaunch) {
-      debugPrint('Could not launch $url');
-    }
+  void _openExternalUrl(String url) {
+    unawaited(ExternalUrlLauncher.open(url));
   }
 }
 

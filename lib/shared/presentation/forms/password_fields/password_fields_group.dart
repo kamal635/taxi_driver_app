@@ -1,8 +1,8 @@
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_text_field.dart';
+import 'package:bawabat_al_saeq/shared/presentation/forms/password_fields/password_visibility_button.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/core/constants/app_icons.dart';
-import 'package:taxi_driver_app/core/widgets/app_text_field.dart';
-import 'package:taxi_driver_app/shared/presentation/forms/password_fields/password_visibility_button.dart';
 
 /// Reusable two-field password block used by password setup/update screens.
 class PasswordFieldsGroup extends StatelessWidget {
@@ -20,6 +20,8 @@ class PasswordFieldsGroup extends StatelessWidget {
     this.confirmPasswordFocusNode,
     this.onPasswordSubmitted,
     this.onConfirmPasswordSubmitted,
+    this.passwordValidator,
+    this.confirmPasswordValidator,
     this.enabled = true,
     super.key,
   });
@@ -35,8 +37,10 @@ class PasswordFieldsGroup extends StatelessWidget {
   final VoidCallback onToggleConfirmPasswordVisibility;
   final FocusNode? passwordFocusNode;
   final FocusNode? confirmPasswordFocusNode;
-  final VoidCallback? onPasswordSubmitted;
-  final VoidCallback? onConfirmPasswordSubmitted;
+  final ValueChanged<String>? onPasswordSubmitted;
+  final ValueChanged<String>? onConfirmPasswordSubmitted;
+  final FormFieldValidator<String>? passwordValidator;
+  final FormFieldValidator<String>? confirmPasswordValidator;
   final bool enabled;
 
   @override
@@ -50,18 +54,20 @@ class PasswordFieldsGroup extends StatelessWidget {
           obscureText: isPasswordObscured,
           labelText: passwordLabel,
           hintText: hintText,
+          keyboardType: TextInputType.visiblePassword,
           textInputAction: TextInputAction.next,
           prefixIcon: const Icon(AppIcons.lock),
           autofillHints: const [AutofillHints.newPassword],
           autocorrect: false,
           enableSuggestions: false,
+          validator: passwordValidator,
           suffixIcon: PasswordVisibilityButton(
             isObscured: isPasswordObscured,
             onPressed: onTogglePasswordVisibility,
           ),
-          onFieldSubmitted: (_) => onPasswordSubmitted?.call(),
+          onFieldSubmitted: onPasswordSubmitted,
         ),
-        AppSpacing.h12,
+        AppSpacing.h14,
         AppTextField(
           controller: confirmPasswordController,
           focusNode: confirmPasswordFocusNode,
@@ -69,16 +75,18 @@ class PasswordFieldsGroup extends StatelessWidget {
           obscureText: isConfirmPasswordObscured,
           labelText: confirmPasswordLabel,
           hintText: hintText,
+          keyboardType: TextInputType.visiblePassword,
           textInputAction: TextInputAction.done,
           prefixIcon: const Icon(AppIcons.lock),
           autofillHints: const [AutofillHints.newPassword],
           autocorrect: false,
           enableSuggestions: false,
+          validator: confirmPasswordValidator,
           suffixIcon: PasswordVisibilityButton(
             isObscured: isConfirmPasswordObscured,
             onPressed: onToggleConfirmPasswordVisibility,
           ),
-          onFieldSubmitted: (_) => onConfirmPasswordSubmitted?.call(),
+          onFieldSubmitted: onConfirmPasswordSubmitted,
         ),
       ],
     );

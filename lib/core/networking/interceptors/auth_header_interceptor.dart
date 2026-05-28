@@ -1,6 +1,6 @@
+import 'package:bawabat_al_saeq/core/networking/config/network_constants.dart';
+import 'package:bawabat_al_saeq/core/session/session_store.dart';
 import 'package:dio/dio.dart';
-import 'package:taxi_driver_app/core/networking/config/network_constants.dart';
-import 'package:taxi_driver_app/core/session/session_store.dart';
 
 class AuthHeaderInterceptor extends Interceptor {
   AuthHeaderInterceptor(this._authSession);

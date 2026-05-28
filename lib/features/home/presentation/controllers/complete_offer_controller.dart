@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import 'package:bawabat_al_saeq/core/errors/failure.dart';
+import 'package:bawabat_al_saeq/features/home/domain/usecases/complete_offer_use_case.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/accept_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/new_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/providers/offer_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/complete_offer_use_case.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
 
 final completeOfferControllerProvider =
     AsyncNotifierProvider<CompleteOfferController, void>(

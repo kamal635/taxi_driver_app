@@ -1,5 +1,5 @@
-import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/l10n/app_localizations.dart';
+import 'package:bawabat_al_saeq/core/errors/failure.dart';
+import 'package:bawabat_al_saeq/l10n/app_localizations.dart';
 
 enum FailureContext {
   general,

@@ -1,5 +1,5 @@
 /// Domain entity representing the authenticated driver session.
-class AuthSessionEntity {
+final class AuthSessionEntity {
   const AuthSessionEntity({
     required this.accessToken,
     required this.refreshToken,

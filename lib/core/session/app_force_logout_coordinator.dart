@@ -1,10 +1,10 @@
 import 'dart:async' show StreamSubscription, unawaited;
 
+import 'package:bawabat_al_saeq/core/session/app_sign_out_service.dart';
+import 'package:bawabat_al_saeq/features/availability/data/datasources/android/driver_background_service_bridge.dart';
+import 'package:bawabat_al_saeq/features/availability/presentation/providers/availability_providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/session/app_sign_out_service.dart';
-import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
-import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
 
 final appForceLogoutCoordinatorProvider = Provider<AppForceLogoutCoordinator>((
   ref,

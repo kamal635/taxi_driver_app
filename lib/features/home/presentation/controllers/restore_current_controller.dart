@@ -1,9 +1,9 @@
 import 'dart:async';
 
+import 'package:bawabat_al_saeq/features/home/domain/entities/current_and_pending_offer_entity.dart';
+import 'package:bawabat_al_saeq/features/home/domain/usecases/get_current_and_pending_offer_use_case.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/providers/offer_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/current_and_pending_offer_entity.dart';
-import 'package:taxi_driver_app/features/home/domain/usecases/get_current_and_pending_offer_use_case.dart';
-import 'package:taxi_driver_app/features/home/presentation/providers/offer_providers.dart';
 
 final restoreCurrentControllerProvider =
     AsyncNotifierProvider<

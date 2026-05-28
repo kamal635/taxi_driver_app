@@ -1,13 +1,13 @@
 import 'dart:async' show FutureOr, StreamSubscription, Timer, unawaited;
 import 'dart:convert';
 
+import 'package:bawabat_al_saeq/features/availability/data/datasources/android/driver_background_service_bridge.dart';
+import 'package:bawabat_al_saeq/features/availability/presentation/providers/availability_providers.dart';
+import 'package:bawabat_al_saeq/features/home/data/models/offer_model.dart';
+import 'package:bawabat_al_saeq/features/home/domain/entities/offer_entity.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/state/new_offer_state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
-import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
-import 'package:taxi_driver_app/features/home/data/models/offer_model.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
-import 'package:taxi_driver_app/features/home/presentation/state/new_offer_state.dart';
 
 final newOfferControllerProvider =
     AsyncNotifierProvider<NewOfferController, NewOfferState>(
@@ -54,7 +54,7 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     _stopNativeOfferAlert();
 
     state = AsyncData(
-      _currentState.copyWith(currentOffer: null),
+      _currentState.copyWith(currentOffer: null, errorMessage: null),
     );
   }
 
@@ -65,34 +65,17 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
   }
 
   void restoreFromNotificationPayload(String payloadJson) {
-    try {
-      final offer = _parseOfferFromPayload(payloadJson);
-      _storeOfferIfActive(offer);
-    } on Exception catch (error, stackTrace) {
-      state = AsyncData(
-        _currentState.copyWith(errorMessage: error.toString()),
-      );
-
-      debugPrint(
-        'Failed to restore offer from notification payload: '
-        '$error\n$stackTrace',
-      );
-    }
+    _handleIncomingOfferPayload(
+      payloadJson,
+      source: 'notification payload',
+    );
   }
 
   void _handleNativeOfferEvent(DriverBackgroundOfferEvent event) {
-    try {
-      final offer = _parseOfferFromPayload(event.payloadJson);
-      _storeOfferIfActive(offer);
-    } on Exception catch (error, stackTrace) {
-      state = AsyncData(
-        _currentState.copyWith(errorMessage: error.toString()),
-      );
-
-      debugPrint(
-        'Failed to parse native background offer: $error\n$stackTrace',
-      );
-    }
+    _handleIncomingOfferPayload(
+      event.payloadJson,
+      source: 'native background offer',
+    );
   }
 
   void _handleOfferNotificationOpened(
@@ -109,6 +92,22 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     restoreFromNotificationPayload(payloadJson);
   }
 
+  void _handleIncomingOfferPayload(
+    String payloadJson, {
+    required String source,
+  }) {
+    try {
+      final offer = _parseOfferFromPayload(payloadJson);
+      _storeOfferIfActionable(offer, source: source);
+    } on Exception catch (error, stackTrace) {
+      state = AsyncData(
+        _currentState.copyWith(errorMessage: error.toString()),
+      );
+
+      debugPrint('Failed to parse $source: $error\n$stackTrace');
+    }
+  }
+
   NewOfferEntity _parseOfferFromPayload(String payloadJson) {
     final decoded = jsonDecode(payloadJson);
 
@@ -122,25 +121,31 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     return model.toEntity();
   }
 
-  void _storeOfferIfActive(NewOfferEntity offer) {
-    _cancelExpiryTimer();
-
+  void _storeOfferIfActionable(
+    NewOfferEntity offer, {
+    required String source,
+  }) {
     if (_isExpired(offer)) {
-      _stopNativeOfferAlert();
+      _handleExpiredIncomingOffer(offer, source: source);
+      return;
+    }
 
-      state = AsyncData(
-        _currentState.copyWith(
-          currentOffer: null,
-          errorMessage: null,
-        ),
-      );
+    final activeOffer = _currentState.currentOffer;
+    final hasDifferentActiveOffer =
+        activeOffer != null &&
+        activeOffer.offerId != offer.offerId &&
+        !_isExpired(activeOffer);
 
+    if (hasDifferentActiveOffer) {
       debugPrint(
-        'Ignoring expired native background offer -> id=${offer.offerId}',
+        'Incoming offer ignored because another pending offer is active '
+        '-> active=${activeOffer.offerId}, incoming=${offer.offerId}, '
+        'source=$source',
       );
       return;
     }
 
+    _cancelExpiryTimer();
     _scheduleExpiryTimer(offer);
 
     state = AsyncData(
@@ -152,6 +157,22 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
 
     debugPrint(
       'Native background offer stored successfully -> id=${offer.offerId}',
+    );
+  }
+
+  void _handleExpiredIncomingOffer(
+    NewOfferEntity offer, {
+    required String source,
+  }) {
+    final activeOffer = _currentState.currentOffer;
+    if (activeOffer?.offerId == offer.offerId) {
+      clearCurrent();
+    } else {
+      _stopNativeOfferAlert();
+    }
+
+    debugPrint(
+      'Ignoring expired offer -> id=${offer.offerId}, source=$source',
     );
   }
 

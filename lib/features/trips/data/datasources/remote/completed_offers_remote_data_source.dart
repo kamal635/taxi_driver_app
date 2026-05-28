@@ -1,7 +1,7 @@
-import 'package:taxi_driver_app/core/networking/api_client.dart';
-import 'package:taxi_driver_app/features/trips/data/mappers/completed_period_mapper.dart';
-import 'package:taxi_driver_app/features/trips/data/models/completed_offers_result_model.dart';
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offers_result_entity.dart';
+import 'package:bawabat_al_saeq/core/networking/api_client.dart';
+import 'package:bawabat_al_saeq/features/trips/data/mappers/completed_period_mapper.dart';
+import 'package:bawabat_al_saeq/features/trips/data/models/completed_offers_result_model.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offers_result_entity.dart';
 
 /// Contract for loading completed trips from the backend.
 abstract interface class CompletedOffersRemoteDataSource {
@@ -13,9 +13,11 @@ abstract interface class CompletedOffersRemoteDataSource {
 /// Remote implementation backed by [ApiClient].
 final class CompletedOffersRemoteDataSourceImpl
     implements CompletedOffersRemoteDataSource {
-  CompletedOffersRemoteDataSourceImpl({
+  const CompletedOffersRemoteDataSourceImpl({
     required this.apiClient,
   });
+
+  static const String _completedOrdersEndpoint = '/api/admin/orders/completed';
 
   final ApiClient apiClient;
 
@@ -24,7 +26,7 @@ final class CompletedOffersRemoteDataSourceImpl
     required CompletedPeriod period,
   }) async {
     final data = await apiClient.getJson(
-      '/api/admin/orders/completed',
+      _completedOrdersEndpoint,
       query: {
         'period': completedPeriodToQuery(period),
       },

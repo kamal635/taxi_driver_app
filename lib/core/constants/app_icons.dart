@@ -29,6 +29,8 @@ final class AppIcons {
   static const IconData delete = Icons.delete_outline_rounded;
   static const IconData timer = Icons.timer_outlined;
   static const IconData history = Icons.history_rounded;
+  static const IconData privacyPolicy = Icons.verified_user_rounded;
+  static const IconData termsAndConditions = Icons.balance_rounded;
 
   // Update flow icons.
   static const IconData update = Icons.system_update_alt_rounded;

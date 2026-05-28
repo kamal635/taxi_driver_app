@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/features/home/domain/repositories/offer_repository.dart';
+import 'package:bawabat_al_saeq/features/home/domain/repositories/offer_repository.dart';
 
 final class DeclineOfferUseCase {
   const DeclineOfferUseCase(this._offerRepository);

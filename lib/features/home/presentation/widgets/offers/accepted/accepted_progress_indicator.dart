@@ -1,9 +1,10 @@
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/utils/offer_time_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 
 /// Visual countdown and progress bar for the accepted offer cooldown.
 class AcceptedProgressIndicator extends StatelessWidget {
@@ -15,19 +16,6 @@ class AcceptedProgressIndicator extends StatelessWidget {
 
   final Duration remaining;
   final double progress;
-
-  String _formatRemaining(Duration duration) {
-    final safeDuration = duration.isNegative ? Duration.zero : duration;
-    final minutes = safeDuration.inMinutes
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
-    final seconds = safeDuration.inSeconds
-        .remainder(60)
-        .toString()
-        .padLeft(2, '0');
-    return '$minutes:$seconds';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +33,7 @@ class AcceptedProgressIndicator extends StatelessWidget {
               ),
             ),
             Text(
-              _formatRemaining(remaining),
+              formatOfferCountdown(remaining),
               style: AppTypography.titleSm.copyWith(
                 fontSize: 16.sp,
                 color: AppColors.error,
@@ -59,8 +47,8 @@ class AcceptedProgressIndicator extends StatelessWidget {
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 10.h,
-            backgroundColor: AppColors.error,
-            valueColor: const AlwaysStoppedAnimation(AppColors.border),
+            backgroundColor: AppColors.error.withValues(alpha: 0.22),
+            valueColor: const AlwaysStoppedAnimation(AppColors.error),
           ),
         ),
       ],

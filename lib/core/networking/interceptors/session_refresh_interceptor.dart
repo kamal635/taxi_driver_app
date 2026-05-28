@@ -1,9 +1,9 @@
+import 'package:bawabat_al_saeq/core/networking/config/network_constants.dart';
+import 'package:bawabat_al_saeq/core/networking/refresh/forced_logout_policy.dart';
+import 'package:bawabat_al_saeq/core/networking/refresh/session_refresh_service.dart';
+import 'package:bawabat_al_saeq/core/session/app_sign_out_service.dart';
+import 'package:bawabat_al_saeq/core/session/session_store.dart';
 import 'package:dio/dio.dart';
-import 'package:taxi_driver_app/core/networking/config/network_constants.dart';
-import 'package:taxi_driver_app/core/networking/refresh/forced_logout_policy.dart';
-import 'package:taxi_driver_app/core/networking/refresh/session_refresh_service.dart';
-import 'package:taxi_driver_app/core/session/app_sign_out_service.dart';
-import 'package:taxi_driver_app/core/session/session_store.dart';
 
 class SessionRefreshInterceptor extends QueuedInterceptor {
   SessionRefreshInterceptor({

@@ -1,5 +1,5 @@
+import 'package:bawabat_al_saeq/features/home/domain/entities/offer_entity.dart';
 import 'package:flutter/foundation.dart';
-import 'package:taxi_driver_app/features/home/domain/entities/offer_entity.dart';
 
 @immutable
 final class CurrentAndPendingOfferEntity {

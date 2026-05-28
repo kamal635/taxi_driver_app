@@ -1,106 +1,181 @@
+import 'package:bawabat_al_saeq/core/errors/failure.dart';
+import 'package:bawabat_al_saeq/core/networking/dio_exception_mapper.dart';
 import 'package:dio/dio.dart';
-import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/core/networking/dio_exception_mapper.dart';
 
+typedef JsonMap = Map<String, dynamic>;
+
+/// Small Dio wrapper that normalizes API errors into app [Failure] objects.
 class ApiClient {
   ApiClient(this._dio);
 
   final Dio _dio;
 
-  Future<Map<String, dynamic>> postJson(
+  Future<JsonMap> getJson(
     String path, {
-    Map<String, dynamic>? body,
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? query,
+    JsonMap? headers,
+    JsonMap? query,
   }) {
     return _executeJsonRequest(
-      () => _dio.post<Map<String, dynamic>>(
-        path,
-        data: body,
-        queryParameters: query,
-        options: Options(headers: headers),
-      ),
-    );
-  }
-
-  Future<void> postVoid(
-    String path, {
-    Map<String, dynamic>? body,
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? query,
-  }) {
-    return _executeVoidRequest(
-      () => _dio.post<void>(
-        path,
-        data: body,
-        queryParameters: query,
-        options: Options(headers: headers),
-      ),
-    );
-  }
-
-  Future<Map<String, dynamic>> putJson(
-    String path, {
-    Map<String, dynamic>? body,
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? query,
-  }) {
-    return _executeJsonRequest(
-      () => _dio.put<Map<String, dynamic>>(
-        path,
-        data: body,
-        queryParameters: query,
-        options: Options(headers: headers),
-      ),
-    );
-  }
-
-  Future<void> putVoid(
-    String path, {
-    Map<String, dynamic>? body,
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? query,
-  }) {
-    return _executeVoidRequest(
-      () => _dio.put<void>(
-        path,
-        data: body,
-        queryParameters: query,
-        options: Options(headers: headers),
-      ),
-    );
-  }
-
-  Future<Map<String, dynamic>> getJson(
-    String path, {
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? query,
-  }) {
-    return _executeJsonRequest(
-      () => _dio.get<Map<String, dynamic>>(
+      () => _dio.get<JsonMap>(
         path,
         queryParameters: query,
-        options: Options(headers: headers),
+        options: _options(headers),
       ),
     );
   }
 
   Future<void> getVoid(
     String path, {
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? query,
+    JsonMap? headers,
+    JsonMap? query,
   }) {
     return _executeVoidRequest(
       () => _dio.get<void>(
         path,
         queryParameters: query,
-        options: Options(headers: headers),
+        options: _options(headers),
       ),
     );
   }
 
-  Future<Map<String, dynamic>> _executeJsonRequest(
-    Future<Response<Map<String, dynamic>>> Function() request,
+  Future<JsonMap> postJson(
+    String path, {
+    JsonMap? body,
+    JsonMap? headers,
+    JsonMap? query,
+  }) {
+    return _executeJsonRequest(
+      () => _dio.post<JsonMap>(
+        path,
+        data: body,
+        queryParameters: query,
+        options: _options(headers),
+      ),
+    );
+  }
+
+  Future<void> postVoid(
+    String path, {
+    JsonMap? body,
+    JsonMap? headers,
+    JsonMap? query,
+  }) {
+    return _executeVoidRequest(
+      () => _dio.post<void>(
+        path,
+        data: body,
+        queryParameters: query,
+        options: _options(headers),
+      ),
+    );
+  }
+
+  Future<JsonMap> putJson(
+    String path, {
+    JsonMap? body,
+    JsonMap? headers,
+    JsonMap? query,
+  }) {
+    return _executeJsonRequest(
+      () => _dio.put<JsonMap>(
+        path,
+        data: body,
+        queryParameters: query,
+        options: _options(headers),
+      ),
+    );
+  }
+
+  Future<void> putVoid(
+    String path, {
+    JsonMap? body,
+    JsonMap? headers,
+    JsonMap? query,
+  }) {
+    return _executeVoidRequest(
+      () => _dio.put<void>(
+        path,
+        data: body,
+        queryParameters: query,
+        options: _options(headers),
+      ),
+    );
+  }
+
+  Future<JsonMap> patchJson(
+    String path, {
+    JsonMap? body,
+    JsonMap? headers,
+    JsonMap? query,
+  }) {
+    return _executeJsonRequest(
+      () => _dio.patch<JsonMap>(
+        path,
+        data: body,
+        queryParameters: query,
+        options: _options(headers),
+      ),
+    );
+  }
+
+  Future<void> patchVoid(
+    String path, {
+    JsonMap? body,
+    JsonMap? headers,
+    JsonMap? query,
+  }) {
+    return _executeVoidRequest(
+      () => _dio.patch<void>(
+        path,
+        data: body,
+        queryParameters: query,
+        options: _options(headers),
+      ),
+    );
+  }
+
+  Future<JsonMap> deleteJson(
+    String path, {
+    JsonMap? body,
+    JsonMap? headers,
+    JsonMap? query,
+  }) {
+    return _executeJsonRequest(
+      () => _dio.delete<JsonMap>(
+        path,
+        data: body,
+        queryParameters: query,
+        options: _options(headers),
+      ),
+    );
+  }
+
+  Future<void> deleteVoid(
+    String path, {
+    JsonMap? body,
+    JsonMap? headers,
+    JsonMap? query,
+  }) {
+    return _executeVoidRequest(
+      () => _dio.delete<void>(
+        path,
+        data: body,
+        queryParameters: query,
+        options: _options(headers),
+      ),
+    );
+  }
+
+  Options? _options(JsonMap? headers) {
+    if (headers == null || headers.isEmpty) {
+      return null;
+    }
+
+    return Options(headers: headers);
+  }
+
+  Future<JsonMap> _executeJsonRequest(
+    Future<Response<JsonMap>> Function() request,
   ) async {
     try {
       final response = await request();
@@ -115,6 +190,10 @@ class ApiClient {
       throw mapDioException(error);
     } on FormatException catch (error) {
       throw ParsingFailure(details: error);
+    } on Failure {
+      rethrow;
+    } catch (error) {
+      throw ParsingFailure(details: error);
     }
   }
 
@@ -125,6 +204,10 @@ class ApiClient {
       await request();
     } on DioException catch (error) {
       throw mapDioException(error);
+    } on Failure {
+      rethrow;
+    } catch (error) {
+      throw ParsingFailure(details: error);
     }
   }
 }

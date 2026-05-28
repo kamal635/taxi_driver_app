@@ -1,8 +1,8 @@
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/listeners/home_action_feedback_listener.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/home_offer_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/features/home/presentation/listeners/home_action_feedback_listener.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/home_offer_section.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

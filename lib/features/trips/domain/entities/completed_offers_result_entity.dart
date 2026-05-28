@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offer_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_entity.dart';
 
 /// Available filters for completed trips.
 enum CompletedPeriod {
@@ -10,7 +10,7 @@ enum CompletedPeriod {
 
 /// Domain entity for the completed trips screen payload.
 final class CompletedOffersResultEntity {
-  CompletedOffersResultEntity({
+  const CompletedOffersResultEntity({
     required this.type,
     required this.period,
     required this.count,

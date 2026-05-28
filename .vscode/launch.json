@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
  {
-  "name": "Taxi Driver (Dev - Emulator)",
+  "name": "Bawabat Al Saeq (Dev - Emulator)",
   "request": "launch",
   "type": "dart",
   "args": [

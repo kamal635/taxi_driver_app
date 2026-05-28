@@ -1,5 +1,6 @@
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/shared/presentation/widgets/surfaces/app_card_surface.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OfferCardSurface extends StatelessWidget {
   const OfferCardSurface({
@@ -11,6 +12,22 @@ class OfferCardSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppCardSurface(child: child);
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(18.r),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(22.r),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            offset: const Offset(0, 10),
+            blurRadius: 24,
+          ),
+        ],
+      ),
+      child: child,
+    );
   }
 }

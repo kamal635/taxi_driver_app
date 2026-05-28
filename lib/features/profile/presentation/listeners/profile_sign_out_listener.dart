@@ -1,11 +1,11 @@
+import 'package:bawabat_al_saeq/app/router/config/app_route_paths.dart';
+import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
+import 'package:bawabat_al_saeq/features/profile/presentation/controllers/sign_out_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taxi_driver_app/app/router/config/app_route_paths.dart';
-import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
-import 'package:taxi_driver_app/features/profile/presentation/controllers/sign_out_controller.dart';
 
 class ProfileSignOutListener extends ConsumerStatefulWidget {
   const ProfileSignOutListener({super.key});
@@ -34,20 +34,24 @@ class _ProfileSignOutListenerState
   ) async {
     await next.whenOrNull(
       error: (error, _) async {
+        if (!mounted) {
+          return;
+        }
+
         final message = failureToUserMessage(
           error,
           l10n: context.l10n,
         );
         context.showAppSnack(message, type: AppSnackType.error);
+        ref.read(signOutControllerProvider.notifier).reset();
       },
       data: (didSignOut) async {
-        if (!didSignOut || (previous?.value ?? false)) {
+        if (!didSignOut || (previous?.asData?.value ?? false) || !mounted) {
           return;
         }
 
-        if (mounted) {
-          context.go(AppRoutePaths.login);
-        }
+        ref.read(signOutControllerProvider.notifier).reset();
+        context.go(AppRoutePaths.login);
       },
     );
   }

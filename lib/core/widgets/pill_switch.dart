@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_typography.dart';
 
 /// Animated on/off pill used for the driver availability toggle.
 class PillSwitch extends StatefulWidget {

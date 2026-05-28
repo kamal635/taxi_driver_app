@@ -1,12 +1,13 @@
+import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/accept_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/complete_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/decline_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/errors/failure_message_mapper.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/extensions/snackbar_x.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/complete_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/decline_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
+import 'package:flutter_riverpod/misc.dart';
 
 class HomeActionFeedbackListener extends ConsumerStatefulWidget {
   const HomeActionFeedbackListener({super.key});
@@ -32,59 +33,40 @@ class _HomeActionFeedbackListenerState
         (state) => state.asData?.value.errorMessage,
       ),
       (previous, next) {
-        if (next == null || next.isEmpty || previous == next) {
-          return;
-        }
+        if (next == null || next.isEmpty || previous == next) return;
 
-        final message = failureToUserMessage(next, l10n: context.l10n);
-        context.showAppSnack(message, type: AppSnackType.error);
+        _showError(next);
       },
     );
 
-    _acceptErrorSubscription = ref.listenManual<Object?>(
+    _acceptErrorSubscription = _listenToControllerError(
       acceptOfferControllerProvider.select((state) => state.error),
-      (previous, next) {
-        if (next == null || identical(previous, next)) {
-          return;
-        }
-
-        final message = failureToUserMessage(
-          next.toString(),
-          l10n: context.l10n,
-        );
-        context.showAppSnack(message, type: AppSnackType.error);
-      },
     );
 
-    _declineErrorSubscription = ref.listenManual<Object?>(
+    _declineErrorSubscription = _listenToControllerError(
       declineOfferControllerProvider.select((state) => state.error),
-      (previous, next) {
-        if (next == null || identical(previous, next)) {
-          return;
-        }
-
-        final message = failureToUserMessage(
-          next.toString(),
-          l10n: context.l10n,
-        );
-        context.showAppSnack(message, type: AppSnackType.error);
-      },
     );
 
-    _completeErrorSubscription = ref.listenManual<Object?>(
+    _completeErrorSubscription = _listenToControllerError(
       completeOfferControllerProvider.select((state) => state.error),
-      (previous, next) {
-        if (next == null || identical(previous, next)) {
-          return;
-        }
-
-        final message = failureToUserMessage(
-          next.toString(),
-          l10n: context.l10n,
-        );
-        context.showAppSnack(message, type: AppSnackType.error);
-      },
     );
+  }
+
+  ProviderSubscription<Object?> _listenToControllerError(
+    ProviderListenable<Object?> provider,
+  ) {
+    return ref.listenManual<Object?>(provider, (previous, next) {
+      if (next == null || identical(previous, next)) return;
+
+      _showError(next);
+    });
+  }
+
+  void _showError(Object error) {
+    if (!mounted) return;
+
+    final message = failureToUserMessage(error, l10n: context.l10n);
+    context.showAppSnack(message, type: AppSnackType.error);
   }
 
   @override

@@ -45,6 +45,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get copyright => '© 2026 تطبيق بوابة السائق';
 
   @override
+  String get legalPrivacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get legalTermsAndConditions => 'الشروط والأحكام';
+
+  @override
+  String get validationPhoneRequired => 'يرجى إدخال رقم الهاتف.';
+
+  @override
+  String get validationPasswordRequired => 'يرجى إدخال كلمة المرور.';
+
+  @override
+  String get authShowPassword => 'إظهار كلمة المرور';
+
+  @override
+  String get authHidePassword => 'إخفاء كلمة المرور';
+
+  @override
   String get notes => 'ملاحظات';
 
   @override
@@ -215,6 +233,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileSectionSignOut => 'تسجيل الخروج';
 
   @override
+  String get profileSectionLegal => 'المعلومات القانونية';
+
+  @override
+  String get profilePrivacyPolicySubtitle => 'تعرف على كيفية حماية بياناتك';
+
+  @override
+  String get profileTermsAndConditionsSubtitle => 'اقرأ شروط استخدام التطبيق';
+
+  @override
+  String get profilePasswordUpdatedSuccess => 'تم تحديث كلمة المرور بنجاح.';
+
+  @override
+  String get profilePasswordMismatch => 'كلمتا المرور غير متطابقتين.';
+
+  @override
   String get profileEditTitle => 'تعديل الملف الشخصي';
 
   @override
@@ -319,6 +352,12 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get tripsPickupLabel => 'من';
+
+  @override
+  String get tripsDropoffLabel => 'إلى';
+
+  @override
   String get errorUnexpected => 'حدث خطأ غير متوقع. حاول مرة أخرى.';
 
   @override
@@ -399,6 +438,22 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يوجد اتصال بالإنترنت. لا يمكن تحديث موقعك.';
 
   @override
+  String get availabilityNotificationPermissionRequired =>
+      'صلاحية الإشعارات مطلوبة لتفعيل استقبال الطلبات في الخلفية.';
+
+  @override
+  String get availabilityBackgroundServiceStartFailed =>
+      'تعذّر تشغيل خدمة استقبال الطلبات في الخلفية. حاول مرة أخرى.';
+
+  @override
+  String get availabilityBackgroundServiceStopped =>
+      'توقفت خدمة استقبال الطلبات. تم تحويلك إلى غير متصل.';
+
+  @override
+  String get availabilityRuntimeError =>
+      'تعذّر تشغيل وضع التوفر. حاول مرة أخرى.';
+
+  @override
   String get actionSettings => 'الإعدادات';
 
   @override
@@ -457,6 +512,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get price => 'السعر: ';
+
+  @override
+  String get currencySyrianPound => 'ل.س';
 
   @override
   String get customerPhone => 'رقم الزبون';

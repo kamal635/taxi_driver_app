@@ -1,7 +1,7 @@
+import 'package:bawabat_al_saeq/app/router/config/app_route_paths.dart';
+import 'package:bawabat_al_saeq/app/router/guards/route_access_intent.dart';
+import 'package:bawabat_al_saeq/core/session/session_store.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taxi_driver_app/app/router/config/app_route_paths.dart';
-import 'package:taxi_driver_app/app/router/guards/route_access_intent.dart';
-import 'package:taxi_driver_app/core/session/session_store.dart';
 
 enum SessionNavigationState {
   unauthenticated,

@@ -1,17 +1,18 @@
+import 'package:bawabat_al_saeq/app/router/providers/go_router_provider.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/session/app_force_logout_coordinator.dart';
+import 'package:bawabat_al_saeq/core/utils/centered_page.dart';
+import 'package:bawabat_al_saeq/core/utils/screen_util_design_size.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_background.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_system_ui.dart';
+import 'package:bawabat_al_saeq/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taxi_driver_app/app/router/providers/go_router_provider.dart';
-import 'package:taxi_driver_app/app/theme/app_theme.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/session/app_force_logout_coordinator.dart';
-import 'package:taxi_driver_app/core/utils/centered_page.dart';
-import 'package:taxi_driver_app/core/utils/screen_util_design_size.dart';
-import 'package:taxi_driver_app/core/widgets/app_background.dart';
-import 'package:taxi_driver_app/l10n/app_localizations.dart';
 
-class TaxiDriverApp extends ConsumerWidget {
-  const TaxiDriverApp({super.key});
+class BawabatAlSaeqApp extends ConsumerWidget {
+  const BawabatAlSaeqApp({super.key});
 
   static const Locale _appLocale = Locale('ar');
 
@@ -36,7 +37,7 @@ class TaxiDriverApp extends ConsumerWidget {
           builder: (_, child) => child!,
           child: MaterialApp.router(
             debugShowCheckedModeBanner: false,
-            title: 'Taxi Driver App',
+            title: 'Bawabat Al Saeq App',
             onGenerateTitle: (context) => context.l10n.appTitle,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
@@ -44,15 +45,17 @@ class TaxiDriverApp extends ConsumerWidget {
             theme: AppTheme.light(_appLocale),
             routerConfig: router,
             builder: (context, child) {
-              return Stack(
-                children: [
-                  const AppBackground(),
-                  Positioned.fill(
-                    child: CenteredPage(
-                      child: child ?? const SizedBox.shrink(),
+              return AppSystemUi(
+                child: Stack(
+                  children: [
+                    const AppBackground(),
+                    Positioned.fill(
+                      child: CenteredPage(
+                        child: child ?? const SizedBox.shrink(),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               );
             },
           ),

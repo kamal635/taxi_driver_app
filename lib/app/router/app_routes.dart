@@ -1,5 +1,9 @@
-import 'package:taxi_driver_app/app/router/config/app_route_paths.dart';
+import 'package:bawabat_al_saeq/app/router/config/app_route_paths.dart';
 
+/// Backward-compatible route path aliases.
+///
+/// New code should import [AppRoutePaths] directly. This class remains to avoid
+/// breaking older feature files that still import `app_routes.dart`.
 abstract final class AppRoutes {
   const AppRoutes._();
 
@@ -9,6 +13,5 @@ abstract final class AppRoutes {
   static const String home = AppRoutePaths.home;
   static const String trips = AppRoutePaths.trips;
   static const String profile = AppRoutePaths.profile;
-
   static const String profilePassword = AppRoutePaths.profilePassword;
 }

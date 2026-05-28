@@ -1,5 +1,5 @@
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
 
 /// Formats completed trip time labels for the trips list.
 class CompletedTripTimeFormatter {

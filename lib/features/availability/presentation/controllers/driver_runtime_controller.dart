@@ -1,13 +1,17 @@
+import 'package:bawabat_al_saeq/core/session/session_providers.dart';
+import 'package:bawabat_al_saeq/features/availability/data/datasources/android/driver_background_service_bridge.dart';
+import 'package:bawabat_al_saeq/features/availability/domain/failures/availability_runtime_failure.dart';
+import 'package:bawabat_al_saeq/features/availability/presentation/providers/availability_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/session/session_providers.dart';
-import 'package:taxi_driver_app/features/availability/data/datasources/android/driver_background_service_bridge.dart';
-import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
 
-/// Coordinates services that must run while the driver is online.
-class DriverRuntimeController {
+/// Coordinates local runtime services that must run while the driver is online.
+final class DriverRuntimeController {
   DriverRuntimeController(this._ref);
 
   final Ref _ref;
+
+  static const int _maxServiceStartChecks = 20;
+  static const Duration _serviceStartCheckDelay = Duration(milliseconds: 150);
 
   /// Starts the complete runtime required for online mode.
   Future<void> startOnlineRuntime() async {
@@ -21,16 +25,16 @@ class DriverRuntimeController {
         token.isEmpty ||
         driverId == null ||
         driverId.isEmpty) {
-      throw StateError(
-        'Auth session is not ready for background driver mode.',
+      throw const AvailabilityRuntimeFailure(
+        reason: AvailabilityRuntimeFailureReason.missingAuthSession,
       );
     }
 
     final permissionGranted = await bridge.ensureNotificationPermission();
 
     if (!permissionGranted) {
-      throw StateError(
-        'Notification permission is required to start background driver mode.',
+      throw const AvailabilityRuntimeFailure(
+        reason: AvailabilityRuntimeFailureReason.notificationPermissionDenied,
       );
     }
 
@@ -42,7 +46,9 @@ class DriverRuntimeController {
     final isRunning = await _waitForServiceRunning(bridge);
 
     if (!isRunning) {
-      throw StateError('Background service did not start successfully.');
+      throw const AvailabilityRuntimeFailure(
+        reason: AvailabilityRuntimeFailureReason.backgroundServiceStartFailed,
+      );
     }
   }
 
@@ -54,17 +60,14 @@ class DriverRuntimeController {
   Future<bool> _waitForServiceRunning(
     DriverBackgroundServiceBridge bridge,
   ) async {
-    const maxAttempts = 20;
-    const delay = Duration(milliseconds: 150);
-
-    for (var i = 0; i < maxAttempts; i++) {
+    for (var i = 0; i < _maxServiceStartChecks; i++) {
       final isRunning = await bridge.isServiceRunning();
 
       if (isRunning) {
         return true;
       }
 
-      await Future<void>.delayed(delay);
+      await Future<void>.delayed(_serviceStartCheckDelay);
     }
 
     return false;

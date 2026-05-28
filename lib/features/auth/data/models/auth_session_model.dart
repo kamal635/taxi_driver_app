@@ -1,7 +1,8 @@
-import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_result.dart';
+import 'package:bawabat_al_saeq/core/utils/json_reader.dart';
+import 'package:bawabat_al_saeq/features/auth/domain/entities/auth_sign_in_result.dart';
 
 /// Data model for the authenticated driver session returned by the backend.
-class AuthSessionModel {
+final class AuthSessionModel {
   const AuthSessionModel({
     required this.driverId,
     required this.accessToken,
@@ -14,30 +15,12 @@ class AuthSessionModel {
   ///
   /// The backend currently returns the session fields at the root level.
   factory AuthSessionModel.fromJson(Map<String, dynamic> json) {
-    final accessToken = json['token']?.toString();
-    final refreshToken = json['refreshToken']?.toString();
-    final driverId = json['userId']?.toString();
-    final driverName = json['name'].toString();
-    final driverPhone = json['phone'].toString();
-
-    if (accessToken == null || accessToken.isEmpty) {
-      throw const FormatException('Missing token');
-    }
-
-    if (refreshToken == null || refreshToken.isEmpty) {
-      throw const FormatException('Missing refreshToken');
-    }
-
-    if (driverId == null || driverId.isEmpty) {
-      throw const FormatException('Missing driverId');
-    }
-
     return AuthSessionModel(
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      driverId: driverId,
-      driverName: driverName,
-      driverPhone: driverPhone,
+      accessToken: JsonReader.requireString(json, 'token'),
+      refreshToken: JsonReader.requireString(json, 'refreshToken'),
+      driverId: JsonReader.requireString(json, 'userId'),
+      driverName: JsonReader.optionalString(json, 'name') ?? '',
+      driverPhone: JsonReader.optionalString(json, 'phone') ?? '',
     );
   }
 

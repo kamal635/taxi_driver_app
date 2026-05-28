@@ -1,5 +1,5 @@
-import 'package:taxi_driver_app/core/networking/api_client.dart';
-import 'package:taxi_driver_app/features/auth/data/models/sign_in_response_model.dart';
+import 'package:bawabat_al_saeq/core/networking/api_client.dart';
+import 'package:bawabat_al_saeq/features/auth/data/models/sign_in_response_model.dart';
 
 /// Contract for remote authentication operations.
 abstract interface class AuthRemoteDataSource {
@@ -12,8 +12,10 @@ abstract interface class AuthRemoteDataSource {
 }
 
 /// API-based implementation of [AuthRemoteDataSource].
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  AuthRemoteDataSourceImpl(this._apiClient);
+final class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+  const AuthRemoteDataSourceImpl(this._apiClient);
+
+  static const String _loginPath = '/api/auth/login';
 
   final ApiClient _apiClient;
 
@@ -23,12 +25,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     String? fcmToken,
   }) async {
+    final normalizedPhone = phone.trim();
+    final normalizedFcmToken = fcmToken?.trim();
+
     final response = await _apiClient.postJson(
-      '/api/auth/login',
+      _loginPath,
       body: {
-        'phone': phone,
+        'phone': normalizedPhone,
         'password': password,
-        if (fcmToken != null && fcmToken.isNotEmpty) 'fcmToken': fcmToken,
+        if (normalizedFcmToken != null && normalizedFcmToken.isNotEmpty)
+          'fcmToken': normalizedFcmToken,
       },
     );
 

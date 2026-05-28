@@ -1,8 +1,9 @@
-import 'package:taxi_driver_app/features/auth/data/models/auth_session_model.dart';
-import 'package:taxi_driver_app/features/auth/domain/entities/auth_sign_in_result.dart';
+import 'package:bawabat_al_saeq/core/utils/json_reader.dart';
+import 'package:bawabat_al_saeq/features/auth/data/models/auth_session_model.dart';
+import 'package:bawabat_al_saeq/features/auth/domain/entities/auth_sign_in_result.dart';
 
 /// Data model for the complete login response.
-class SignInResponseModel {
+final class SignInResponseModel {
   const SignInResponseModel({
     required this.mustChangePassword,
     required this.authSession,
@@ -10,7 +11,8 @@ class SignInResponseModel {
 
   factory SignInResponseModel.fromJson(Map<String, dynamic> json) {
     return SignInResponseModel(
-      mustChangePassword: json['mustChangePassword'] == true,
+      mustChangePassword:
+          JsonReader.optionalBool(json, 'mustChangePassword') ?? false,
       authSession: AuthSessionModel.fromJson(json),
     );
   }

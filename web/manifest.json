@@ -1,6 +1,6 @@
 {
-    "name": "taxi_driver_app",
-    "short_name": "taxi_driver_app",
+    "name": "bawabat_al_saeq_app",
+    "short_name": "bawabat_al_saeq_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

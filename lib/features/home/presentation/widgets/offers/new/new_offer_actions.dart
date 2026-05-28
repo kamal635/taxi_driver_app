@@ -1,8 +1,8 @@
+import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
 import 'package:flutter/material.dart';
-import 'package:taxi_driver_app/app/theme/app_colors.dart';
-import 'package:taxi_driver_app/app/theme/app_spacing.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/core/widgets/app_button.dart';
 
 /// Action row for a pending offer.
 class NewOfferActions extends StatelessWidget {
@@ -22,6 +22,7 @@ class NewOfferActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isBusy = isAcceptLoading || isDeclineLoading;
 
     return Row(
       children: [
@@ -32,7 +33,7 @@ class NewOfferActions extends StatelessWidget {
             labelColor: AppColors.error,
             backgroundColor: Colors.transparent,
             label: l10n.decline,
-            onPressed: onDecline,
+            onPressed: isBusy ? null : onDecline,
             isLoading: isDeclineLoading,
           ),
         ),
@@ -42,7 +43,7 @@ class NewOfferActions extends StatelessWidget {
           child: AppButton(
             isLoading: isAcceptLoading,
             label: l10n.actionAccept,
-            onPressed: onAccept,
+            onPressed: isBusy ? null : onAccept,
           ),
         ),
       ],

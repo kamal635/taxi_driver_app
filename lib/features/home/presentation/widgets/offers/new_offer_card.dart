@@ -1,11 +1,11 @@
+import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
+import 'package:bawabat_al_saeq/features/availability/presentation/providers/availability_providers.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/accept_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/decline_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/controllers/new_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/offer_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/extensions/l10n_x.dart';
-import 'package:taxi_driver_app/features/availability/presentation/providers/availability_providers.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/accept_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/decline_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/controllers/new_offer_controller.dart';
-import 'package:taxi_driver_app/features/home/presentation/widgets/offers/offer_card.dart';
 
 class NewOfferCard extends ConsumerWidget {
   const NewOfferCard({super.key});
@@ -33,7 +33,7 @@ class NewOfferCard extends ConsumerWidget {
       expiresAt: pendingOffer.expiresAt,
       totalFare: pendingOffer.price,
       pickup: pendingOffer.pickup,
-      dropoff: pendingOffer.dropoff ?? '',
+      dropoff: pendingOffer.dropoff,
       notes: pendingOffer.notes,
       isAcceptLoading: isAcceptLoading,
       isDeclineLoading: isDeclineLoading,

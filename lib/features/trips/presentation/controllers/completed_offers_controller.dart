@@ -1,11 +1,10 @@
 import 'dart:async';
 
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offers_result_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/usecases/get_completed_offers_use_case.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/providers/trips_providers.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/state/completed_offers_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taxi_driver_app/core/errors/failure.dart';
-import 'package:taxi_driver_app/features/trips/domain/entities/completed_offers_result_entity.dart';
-import 'package:taxi_driver_app/features/trips/domain/usecases/get_completed_offers_use_case.dart';
-import 'package:taxi_driver_app/features/trips/presentation/providers/trips_providers.dart';
-import 'package:taxi_driver_app/features/trips/presentation/state/completed_offers_state.dart';
 
 final completedOffersControllerProvider =
     NotifierProvider<CompletedOffersController, CompletedOffersState>(
@@ -15,57 +14,46 @@ final completedOffersControllerProvider =
 /// Handles loading and filter changes for the trips screen.
 final class CompletedOffersController extends Notifier<CompletedOffersState> {
   late final GetCompletedOffersUseCase _getCompletedOffersUseCase;
+  int _requestId = 0;
 
   @override
   CompletedOffersState build() {
     _getCompletedOffersUseCase = ref.read(getCompletedOffersUseCaseProvider);
 
-    unawaited(Future.microtask(loadInitial));
+    unawaited(Future<void>.microtask(loadInitial));
 
-    return const CompletedOffersState(
-      isLoading: true,
-    );
+    return const CompletedOffersState(isLoading: true);
   }
 
   /// Loads the initial screen state once.
   Future<void> loadInitial() async {
-    if (state.result != null) return;
-
-    state = state.copyWith(
-      isLoading: true,
-      isRefreshing: false,
-      error: null,
-    );
+    if (state.hasVisibleData) return;
 
     await _loadPeriod(
-      period: CompletedPeriod.all,
+      period: state.selectedPeriod,
       hasVisibleData: false,
     );
   }
 
   /// Changes the selected filter while preserving current visible data.
   Future<void> changePeriod(CompletedPeriod period) async {
-    final currentPeriod = state.result?.period;
-
-    if (state.isLoading || state.isRefreshing || currentPeriod == period) {
+    if (!state.canChangePeriod || state.selectedPeriod == period) {
       return;
     }
 
     await _loadPeriod(
       period: period,
-      hasVisibleData: state.result != null,
+      hasVisibleData: state.hasVisibleData,
     );
   }
 
   /// Refreshes the current period.
   Future<void> refresh() async {
-    if (state.isLoading || state.isRefreshing) return;
-
-    final period = state.result?.period ?? CompletedPeriod.all;
+    if (!state.canChangePeriod) return;
 
     await _loadPeriod(
-      period: period,
-      hasVisibleData: state.result != null,
+      period: state.selectedPeriod,
+      hasVisibleData: state.hasVisibleData,
     );
   }
 
@@ -73,39 +61,35 @@ final class CompletedOffersController extends Notifier<CompletedOffersState> {
     required CompletedPeriod period,
     required bool hasVisibleData,
   }) async {
+    final currentRequestId = ++_requestId;
+
     state = state.copyWith(
+      selectedPeriod: period,
       isLoading: !hasVisibleData,
       isRefreshing: hasVisibleData,
       error: null,
     );
 
     try {
-      final data = await _fetchOffers(period: period);
+      final data = await _getCompletedOffersUseCase(period: period);
+
+      if (currentRequestId != _requestId) return;
 
       state = state.copyWith(
+        selectedPeriod: data.period,
         result: data,
         isLoading: false,
         isRefreshing: false,
         error: null,
       );
-    } on Failure catch (error) {
-      state = state.copyWith(
-        isLoading: false,
-        isRefreshing: false,
-        error: error,
-      );
-    } on Exception catch (error) {
+    } on Object catch (error) {
+      if (currentRequestId != _requestId) return;
+
       state = state.copyWith(
         isLoading: false,
         isRefreshing: false,
         error: error,
       );
     }
-  }
-
-  Future<CompletedOffersResultEntity> _fetchOffers({
-    required CompletedPeriod period,
-  }) {
-    return _getCompletedOffersUseCase(period: period);
   }
 }

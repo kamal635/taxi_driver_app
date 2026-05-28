@@ -1,4 +1,4 @@
-import 'package:taxi_driver_app/core/location/location_result.dart';
+import 'package:bawabat_al_saeq/core/location/location_result.dart';
 
 /// Tracks runtime location-service failures needed by the availability flow.
 abstract interface class LocationTracker {

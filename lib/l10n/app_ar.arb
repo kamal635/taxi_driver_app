@@ -12,6 +12,12 @@
   "signIn": "تسجيل الدخول",
   "forgotPassword": "هل نسيت كلمة المرور؟",
   "copyright": "© 2026 تطبيق بوابة السائق",
+  "legalPrivacyPolicy": "سياسة الخصوصية",
+  "legalTermsAndConditions": "الشروط والأحكام",
+  "validationPhoneRequired": "يرجى إدخال رقم الهاتف.",
+  "validationPasswordRequired": "يرجى إدخال كلمة المرور.",
+  "authShowPassword": "إظهار كلمة المرور",
+  "authHidePassword": "إخفاء كلمة المرور",
   "notes": "ملاحظات",
   "unknown": "غير معروف",
   "homeGreeting": "مرحباً،",
@@ -76,6 +82,26 @@
   "profileSectionAccount": "إعدادات الحساب",
   "profileSectionSupport": "الدعم والمساعدة",
   "profileSectionSignOut": "تسجيل الخروج",
+  "profileSectionLegal": "المعلومات القانونية",
+  "@profileSectionLegal": {
+    "description": "عنوان قسم الروابط القانونية في صفحة الملف الشخصي"
+  },
+  "profilePrivacyPolicySubtitle": "تعرف على كيفية حماية بياناتك",
+  "@profilePrivacyPolicySubtitle": {
+    "description": "وصف رابط سياسة الخصوصية في صفحة الملف الشخصي"
+  },
+  "profileTermsAndConditionsSubtitle": "اقرأ شروط استخدام التطبيق",
+  "@profileTermsAndConditionsSubtitle": {
+    "description": "وصف رابط الشروط والأحكام في صفحة الملف الشخصي"
+  },
+  "profilePasswordUpdatedSuccess": "تم تحديث كلمة المرور بنجاح.",
+  "@profilePasswordUpdatedSuccess": {
+    "description": "رسالة نجاح تغيير كلمة المرور"
+  },
+  "profilePasswordMismatch": "كلمتا المرور غير متطابقتين.",
+  "@profilePasswordMismatch": {
+    "description": "رسالة خطأ عند عدم تطابق كلمة المرور وتأكيدها"
+  },
   "profileEditTitle": "تعديل الملف الشخصي",
   "profileEditSubtitle": "تحديث معلوماتك الشخصية",
   "profileChangePasswordTitle": "تغيير كلمة المرور",
@@ -116,6 +142,14 @@
       }
     }
   },
+  "tripsPickupLabel": "من",
+  "@tripsPickupLabel": {
+    "description": "تسمية نقطة الانطلاق داخل بطاقة الرحلة المكتملة"
+  },
+  "tripsDropoffLabel": "إلى",
+  "@tripsDropoffLabel": {
+    "description": "تسمية نقطة الوصول داخل بطاقة الرحلة المكتملة"
+  },
   "errorUnexpected": "حدث خطأ غير متوقع. حاول مرة أخرى.",
   "errorNoInternet": "لا يوجد اتصال بالإنترنت. تأكد من الشبكة وحاول مجددًا.",
   "errorTimeout": "استغرق الطلب وقتًا طويلًا. حاول مرة أخرى.",
@@ -140,6 +174,10 @@
   "locationPermissionDeniedForever": "تم رفض صلاحية الموقع نهائياً. يرجى تفعيلها من الإعدادات.",
   "locationPermissionUnableToDetermine": "تعذّر تحديد صلاحية الموقع. حاول مرة أخرى.",
   "locationNetworkError": "لا يوجد اتصال بالإنترنت. لا يمكن تحديث موقعك.",
+  "availabilityNotificationPermissionRequired": "صلاحية الإشعارات مطلوبة لتفعيل استقبال الطلبات في الخلفية.",
+  "availabilityBackgroundServiceStartFailed": "تعذّر تشغيل خدمة استقبال الطلبات في الخلفية. حاول مرة أخرى.",
+  "availabilityBackgroundServiceStopped": "توقفت خدمة استقبال الطلبات. تم تحويلك إلى غير متصل.",
+  "availabilityRuntimeError": "تعذّر تشغيل وضع التوفر. حاول مرة أخرى.",
   "actionSettings": "الإعدادات",
   "todayLabel": "اليوم",
   "@todayLabel": {
@@ -193,6 +231,7 @@
   "profileAvatarTakePhoto": "التقاط صورة",
   "homeOfferExpiresIn": "ينتهي خلال:",
   "price": "السعر: ",
+  "currencySyrianPound": "ل.س",
   "customerPhone": "رقم الزبون",
   "decline": "رفض",
   "tripProgress": "الرحلة قيد التقدم...",
@@ -204,7 +243,7 @@
   "contactSupportLabel": "تحتاج مساعدة؟",
   "contactSupportAction": "اضغط هنا",
   "contactSupportContact": "للتواصل مع الدعم.",
-    "appUpdateTitle": "يوجد تحديث جديد",
+  "appUpdateTitle": "يوجد تحديث جديد",
   "@appUpdateTitle": {
     "description": "عنوان نافذة تحديث التطبيق"
   },
@@ -256,9 +295,8 @@
   },
   "appUpdateInstalling": "جاري فتح التثبيت...",
   "appUpdateBackgroundStarted": "بدأ تنزيل التحديث في الخلفية",
-"appUpdateInstallerOpening": "تم تنزيل التحديث، سيتم فتح التثبيت الآن",
-"appUpdateInvalidPackage": "الملف المنزّل ليس APK صالحًا"
-,
+  "appUpdateInstallerOpening": "تم تنزيل التحديث، سيتم فتح التثبيت الآن",
+  "appUpdateInvalidPackage": "الملف المنزّل ليس APK صالحًا",
   "profileSectionApp": "التطبيق",
   "profileAppUpdateTitle": "تحديث التطبيق",
   "profileAppUpdateSubtitleChecking": "جارٍ التحقق من آخر إصدار...",
@@ -304,7 +342,7 @@
   },
   "appUpdateInstallerOpenedHint": "تم فتح مثبت التحديث. أكمل التحديث من شاشة التثبيت الخاصة بالنظام.",
   "appUpdateCancel": "إلغاء التحديث",
-"appUpdateReadyToDownload": "يوجد تحديث جاهز للتنزيل",
-"appUpdateDownloadCancelled": "تم إلغاء تنزيل التحديث",
-"profileAppUpdateEntrySubtitle": "تحقق من الإصدار الحالي والتحديثات المتاحة"
+  "appUpdateReadyToDownload": "يوجد تحديث جاهز للتنزيل",
+  "appUpdateDownloadCancelled": "تم إلغاء تنزيل التحديث",
+  "profileAppUpdateEntrySubtitle": "تحقق من الإصدار الحالي والتحديثات المتاحة"
 }
