@@ -749,11 +749,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileLocationStatusSubtitle =>
-      'تحقق من صلاحيات الموقع المطلوبة لاستقبال الطلبات.';
+      'تحقق من إعدادات الموقع اللازمة لاستقبال الطلبات.';
 
   @override
   String get profileLocationStatusPageSubtitle =>
-      'الموقع ضروري لاستقبال الطلبات القريبة منك وتتبع الرحلات أثناء عملك.';
+      'الموقع ضروري لاستقبال الطلبات القريبة منك وتتبع الرحلات أثناء عملك. صلاحية الخلفية اختيارية لتحسين التتبع عند إغلاق التطبيق.';
 
   @override
   String get locationStatusServiceTitle => 'خدمة الموقع';
@@ -773,7 +773,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get locationStatusPermissionWhileInUse =>
-      'الصلاحية ممنوحة أثناء استخدام التطبيق فقط.';
+      'الصلاحية ممنوحة أثناء استخدام التطبيق، وهذا كافٍ لتفعيل التوفر.';
 
   @override
   String get locationStatusPermissionDenied => 'صلاحية الموقع غير ممنوحة.';
@@ -794,17 +794,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get locationStatusBackgroundMissing =>
-      'يحتاج التطبيق إلى صلاحية الموقع دائمًا للعمل أثناء الخلفية.';
+      'اختياري: يمكن تفعيل الموقع في الخلفية لتحسين التتبع عند إغلاق التطبيق.';
 
   @override
-  String get locationStatusReadyTitle => 'الموقع جاهز';
+  String get locationStatusReadyTitle => 'الموقع جاهز لاستقبال الطلبات';
 
   @override
   String get locationStatusNeedsAttentionTitle => 'الموقع يحتاج إلى انتباه';
 
   @override
   String get locationStatusWhyMessage =>
-      'نحتاج إلى الموقع لتحديد الطلبات القريبة منك وتتبع الرحلة بدقة عند التوفر.';
+      'نحتاج إلى الموقع لتحديد الطلبات القريبة منك وتتبع الرحلة بدقة عند التوفر. تشغيل الموقع في الخلفية اختياري.';
 
   @override
   String get locationStatusRefreshAction => 'تحديث الحالة';
@@ -830,7 +830,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get locationBackgroundPermissionRequired =>
-      'صلاحية الموقع في الخلفية مطلوبة لتفعيل التوفر واستقبال الطلبات.';
+      'يمكنك تفعيل صلاحية الموقع في الخلفية لتحسين التتبع، لكنها ليست مطلوبة لتفعيل التوفر.';
 
   @override
   String get profileAboutTitle => 'حول التطبيق';

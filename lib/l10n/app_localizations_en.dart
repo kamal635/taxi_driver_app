@@ -753,11 +753,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileLocationStatusSubtitle =>
-      'Check the location permissions required to receive requests.';
+      'Check the location settings needed to receive requests.';
 
   @override
   String get profileLocationStatusPageSubtitle =>
-      'Location is required to receive nearby requests and track trips while you are available.';
+      'Location is required to receive nearby requests and track trips while you are available. Background location is optional and only improves tracking when the app is closed.';
 
   @override
   String get locationStatusServiceTitle => 'Location services';
@@ -779,7 +779,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get locationStatusPermissionWhileInUse =>
-      'Location permission is allowed only while using the app.';
+      'Location is allowed while using the app, which is enough to turn availability on.';
 
   @override
   String get locationStatusPermissionDenied =>
@@ -802,17 +802,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get locationStatusBackgroundMissing =>
-      'The app needs always-on location permission to work in the background.';
+      'Optional: enable background location to improve tracking when the app is closed.';
 
   @override
-  String get locationStatusReadyTitle => 'Location is ready';
+  String get locationStatusReadyTitle => 'Location is ready for requests';
 
   @override
   String get locationStatusNeedsAttentionTitle => 'Location needs attention';
 
   @override
   String get locationStatusWhyMessage =>
-      'We need your location to find nearby requests and track trips accurately while you are available.';
+      'We need your location to find nearby requests and track trips accurately while you are available. Background location is optional.';
 
   @override
   String get locationStatusRefreshAction => 'Refresh status';
@@ -841,7 +841,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get locationBackgroundPermissionRequired =>
-      'Background location permission is required to turn availability on and receive requests.';
+      'You can enable background location to improve tracking, but it is not required to turn availability on.';
 
   @override
   String get profileAboutTitle => 'About app';

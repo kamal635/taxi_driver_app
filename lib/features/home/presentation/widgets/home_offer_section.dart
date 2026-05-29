@@ -53,7 +53,7 @@ class HomeOfferSection extends ConsumerWidget {
 
     if (!isOnline) {
       return HomeEmptyState(
-        icon: Icons.power_settings_new_rounded,
+        icon: Icons.person_off_rounded,
         title: l10n.homeAvailabilityOffTitle,
         subtitle: l10n.homeAvailabilityOffSubtitle,
         animateIcon: false,

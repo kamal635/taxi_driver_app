@@ -1,5 +1,3 @@
-import 'dart:async' show unawaited;
-
 import 'package:bawabat_al_saeq/app/router/config/app_route_names.dart';
 import 'package:bawabat_al_saeq/app/router/config/app_route_paths.dart';
 import 'package:bawabat_al_saeq/app/settings/app_settings_providers.dart';
@@ -7,11 +5,9 @@ import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
-import 'package:bawabat_al_saeq/core/constants/app_links.dart';
 import 'package:bawabat_al_saeq/core/errors/failure_message_mapper.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
-import 'package:bawabat_al_saeq/core/services/external_url_launcher.dart';
 import 'package:bawabat_al_saeq/core/session/session_providers.dart';
 import 'package:bawabat_al_saeq/core/widgets/app_confirm_dialog.dart';
 import 'package:bawabat_al_saeq/features/profile/presentation/controllers/sign_out_controller.dart';
@@ -145,22 +141,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 subtitle: l10n.profileAboutSubtitle,
                 icon: Icons.info_outline_rounded,
                 onPressed: _openAboutPage,
-              ),
-              ProfileSectionItem(
-                title: l10n.legalPrivacyPolicy,
-                subtitle: l10n.profilePrivacyPolicySubtitle,
-                icon: AppIcons.privacyPolicy,
-                onPressed: () => unawaited(
-                  ExternalUrlLauncher.open(AppLinks.privacyPolicy),
-                ),
-              ),
-              ProfileSectionItem(
-                title: l10n.legalTermsAndConditions,
-                subtitle: l10n.profileTermsAndConditionsSubtitle,
-                icon: AppIcons.termsAndConditions,
-                onPressed: () => unawaited(
-                  ExternalUrlLauncher.open(AppLinks.termsAndConditions),
-                ),
               ),
             ],
           ),

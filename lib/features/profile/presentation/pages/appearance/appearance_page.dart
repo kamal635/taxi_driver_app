@@ -1,3 +1,5 @@
+import 'dart:async' show unawaited;
+
 import 'package:bawabat_al_saeq/app/settings/app_settings_providers.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
@@ -43,39 +45,36 @@ class AppearancePage extends ConsumerWidget {
                   subtitle: l10n.profileAppearanceSystemSubtitle,
                   icon: Icons.brightness_auto_rounded,
                   onPressed: () => _selectThemeMode(
-                    context,
                     ref,
                     ThemeMode.system,
                   ),
-                  trailing: settings.themeMode == ThemeMode.system
-                      ? const _SelectedAppearanceIcon()
-                      : null,
+                  trailing: _AppearanceSelectionIndicator(
+                    isSelected: settings.themeMode == ThemeMode.system,
+                  ),
                 ),
                 ProfileSectionItem(
                   title: l10n.profileAppearanceLightTitle,
                   subtitle: l10n.profileAppearanceLightSubtitle,
                   icon: Icons.light_mode_rounded,
                   onPressed: () => _selectThemeMode(
-                    context,
                     ref,
                     ThemeMode.light,
                   ),
-                  trailing: settings.themeMode == ThemeMode.light
-                      ? const _SelectedAppearanceIcon()
-                      : null,
+                  trailing: _AppearanceSelectionIndicator(
+                    isSelected: settings.themeMode == ThemeMode.light,
+                  ),
                 ),
                 ProfileSectionItem(
                   title: l10n.profileAppearanceDarkTitle,
                   subtitle: l10n.profileAppearanceDarkSubtitle,
                   icon: Icons.dark_mode_rounded,
                   onPressed: () => _selectThemeMode(
-                    context,
                     ref,
                     ThemeMode.dark,
                   ),
-                  trailing: settings.themeMode == ThemeMode.dark
-                      ? const _SelectedAppearanceIcon()
-                      : null,
+                  trailing: _AppearanceSelectionIndicator(
+                    isSelected: settings.themeMode == ThemeMode.dark,
+                  ),
                 ),
               ],
             ),
@@ -85,30 +84,30 @@ class AppearancePage extends ConsumerWidget {
     );
   }
 
-  Future<void> _selectThemeMode(
-    BuildContext context,
-    WidgetRef ref,
-    ThemeMode themeMode,
-  ) async {
-    await ref.read(appSettingsControllerProvider).setThemeMode(themeMode);
-
-    if (!context.mounted) {
-      return;
-    }
-
-    Navigator.of(context).pop();
+  void _selectThemeMode(WidgetRef ref, ThemeMode themeMode) {
+    unawaited(
+      ref.read(appSettingsControllerProvider).setThemeMode(themeMode),
+    );
   }
 }
 
-class _SelectedAppearanceIcon extends StatelessWidget {
-  const _SelectedAppearanceIcon();
+class _AppearanceSelectionIndicator extends StatelessWidget {
+  const _AppearanceSelectionIndicator({required this.isSelected});
+
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
-      Icons.check_circle_rounded,
-      size: 22.r,
-      color: context.colors.primary,
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 180),
+      child: Icon(
+        isSelected
+            ? Icons.radio_button_checked_rounded
+            : Icons.radio_button_unchecked_rounded,
+        key: ValueKey<bool>(isSelected),
+        size: 22.r,
+        color: isSelected ? context.colors.primary : context.colors.iconMuted,
+      ),
     );
   }
 }

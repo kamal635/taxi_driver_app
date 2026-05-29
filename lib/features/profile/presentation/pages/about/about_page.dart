@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-/// App information and legal/support links screen.
+/// App information and legal links screen.
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
 
@@ -76,14 +76,6 @@ class _AboutPageState extends State<AboutPage> {
                   ExternalUrlLauncher.open(AppLinks.termsAndConditions),
                 ),
               ),
-              ProfileSectionItem(
-                title: l10n.aboutSupportTitle,
-                subtitle: l10n.aboutSupportSubtitle,
-                icon: Icons.support_agent_rounded,
-                onPressed: () => unawaited(
-                  ExternalUrlLauncher.open(AppLinks.support),
-                ),
-              ),
             ],
           ),
         ],
@@ -109,17 +101,22 @@ class _AboutInfoCard extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 64.r,
-            height: 64.r,
+            width: 92.r,
+            height: 92.r,
+            padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
-              color: context.colors.primary.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(22.r),
+              color: context.colors.backgroundDecorative,
+              borderRadius: BorderRadius.circular(28.r),
               border: Border.all(color: context.colors.border),
             ),
-            child: Icon(
-              Icons.local_taxi_rounded,
-              size: 34.r,
-              color: context.colors.primary,
+            child: Image.asset(
+              'assets/images/app_icon_foreground.png',
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Icon(
+                Icons.local_taxi_rounded,
+                size: 38.r,
+                color: context.colors.primary,
+              ),
             ),
           ),
           AppSpacing.h14,

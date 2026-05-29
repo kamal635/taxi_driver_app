@@ -1475,13 +1475,13 @@ abstract class AppLocalizations {
   /// No description provided for @profileLocationStatusSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Check the location permissions required to receive requests.'**
+  /// **'Check the location settings needed to receive requests.'**
   String get profileLocationStatusSubtitle;
 
   /// No description provided for @profileLocationStatusPageSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Location is required to receive nearby requests and track trips while you are available.'**
+  /// **'Location is required to receive nearby requests and track trips while you are available. Background location is optional and only improves tracking when the app is closed.'**
   String get profileLocationStatusPageSubtitle;
 
   /// No description provided for @locationStatusServiceTitle.
@@ -1517,7 +1517,7 @@ abstract class AppLocalizations {
   /// No description provided for @locationStatusPermissionWhileInUse.
   ///
   /// In en, this message translates to:
-  /// **'Location permission is allowed only while using the app.'**
+  /// **'Location is allowed while using the app, which is enough to turn availability on.'**
   String get locationStatusPermissionWhileInUse;
 
   /// No description provided for @locationStatusPermissionDenied.
@@ -1553,13 +1553,13 @@ abstract class AppLocalizations {
   /// No description provided for @locationStatusBackgroundMissing.
   ///
   /// In en, this message translates to:
-  /// **'The app needs always-on location permission to work in the background.'**
+  /// **'Optional: enable background location to improve tracking when the app is closed.'**
   String get locationStatusBackgroundMissing;
 
   /// No description provided for @locationStatusReadyTitle.
   ///
   /// In en, this message translates to:
-  /// **'Location is ready'**
+  /// **'Location is ready for requests'**
   String get locationStatusReadyTitle;
 
   /// No description provided for @locationStatusNeedsAttentionTitle.
@@ -1571,7 +1571,7 @@ abstract class AppLocalizations {
   /// No description provided for @locationStatusWhyMessage.
   ///
   /// In en, this message translates to:
-  /// **'We need your location to find nearby requests and track trips accurately while you are available.'**
+  /// **'We need your location to find nearby requests and track trips accurately while you are available. Background location is optional.'**
   String get locationStatusWhyMessage;
 
   /// No description provided for @locationStatusRefreshAction.
@@ -1619,7 +1619,7 @@ abstract class AppLocalizations {
   /// No description provided for @locationBackgroundPermissionRequired.
   ///
   /// In en, this message translates to:
-  /// **'Background location permission is required to turn availability on and receive requests.'**
+  /// **'You can enable background location to improve tracking, but it is not required to turn availability on.'**
   String get locationBackgroundPermissionRequired;
 
   /// No description provided for @profileAboutTitle.

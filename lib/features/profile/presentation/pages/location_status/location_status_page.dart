@@ -39,11 +39,7 @@ class _LocationStatusPageState extends ConsumerState<LocationStatusPage> {
   }
 
   Future<void> _requestLocationPermission() async {
-    await ref
-        .read(locationServiceProvider)
-        .ensureReady(
-          requireBackground: true,
-        );
+    await ref.read(locationServiceProvider).ensureReady();
 
     if (!mounted) {
       return;
@@ -132,7 +128,8 @@ class _LocationStatusContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final isFullyReady = status.isFullyReadyForBackgroundTracking;
+    final isReadyForRequests =
+        status.isServiceEnabled && status.hasForegroundPermission;
 
     return Column(
       children: [
@@ -172,7 +169,7 @@ class _LocationStatusContent extends StatelessWidget {
                     : Icons.route_outlined,
                 state: status.hasBackgroundPermission
                     ? _LocationStatusRowState.ready
-                    : _LocationStatusRowState.warning,
+                    : _LocationStatusRowState.info,
               ),
             ],
           ),
@@ -184,11 +181,11 @@ class _LocationStatusContent extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _LocationStatusSummaryIcon(isReady: isFullyReady),
+                  _LocationStatusSummaryIcon(isReady: isReadyForRequests),
                   AppSpacing.w12,
                   Expanded(
                     child: Text(
-                      isFullyReady
+                      isReadyForRequests
                           ? l10n.locationStatusReadyTitle
                           : l10n.locationStatusNeedsAttentionTitle,
                       style: AppTypography.labelMd.copyWith(
@@ -215,6 +212,7 @@ class _LocationStatusContent extends StatelessWidget {
           onRequestPermissionPressed: onRequestPermissionPressed,
           onOpenAppSettingsPressed: onOpenAppSettingsPressed,
           onOpenLocationSettingsPressed: onOpenLocationSettingsPressed,
+          onRefreshPressed: onRefreshPressed,
         ),
         AppSpacing.h10,
         TextButton.icon(
@@ -251,12 +249,14 @@ class _LocationPrimaryAction extends StatelessWidget {
     required this.onRequestPermissionPressed,
     required this.onOpenAppSettingsPressed,
     required this.onOpenLocationSettingsPressed,
+    required this.onRefreshPressed,
   });
 
   final LocationStatus status;
   final VoidCallback onRequestPermissionPressed;
   final VoidCallback onOpenAppSettingsPressed;
   final VoidCallback onOpenLocationSettingsPressed;
+  final VoidCallback onRefreshPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -283,16 +283,9 @@ class _LocationPrimaryAction extends StatelessWidget {
       );
     }
 
-    if (!status.hasBackgroundPermission) {
-      return AppButton(
-        label: l10n.locationStatusOpenAppSettingsAction,
-        onPressed: onOpenAppSettingsPressed,
-      );
-    }
-
     return AppButton(
       label: l10n.locationStatusRefreshAction,
-      onPressed: onRequestPermissionPressed,
+      onPressed: onRefreshPressed,
     );
   }
 }
@@ -314,11 +307,13 @@ class _LocationStatusRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final accentColor = switch (state) {
       _LocationStatusRowState.ready => context.colors.success,
+      _LocationStatusRowState.info => context.colors.info,
       _LocationStatusRowState.warning => context.colors.error,
     };
 
     final backgroundColor = switch (state) {
       _LocationStatusRowState.ready => context.colors.successBg,
+      _LocationStatusRowState.info => context.colors.infoBg,
       _LocationStatusRowState.warning => context.colors.errorBg,
     };
 
@@ -367,9 +362,11 @@ class _LocationStatusRow extends StatelessWidget {
             ),
           ),
           Icon(
-            state == _LocationStatusRowState.ready
-                ? Icons.check_circle_rounded
-                : Icons.error_rounded,
+            switch (state) {
+              _LocationStatusRowState.ready => Icons.check_circle_rounded,
+              _LocationStatusRowState.info => Icons.info_rounded,
+              _LocationStatusRowState.warning => Icons.error_rounded,
+            },
             size: 22.r,
             color: accentColor,
           ),
@@ -473,5 +470,6 @@ class _LocationStatusErrorCard extends StatelessWidget {
 
 enum _LocationStatusRowState {
   ready,
+  info,
   warning,
 }
