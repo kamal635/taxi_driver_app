@@ -31,49 +31,82 @@ class TripsSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: AppTypography.titleSm,
+          Row(
+            children: [
+              Container(
+                width: 42.r,
+                height: 42.r,
+                decoration: BoxDecoration(
+                  color: context.colors.primary.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(14.r),
+                  border: Border.all(color: context.colors.border),
+                ),
+                child: Icon(
+                  Icons.payments_rounded,
+                  size: 22.r,
+                  color: context.colors.textPrimary,
+                ),
+              ),
+              AppSpacing.w12,
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.titleSm,
+                ),
+              ),
+            ],
+          ),
+          AppSpacing.h14,
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+            decoration: BoxDecoration(
+              color: context.colors.success.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(18.r),
+              border: Border.all(
+                color: context.colors.success.withValues(alpha: 0.20),
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  earningsLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.subtitleSm.copyWith(
+                    color: context.colors.success,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                AppSpacing.h6,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    earningsText,
+                    textAlign: TextAlign.center,
+                    style: AppTypography.titleLg.copyWith(
+                      color: context.colors.success,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           AppSpacing.h12,
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final itemWidth = constraints.maxWidth >= 340.w
-                  ? (constraints.maxWidth - 10.w) / 2
-                  : constraints.maxWidth;
-
-              return Wrap(
-                spacing: 10.w,
-                runSpacing: 10.h,
-                children: [
-                  SizedBox(
-                    width: itemWidth,
-                    child: _TripsSummaryStat(
-                      icon: Icons.local_taxi_rounded,
-                      label: tripsCountLabel,
-                      value: tripsCountText,
-                    ),
-                  ),
-                  SizedBox(
-                    width: itemWidth,
-                    child: _TripsSummaryStat(
-                      icon: Icons.payments_rounded,
-                      label: earningsLabel,
-                      value: earningsText,
-                      valueColor: context.colors.success,
-                    ),
-                  ),
-                  SizedBox(
-                    width: itemWidth,
-                    child: _TripsSummaryStat(
-                      icon: Icons.query_stats_rounded,
-                      label: averageFareLabel,
-                      value: averageFareText,
-                    ),
-                  ),
-                ],
-              );
-            },
+          _SummaryInfoRow(
+            label: tripsCountLabel,
+            value: tripsCountText,
+            icon: Icons.local_taxi_rounded,
+          ),
+          AppSpacing.h8,
+          _SummaryInfoRow(
+            label: averageFareLabel,
+            value: averageFareText,
+            icon: Icons.query_stats_rounded,
           ),
         ],
       ),
@@ -81,23 +114,22 @@ class TripsSummaryCard extends StatelessWidget {
   }
 }
 
-class _TripsSummaryStat extends StatelessWidget {
-  const _TripsSummaryStat({
-    required this.icon,
+class _SummaryInfoRow extends StatelessWidget {
+  const _SummaryInfoRow({
     required this.label,
     required this.value,
-    this.valueColor,
+    required this.icon,
   });
 
-  final IconData icon;
   final String label;
   final String value;
-  final Color? valueColor;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(12.r),
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: context.colors.surfaceMuted,
         borderRadius: BorderRadius.circular(16.r),
@@ -105,42 +137,31 @@ class _TripsSummaryStat extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 38.r,
-            height: 38.r,
-            decoration: BoxDecoration(
-              color: context.colors.primary.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: context.colors.border),
-            ),
-            child: Icon(
-              icon,
-              size: 20.r,
-              color: context.colors.textPrimary,
+          Icon(
+            icon,
+            size: 18.r,
+            color: context.colors.iconMuted,
+          ),
+          AppSpacing.w10,
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.subtitleSm,
             ),
           ),
           AppSpacing.w12,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.subtitleSm,
-                ),
-                AppSpacing.h4,
-                Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.labelMd.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: valueColor ?? context.colors.textPrimary,
-                  ),
-                ),
-              ],
+          Flexible(
+            child: Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
+              style: AppTypography.labelMd.copyWith(
+                color: context.colors.textPrimary,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ),
         ],

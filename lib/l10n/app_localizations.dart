@@ -1669,6 +1669,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Important links'**
   String get aboutLinksSectionTitle;
+
+  /// No description provided for @tripsCommissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Office commission calculator'**
+  String get tripsCommissionTitle;
+
+  /// No description provided for @tripsCommissionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a trip date range and percentage to calculate the amount due.'**
+  String get tripsCommissionSubtitle;
+
+  /// No description provided for @tripsCommissionFromDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'From date'**
+  String get tripsCommissionFromDateLabel;
+
+  /// No description provided for @tripsCommissionToDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To date'**
+  String get tripsCommissionToDateLabel;
+
+  /// No description provided for @tripsCommissionDatePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get tripsCommissionDatePlaceholder;
+
+  /// No description provided for @tripsCommissionClearDatesAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear dates'**
+  String get tripsCommissionClearDatesAction;
+
+  /// No description provided for @tripsCommissionPercentageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Office percentage'**
+  String get tripsCommissionPercentageLabel;
+
+  /// No description provided for @tripsCommissionPercentageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: 8'**
+  String get tripsCommissionPercentageHint;
+
+  /// No description provided for @tripsCommissionSelectedTripsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected trips'**
+  String get tripsCommissionSelectedTripsLabel;
+
+  /// No description provided for @tripsCommissionSelectedTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected trips total'**
+  String get tripsCommissionSelectedTotalLabel;
+
+  /// No description provided for @tripsCommissionAmountDueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount due'**
+  String get tripsCommissionAmountDueLabel;
 }
 
 class _AppLocalizationsDelegate

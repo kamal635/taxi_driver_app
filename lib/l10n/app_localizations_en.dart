@@ -868,4 +868,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutLinksSectionTitle => 'Important links';
+
+  @override
+  String get tripsCommissionTitle => 'Office commission calculator';
+
+  @override
+  String get tripsCommissionSubtitle =>
+      'Choose a trip date range and percentage to calculate the amount due.';
+
+  @override
+  String get tripsCommissionFromDateLabel => 'From date';
+
+  @override
+  String get tripsCommissionToDateLabel => 'To date';
+
+  @override
+  String get tripsCommissionDatePlaceholder => 'Select';
+
+  @override
+  String get tripsCommissionClearDatesAction => 'Clear dates';
+
+  @override
+  String get tripsCommissionPercentageLabel => 'Office percentage';
+
+  @override
+  String get tripsCommissionPercentageHint => 'Example: 8';
+
+  @override
+  String get tripsCommissionSelectedTripsLabel => 'Selected trips';
+
+  @override
+  String get tripsCommissionSelectedTotalLabel => 'Selected trips total';
+
+  @override
+  String get tripsCommissionAmountDueLabel => 'Amount due';
 }

@@ -3,9 +3,9 @@ import 'package:bawabat_al_saeq/l10n/app_localizations.dart';
 
 /// Periods shown in the trips filter UI.
 ///
-/// The backend still supports [CompletedPeriod.all], but the driver-facing
-/// screen intentionally focuses on the three useful operational filters.
+/// The driver-facing screen includes all unpaid trips plus common date filters.
 const tripsVisiblePeriods = <CompletedPeriod>[
+  CompletedPeriod.all,
   CompletedPeriod.day,
   CompletedPeriod.week,
   CompletedPeriod.month,

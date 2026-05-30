@@ -1,10 +1,13 @@
+import 'dart:async' show unawaited;
+
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
-import 'package:bawabat_al_saeq/core/utils/price_formatter.dart';
 import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_entity.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/controllers/completed_offers_controller.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/formatters/trip_amount_formatter.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/listeners/trips_error_listener.dart';
+import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_commission_calculator_card.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_content_section.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_filter_dropdown.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_section_header.dart';
@@ -23,16 +26,28 @@ class TripsPage extends ConsumerWidget {
     final offers = result?.offers ?? const <CompletedOfferEntity>[];
     final tripsCount = result?.count ?? offers.length;
     final totalProfitsValue = _parsePriceValue(result?.totalProfits ?? '0');
-    final totalProfitsText = formatOrderPrice(
-      _formatNumberForPrice(totalProfitsValue),
-    );
+    final totalProfitsText = formatTripAmount(totalProfitsValue);
     final averageFareValue = tripsCount == 0
         ? 0
         : totalProfitsValue / tripsCount;
-    final averageFareText = formatOrderPrice(
-      _formatNumberForPrice(averageFareValue),
-    );
+    final averageFareText = formatTripAmount(averageFareValue);
     final currency = context.l10n.currencySyrianPound;
+    final commissionOffers = _filterOffersByDateRange(
+      offers: offers,
+      fromDate: tripsState.commissionFromDate,
+      toDate: tripsState.commissionToDate,
+    );
+    final commissionTotalValue = _calculateOffersTotal(commissionOffers);
+    final commissionPercentage = _parsePercentage(
+      tripsState.commissionPercentageText,
+    );
+    final commissionAmountValue =
+        commissionTotalValue * (commissionPercentage / 100);
+    final commissionDateRangeText = _formatCommissionDateRange(
+      context: context,
+      fromDate: tripsState.commissionFromDate,
+      toDate: tripsState.commissionToDate,
+    );
 
     return Stack(
       children: [
@@ -52,14 +67,28 @@ class TripsPage extends ConsumerWidget {
                     TripsSummaryCard(
                       title: context.l10n.tripsSummaryTitle,
                       tripsCountLabel: context.l10n.tripsSummaryTripsLabel,
-                      tripsCountText: context.l10n.tripsTotalTrips(tripsCount),
+                      tripsCountText: tripsCount.toString(),
                       earningsLabel: context.l10n.tripsSummaryEarningsLabel,
                       earningsText: '$currency $totalProfitsText',
                       averageFareLabel:
                           context.l10n.tripsSummaryAverageFareLabel,
                       averageFareText: '$currency $averageFareText',
                     ),
-                    AppSpacing.h14,
+                    AppSpacing.h12,
+                    TripsCommissionCalculatorEntryCard(
+                      title: context.l10n.tripsCommissionTitle,
+                      subtitle: context.l10n.tripsCommissionSubtitle,
+                      amountDueLabel:
+                          context.l10n.tripsCommissionAmountDueLabel,
+                      amountDueText:
+                          '''$currency ${formatTripAmount(commissionAmountValue)}''',
+                      selectedTripsText: context.l10n.tripsTotalTrips(
+                        commissionOffers.length,
+                      ),
+                      dateRangeText: commissionDateRangeText,
+                      onTap: () => _showCommissionCalculatorSheet(context),
+                    ),
+                    AppSpacing.h16,
                     TripsFilterDropdown(
                       value: tripsState.selectedPeriod,
                       enabled: tripsState.canChangePeriod,
@@ -108,25 +137,174 @@ class TripsPage extends ConsumerWidget {
   }
 }
 
-num _parsePriceValue(String rawValue) {
-  final trimmed = rawValue.trim();
-  if (trimmed.isEmpty) return 0;
+String? _formatCommissionDateRange({
+  required BuildContext context,
+  required DateTime? fromDate,
+  required DateTime? toDate,
+}) {
+  if (fromDate == null && toDate == null) return null;
 
-  final directValue = num.tryParse(trimmed.replaceAll(',', ''));
-  if (directValue != null) return directValue;
+  final l10n = context.l10n;
+  final localizations = MaterialLocalizations.of(context);
 
-  final cleaned = trimmed.replaceAll(RegExp('[^0-9,.-]'), '');
-  if (cleaned.isEmpty) return 0;
+  if (fromDate != null && toDate != null) {
+    return '${l10n.tripsCommissionFromDateLabel}: '
+        '${localizations.formatCompactDate(fromDate)} • '
+        '${l10n.tripsCommissionToDateLabel}: '
+        '${localizations.formatCompactDate(toDate)}';
+  }
 
-  final normalized = cleaned.contains(',') && cleaned.contains('.')
-      ? cleaned.replaceAll(',', '')
-      : cleaned.replaceAll(',', '.');
+  if (fromDate != null) {
+    return '${l10n.tripsCommissionFromDateLabel}: '
+        '${localizations.formatCompactDate(fromDate)}';
+  }
 
-  return num.tryParse(normalized) ?? 0;
+  return '${l10n.tripsCommissionToDateLabel}: '
+      '${localizations.formatCompactDate(toDate!)}';
 }
 
-String _formatNumberForPrice(num value) {
-  if (value.isNaN || value.isInfinite) return '0';
+void _showCommissionCalculatorSheet(BuildContext context) {
+  unawaited(
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _TripsCommissionCalculatorSheet(),
+    ),
+  );
+}
 
-  return value.round().toString();
+class _TripsCommissionCalculatorSheet extends ConsumerWidget {
+  const _TripsCommissionCalculatorSheet();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tripsState = ref.watch(completedOffersControllerProvider);
+    final tripsController = ref.read(
+      completedOffersControllerProvider.notifier,
+    );
+    final offers = tripsState.result?.offers ?? const <CompletedOfferEntity>[];
+    final commissionOffers = _filterOffersByDateRange(
+      offers: offers,
+      fromDate: tripsState.commissionFromDate,
+      toDate: tripsState.commissionToDate,
+    );
+    final commissionTotalValue = _calculateOffersTotal(commissionOffers);
+    final commissionPercentage = _parsePercentage(
+      tripsState.commissionPercentageText,
+    );
+    final commissionAmountValue =
+        commissionTotalValue * (commissionPercentage / 100);
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: context.colors.background,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(28.r),
+          ),
+        ),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 20.h),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 44.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: context.colors.border,
+                  borderRadius: BorderRadius.circular(999.r),
+                ),
+              ),
+              AppSpacing.h14,
+              TripsCommissionCalculatorCard(
+                fromDate: tripsState.commissionFromDate,
+                toDate: tripsState.commissionToDate,
+                percentageText: tripsState.commissionPercentageText,
+                currency: context.l10n.currencySyrianPound,
+                selectedTripsCount: commissionOffers.length,
+                selectedTripsTotalText: formatTripAmount(
+                  commissionTotalValue,
+                ),
+                commissionAmountText: formatTripAmount(
+                  commissionAmountValue,
+                ),
+                onFromDateChanged: tripsController.setCommissionFromDate,
+                onToDateChanged: tripsController.setCommissionToDate,
+                onClearDates: tripsController.clearCommissionDateRange,
+                onPercentageChanged:
+                    tripsController.setCommissionPercentageText,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+List<CompletedOfferEntity> _filterOffersByDateRange({
+  required List<CompletedOfferEntity> offers,
+  required DateTime? fromDate,
+  required DateTime? toDate,
+}) {
+  if (fromDate == null && toDate == null) return offers;
+
+  final normalizedFromDate = _dateOnly(fromDate);
+  final normalizedToDate = _endOfDay(toDate);
+
+  return offers
+      .where((offer) {
+        final tripDate = offer.updatedAt;
+        final isAfterStart =
+            normalizedFromDate == null ||
+            !tripDate.isBefore(normalizedFromDate);
+        final isBeforeEnd =
+            normalizedToDate == null || !tripDate.isAfter(normalizedToDate);
+
+        return isAfterStart && isBeforeEnd;
+      })
+      .toList(growable: false);
+}
+
+num _calculateOffersTotal(List<CompletedOfferEntity> offers) {
+  return offers.fold<num>(
+    0,
+    (total, offer) => total + parseTripAmount(offer.price),
+  );
+}
+
+num _parsePercentage(String rawValue) {
+  final normalized = rawValue.trim().replaceAll(',', '.');
+  final percentage = num.tryParse(normalized);
+
+  if (percentage == null || percentage.isNaN || percentage.isInfinite) {
+    return 0;
+  }
+
+  if (percentage < 0) return 0;
+  if (percentage > 100) return 100;
+
+  return percentage;
+}
+
+DateTime? _dateOnly(DateTime? value) {
+  if (value == null) return null;
+
+  return DateTime(value.year, value.month, value.day);
+}
+
+DateTime? _endOfDay(DateTime? value) {
+  if (value == null) return null;
+
+  return DateTime(value.year, value.month, value.day, 23, 59, 59, 999);
+}
+
+num _parsePriceValue(String rawValue) {
+  return parseTripAmount(rawValue);
 }

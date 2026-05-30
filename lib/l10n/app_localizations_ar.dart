@@ -857,4 +857,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get aboutLinksSectionTitle => 'الروابط المهمة';
+
+  @override
+  String get tripsCommissionTitle => 'حاسبة نسبة المكتب';
+
+  @override
+  String get tripsCommissionSubtitle =>
+      'حدد فترة الرحلات والنسبة لمعرفة المبلغ المطلوب دفعه.';
+
+  @override
+  String get tripsCommissionFromDateLabel => 'من تاريخ';
+
+  @override
+  String get tripsCommissionToDateLabel => 'إلى تاريخ';
+
+  @override
+  String get tripsCommissionDatePlaceholder => 'اختيار';
+
+  @override
+  String get tripsCommissionClearDatesAction => 'مسح التواريخ';
+
+  @override
+  String get tripsCommissionPercentageLabel => 'نسبة المكتب';
+
+  @override
+  String get tripsCommissionPercentageHint => 'مثال: 8';
+
+  @override
+  String get tripsCommissionSelectedTripsLabel => 'الرحلات المحددة';
+
+  @override
+  String get tripsCommissionSelectedTotalLabel => 'إجمالي الرحلات المحددة';
+
+  @override
+  String get tripsCommissionAmountDueLabel => 'المبلغ المطلوب دفعه';
 }

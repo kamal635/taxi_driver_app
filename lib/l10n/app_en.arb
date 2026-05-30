@@ -413,5 +413,16 @@
   "aboutVersionLabel": "Version",
   "aboutVersionUnavailable": "Unavailable",
   "profileAboutPageSubtitle": "View app information, help links, and policies.",
-  "aboutLinksSectionTitle": "Important links"
+  "aboutLinksSectionTitle": "Important links",
+  "tripsCommissionTitle": "Office commission calculator",
+"tripsCommissionSubtitle": "Choose a trip date range and percentage to calculate the amount due.",
+"tripsCommissionFromDateLabel": "From date",
+"tripsCommissionToDateLabel": "To date",
+"tripsCommissionDatePlaceholder": "Select",
+"tripsCommissionClearDatesAction": "Clear dates",
+"tripsCommissionPercentageLabel": "Office percentage",
+"tripsCommissionPercentageHint": "Example: 8",
+"tripsCommissionSelectedTripsLabel": "Selected trips",
+"tripsCommissionSelectedTotalLabel": "Selected trips total",
+"tripsCommissionAmountDueLabel": "Amount due"
 }

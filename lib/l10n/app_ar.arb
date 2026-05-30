@@ -413,5 +413,16 @@
   "aboutVersionLabel": "رقم الإصدار",
   "aboutVersionUnavailable": "غير متوفر",
   "profileAboutPageSubtitle": "تعرّف على معلومات التطبيق وروابط المساعدة والسياسات.",
-  "aboutLinksSectionTitle": "الروابط المهمة"
+  "aboutLinksSectionTitle": "الروابط المهمة",
+  "tripsCommissionTitle": "حاسبة نسبة المكتب",
+"tripsCommissionSubtitle": "حدد فترة الرحلات والنسبة لمعرفة المبلغ المطلوب دفعه.",
+"tripsCommissionFromDateLabel": "من تاريخ",
+"tripsCommissionToDateLabel": "إلى تاريخ",
+"tripsCommissionDatePlaceholder": "اختيار",
+"tripsCommissionClearDatesAction": "مسح التواريخ",
+"tripsCommissionPercentageLabel": "نسبة المكتب",
+"tripsCommissionPercentageHint": "مثال: 8",
+"tripsCommissionSelectedTripsLabel": "الرحلات المحددة",
+"tripsCommissionSelectedTotalLabel": "إجمالي الرحلات المحددة",
+"tripsCommissionAmountDueLabel": "المبلغ المطلوب دفعه"
 }
