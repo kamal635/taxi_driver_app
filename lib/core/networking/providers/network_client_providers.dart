@@ -3,7 +3,7 @@ import 'package:bawabat_al_saeq/core/networking/config/network_constants.dart';
 import 'package:bawabat_al_saeq/core/networking/interceptors/auth_header_interceptor.dart';
 import 'package:bawabat_al_saeq/core/networking/interceptors/session_refresh_interceptor.dart';
 import 'package:bawabat_al_saeq/core/networking/refresh/session_refresh_service.dart';
-import 'package:bawabat_al_saeq/core/session/app_sign_out_service.dart';
+import 'package:bawabat_al_saeq/core/session/session_expiration_handler.dart';
 import 'package:bawabat_al_saeq/core/session/session_providers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -34,7 +34,7 @@ final dioProvider = Provider<Dio>((ref) {
         dio: dio,
         authSession: authSession,
         sessionRefreshService: ref.read(sessionRefreshServiceProvider),
-        appSignOutService: ref.read(appSignOutServiceProvider),
+        sessionExpirationHandler: ref.read(sessionExpirationHandlerProvider),
       ),
     );
 

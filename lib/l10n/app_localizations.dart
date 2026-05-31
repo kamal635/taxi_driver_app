@@ -260,6 +260,12 @@ abstract class AppLocalizations {
   /// **'Turn availability on to start receiving nearby ride requests'**
   String get homeAvailabilityOffSubtitle;
 
+  /// No description provided for @homeEnableAvailabilityAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn availability on'**
+  String get homeEnableAvailabilityAction;
+
   /// No description provided for @actionConfirm.
   ///
   /// In en, this message translates to:
@@ -464,6 +470,12 @@ abstract class AppLocalizations {
   /// **'Earnings'**
   String get tripsSummaryEarningsLabel;
 
+  /// No description provided for @tripsSummaryAverageFareLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Average fare'**
+  String get tripsSummaryAverageFareLabel;
+
   /// No description provided for @tripsFilterAll.
   ///
   /// In en, this message translates to:
@@ -475,6 +487,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Today'**
   String get tripsFilterToday;
+
+  /// No description provided for @tripsFilterLast7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 days'**
+  String get tripsFilterLast7Days;
+
+  /// No description provided for @tripsFilterThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get tripsFilterThisMonth;
 
   /// No description provided for @tripsFilterWeek.
   ///
@@ -584,6 +608,24 @@ abstract class AppLocalizations {
   /// **'Secure your account'**
   String get profileChangePasswordSubtitle;
 
+  /// Title for the dark mode toggle option on the profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode'**
+  String get profileDarkModeTitle;
+
+  /// Subtitle shown when dark mode is currently enabled
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled now, tap to switch to light mode'**
+  String get profileDarkModeEnabledSubtitle;
+
+  /// Subtitle shown when dark mode is currently disabled
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled now, tap to switch to dark mode'**
+  String get profileDarkModeDisabledSubtitle;
+
   /// No description provided for @profileMyVehiclesTitle.
   ///
   /// In en, this message translates to:
@@ -623,8 +665,14 @@ abstract class AppLocalizations {
   /// No description provided for @signOutConfirmMessage.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to sign out from this account?'**
+  /// **'You will not receive new requests after signing out. Do you want to continue?'**
   String get signOutConfirmMessage;
+
+  /// No description provided for @signOutOnlineConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You are currently available to receive requests. Your availability will be turned off first, then you will be signed out. Do you want to continue?'**
+  String get signOutOnlineConfirmMessage;
 
   /// No description provided for @signOutConfirmTitle.
   ///
@@ -1309,6 +1357,384 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Check the current version and available updates'**
   String get profileAppUpdateEntrySubtitle;
+
+  /// No description provided for @connectionOfflineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection'**
+  String get connectionOfflineTitle;
+
+  /// No description provided for @connectionOfflineSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Requests will update when the connection is restored.'**
+  String get connectionOfflineSubtitle;
+
+  /// No description provided for @connectionRestoredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection restored'**
+  String get connectionRestoredTitle;
+
+  /// No description provided for @connectionRestoredSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You can now receive updates again.'**
+  String get connectionRestoredSubtitle;
+
+  /// No description provided for @profileAppearanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get profileAppearanceTitle;
+
+  /// No description provided for @profileAppearancePageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how the app should look.'**
+  String get profileAppearancePageSubtitle;
+
+  /// No description provided for @profileAppearanceSystemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use system settings'**
+  String get profileAppearanceSystemTitle;
+
+  /// No description provided for @profileAppearanceSystemSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The app follows your device appearance automatically.'**
+  String get profileAppearanceSystemSubtitle;
+
+  /// No description provided for @profileAppearanceLightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Light mode'**
+  String get profileAppearanceLightTitle;
+
+  /// No description provided for @profileAppearanceLightSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Always use the light appearance.'**
+  String get profileAppearanceLightSubtitle;
+
+  /// No description provided for @profileAppearanceDarkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode'**
+  String get profileAppearanceDarkTitle;
+
+  /// No description provided for @profileAppearanceDarkSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Always use the dark appearance.'**
+  String get profileAppearanceDarkSubtitle;
+
+  /// No description provided for @profileLanguageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get profileLanguageTitle;
+
+  /// No description provided for @profileLanguagePageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the language you want to use in the app.'**
+  String get profileLanguagePageSubtitle;
+
+  /// No description provided for @profileLanguageArabicSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get profileLanguageArabicSubtitle;
+
+  /// No description provided for @profileLanguageArabicOptionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Arabic and right-to-left layout.'**
+  String get profileLanguageArabicOptionSubtitle;
+
+  /// No description provided for @profileLanguageEnglishSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get profileLanguageEnglishSubtitle;
+
+  /// No description provided for @profileLanguageEnglishOptionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use English and left-to-right layout.'**
+  String get profileLanguageEnglishOptionSubtitle;
+
+  /// No description provided for @profileLocationStatusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location status'**
+  String get profileLocationStatusTitle;
+
+  /// No description provided for @profileLocationStatusSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the location settings needed to receive requests.'**
+  String get profileLocationStatusSubtitle;
+
+  /// No description provided for @profileLocationStatusPageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is required to receive nearby requests and track trips while you are available. Background location is optional and only improves tracking when the app is closed.'**
+  String get profileLocationStatusPageSubtitle;
+
+  /// No description provided for @locationStatusServiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location services'**
+  String get locationStatusServiceTitle;
+
+  /// No description provided for @locationStatusServiceEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are enabled on this device.'**
+  String get locationStatusServiceEnabled;
+
+  /// No description provided for @locationStatusServiceDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are disabled. Turn them on so the app can detect your location.'**
+  String get locationStatusServiceDisabled;
+
+  /// No description provided for @locationStatusPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission'**
+  String get locationStatusPermissionTitle;
+
+  /// No description provided for @locationStatusPermissionAlways.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is always allowed.'**
+  String get locationStatusPermissionAlways;
+
+  /// No description provided for @locationStatusPermissionWhileInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is allowed while using the app, which is enough to turn availability on.'**
+  String get locationStatusPermissionWhileInUse;
+
+  /// No description provided for @locationStatusPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is not granted.'**
+  String get locationStatusPermissionDenied;
+
+  /// No description provided for @locationStatusPermissionDeniedForever.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is permanently denied. Open app settings to enable it.'**
+  String get locationStatusPermissionDeniedForever;
+
+  /// No description provided for @locationStatusPermissionUnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to determine the location permission status.'**
+  String get locationStatusPermissionUnable;
+
+  /// No description provided for @locationStatusBackgroundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Background location'**
+  String get locationStatusBackgroundTitle;
+
+  /// No description provided for @locationStatusBackgroundGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Background location is available and ready.'**
+  String get locationStatusBackgroundGranted;
+
+  /// No description provided for @locationStatusBackgroundMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional: enable background location to improve tracking when the app is closed.'**
+  String get locationStatusBackgroundMissing;
+
+  /// No description provided for @locationStatusReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is ready for requests'**
+  String get locationStatusReadyTitle;
+
+  /// No description provided for @locationStatusNeedsAttentionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location needs attention'**
+  String get locationStatusNeedsAttentionTitle;
+
+  /// No description provided for @locationStatusWhyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We need your location to find nearby requests and track trips accurately while you are available. Background location is optional.'**
+  String get locationStatusWhyMessage;
+
+  /// No description provided for @locationStatusRefreshAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh status'**
+  String get locationStatusRefreshAction;
+
+  /// No description provided for @locationStatusRequestPermissionAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Request location permission'**
+  String get locationStatusRequestPermissionAction;
+
+  /// No description provided for @locationStatusOpenAppSettingsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open app settings'**
+  String get locationStatusOpenAppSettingsAction;
+
+  /// No description provided for @locationStatusOpenLocationSettingsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open location settings'**
+  String get locationStatusOpenLocationSettingsAction;
+
+  /// No description provided for @locationStatusChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking location status...'**
+  String get locationStatusChecking;
+
+  /// No description provided for @locationStatusCheckFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check location status'**
+  String get locationStatusCheckFailedTitle;
+
+  /// No description provided for @locationStatusCheckFailedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong while checking location settings. Try refreshing again.'**
+  String get locationStatusCheckFailedSubtitle;
+
+  /// No description provided for @locationBackgroundPermissionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'You can enable background location to improve tracking, but it is not required to turn availability on.'**
+  String get locationBackgroundPermissionRequired;
+
+  /// No description provided for @profileAboutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About app'**
+  String get profileAboutTitle;
+
+  /// No description provided for @profileAboutSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App information and important links'**
+  String get profileAboutSubtitle;
+
+  /// No description provided for @aboutSupportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact support'**
+  String get aboutSupportTitle;
+
+  /// No description provided for @aboutSupportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get help or send your inquiry to the support team'**
+  String get aboutSupportSubtitle;
+
+  /// No description provided for @aboutVersionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get aboutVersionLabel;
+
+  /// No description provided for @aboutVersionUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable'**
+  String get aboutVersionUnavailable;
+
+  /// No description provided for @profileAboutPageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View app information, help links, and policies.'**
+  String get profileAboutPageSubtitle;
+
+  /// No description provided for @aboutLinksSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Important links'**
+  String get aboutLinksSectionTitle;
+
+  /// No description provided for @tripsCommissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Office commission calculator'**
+  String get tripsCommissionTitle;
+
+  /// No description provided for @tripsCommissionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a trip date range and percentage to calculate the amount due.'**
+  String get tripsCommissionSubtitle;
+
+  /// No description provided for @tripsCommissionFromDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'From date'**
+  String get tripsCommissionFromDateLabel;
+
+  /// No description provided for @tripsCommissionToDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To date'**
+  String get tripsCommissionToDateLabel;
+
+  /// No description provided for @tripsCommissionDatePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get tripsCommissionDatePlaceholder;
+
+  /// No description provided for @tripsCommissionClearDatesAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear dates'**
+  String get tripsCommissionClearDatesAction;
+
+  /// No description provided for @tripsCommissionPercentageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Office percentage'**
+  String get tripsCommissionPercentageLabel;
+
+  /// No description provided for @tripsCommissionPercentageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: 8'**
+  String get tripsCommissionPercentageHint;
+
+  /// No description provided for @tripsCommissionSelectedTripsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected trips'**
+  String get tripsCommissionSelectedTripsLabel;
+
+  /// No description provided for @tripsCommissionSelectedTotalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected trips total'**
+  String get tripsCommissionSelectedTotalLabel;
+
+  /// No description provided for @tripsCommissionAmountDueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount due'**
+  String get tripsCommissionAmountDueLabel;
 }
 
 class _AppLocalizationsDelegate

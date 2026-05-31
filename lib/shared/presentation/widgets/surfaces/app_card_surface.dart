@@ -1,11 +1,12 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// Shared rounded card surface used by feature screens.
 ///
-/// Keeps card styling consistent across auth, profile, trips, and other
-/// presentation widgets while still allowing small layout overrides.
+/// The defaults match the common app card style. The optional shadow and size
+/// parameters cover home/trips/profile variants without creating local wrapper
+/// widgets for every feature.
 class AppCardSurface extends StatelessWidget {
   const AppCardSurface({
     required this.child,
@@ -14,6 +15,9 @@ class AppCardSurface extends StatelessWidget {
     this.borderColor,
     this.borderRadius,
     this.enableShadow = true,
+    this.shadowBlurRadius,
+    this.shadowOffset,
+    this.width,
     super.key,
   });
 
@@ -23,22 +27,26 @@ class AppCardSurface extends StatelessWidget {
   final Color? borderColor;
   final double? borderRadius;
   final bool enableShadow;
+  final double? shadowBlurRadius;
+  final Offset? shadowOffset;
+  final double? width;
 
   @override
   Widget build(BuildContext context) {
     final radius = borderRadius ?? 20.r;
 
-    return DecoratedBox(
+    return Container(
+      width: width,
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.surface,
+        color: backgroundColor ?? context.colors.surface,
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: borderColor ?? AppColors.border),
+        border: Border.all(color: borderColor ?? context.colors.border),
         boxShadow: enableShadow
             ? [
                 BoxShadow(
-                  blurRadius: 16.r,
-                  offset: Offset(0, 8.h),
-                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: shadowBlurRadius ?? 16.r,
+                  offset: shadowOffset ?? Offset(0, 8.h),
+                  color: context.colors.shadow,
                 ),
               ]
             : null,

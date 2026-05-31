@@ -1,10 +1,11 @@
-import 'dart:async' show FutureOr, StreamSubscription, Timer, unawaited;
-import 'dart:convert';
+import 'dart:async' show FutureOr, StreamSubscription, unawaited;
 
 import 'package:bawabat_al_saeq/features/availability/data/datasources/android/driver_background_service_bridge.dart';
 import 'package:bawabat_al_saeq/features/availability/presentation/providers/availability_providers.dart';
-import 'package:bawabat_al_saeq/features/home/data/models/offer_model.dart';
 import 'package:bawabat_al_saeq/features/home/domain/entities/offer_entity.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/parsers/new_offer_payload_parser.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/services/pending_offer_actionability.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/services/pending_offer_expiry_scheduler.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/state/new_offer_state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,11 +16,13 @@ final newOfferControllerProvider =
     );
 
 final class NewOfferController extends AsyncNotifier<NewOfferState> {
+  final NewOfferPayloadParser _payloadParser = const NewOfferPayloadParser();
+  final PendingOfferExpiryScheduler _expiryScheduler =
+      PendingOfferExpiryScheduler();
+
   StreamSubscription<DriverBackgroundOfferEvent>? _offerEventsSubscription;
   StreamSubscription<DriverOfferNotificationOpenEvent>?
   _offerNotificationOpenSubscription;
-
-  Timer? _expiryTimer;
 
   @override
   FutureOr<NewOfferState> build() {
@@ -33,15 +36,7 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       _handleOfferNotificationOpened,
     );
 
-    ref.onDispose(() {
-      unawaited(_offerEventsSubscription?.cancel());
-      _offerEventsSubscription = null;
-
-      unawaited(_offerNotificationOpenSubscription?.cancel());
-      _offerNotificationOpenSubscription = null;
-
-      _cancelExpiryTimer();
-    });
+    ref.onDispose(_disposeSubscriptions);
 
     return const NewOfferState();
   }
@@ -50,7 +45,7 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       state.asData?.value ?? const NewOfferState();
 
   void clearCurrent() {
-    _cancelExpiryTimer();
+    _expiryScheduler.cancel();
     _stopNativeOfferAlert();
 
     state = AsyncData(
@@ -59,9 +54,7 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
   }
 
   void clearError() {
-    state = AsyncData(
-      _currentState.copyWith(errorMessage: null),
-    );
+    state = AsyncData(_currentState.copyWith(errorMessage: null));
   }
 
   void restoreFromNotificationPayload(String payloadJson) {
@@ -97,56 +90,39 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     required String source,
   }) {
     try {
-      final offer = _parseOfferFromPayload(payloadJson);
+      final offer = _payloadParser.parse(payloadJson);
       _storeOfferIfActionable(offer, source: source);
     } on Exception catch (error, stackTrace) {
-      state = AsyncData(
-        _currentState.copyWith(errorMessage: error.toString()),
-      );
-
+      state = AsyncData(_currentState.copyWith(errorMessage: error.toString()));
       debugPrint('Failed to parse $source: $error\n$stackTrace');
     }
-  }
-
-  NewOfferEntity _parseOfferFromPayload(String payloadJson) {
-    final decoded = jsonDecode(payloadJson);
-
-    if (decoded is! Map) {
-      throw const FormatException('Offer payload is not a JSON object.');
-    }
-
-    final json = Map<String, dynamic>.from(decoded);
-    final model = NewOfferModel.fromJson(json);
-
-    return model.toEntity();
   }
 
   void _storeOfferIfActionable(
     NewOfferEntity offer, {
     required String source,
   }) {
-    if (_isExpired(offer)) {
+    if (isPendingOfferExpired(offer)) {
       _handleExpiredIncomingOffer(offer, source: source);
       return;
     }
 
-    final activeOffer = _currentState.currentOffer;
-    final hasDifferentActiveOffer =
-        activeOffer != null &&
-        activeOffer.offerId != offer.offerId &&
-        !_isExpired(activeOffer);
-
-    if (hasDifferentActiveOffer) {
+    if (hasDifferentActivePendingOffer(
+      activeOffer: _currentState.currentOffer,
+      incomingOffer: offer,
+    )) {
       debugPrint(
         'Incoming offer ignored because another pending offer is active '
-        '-> active=${activeOffer.offerId}, incoming=${offer.offerId}, '
-        'source=$source',
+        '-> active=${_currentState.currentOffer?.offerId}, '
+        'incoming=${offer.offerId}, source=$source',
       );
       return;
     }
 
-    _cancelExpiryTimer();
-    _scheduleExpiryTimer(offer);
+    _expiryScheduler.schedule(
+      offer: offer,
+      onExpired: _expireCurrentOfferIfMatching,
+    );
 
     state = AsyncData(
       _currentState.copyWith(
@@ -176,29 +152,14 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     );
   }
 
-  void _scheduleExpiryTimer(NewOfferEntity offer) {
-    final remaining = offer.expiresAt.difference(DateTime.now());
+  void _expireCurrentOfferIfMatching(NewOfferEntity offer) {
+    final currentOffer = state.asData?.value.currentOffer;
+    if (currentOffer?.offerId != offer.offerId) return;
 
-    if (remaining <= Duration.zero) {
-      clearCurrent();
-      return;
-    }
+    _stopNativeOfferAlert();
+    state = AsyncData(_currentState.copyWith(currentOffer: null));
 
-    _expiryTimer = Timer(remaining, () {
-      final currentOffer = state.asData?.value.currentOffer;
-      if (currentOffer?.offerId != offer.offerId) return;
-
-      _stopNativeOfferAlert();
-
-      state = AsyncData(_currentState.copyWith(currentOffer: null));
-
-      debugPrint('Pending offer expired locally -> id=${offer.offerId}');
-    });
-  }
-
-  void _cancelExpiryTimer() {
-    _expiryTimer?.cancel();
-    _expiryTimer = null;
+    debugPrint('Pending offer expired locally -> id=${offer.offerId}');
   }
 
   void _stopNativeOfferAlert() {
@@ -207,7 +168,13 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     );
   }
 
-  bool _isExpired(NewOfferEntity offer) {
-    return !offer.expiresAt.isAfter(DateTime.now());
+  void _disposeSubscriptions() {
+    unawaited(_offerEventsSubscription?.cancel());
+    _offerEventsSubscription = null;
+
+    unawaited(_offerNotificationOpenSubscription?.cancel());
+    _offerNotificationOpenSubscription = null;
+
+    _expiryScheduler.dispose();
   }
 }

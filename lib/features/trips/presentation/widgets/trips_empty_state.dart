@@ -1,7 +1,7 @@
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
-import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_card_surface.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/surfaces/app_card_surface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -19,7 +19,7 @@ class TripsEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TripsCardSurface(
+    return AppCardSurface(
       child: Column(
         children: [
           Container(
@@ -27,15 +27,15 @@ class TripsEmptyState extends StatelessWidget {
             height: 96.r,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primary.withValues(alpha: 0.14),
+              color: context.colors.primary.withValues(alpha: 0.14),
               border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.30),
+                color: context.colors.primary.withValues(alpha: 0.30),
               ),
             ),
             child: Icon(
               icon,
               size: 34.r,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           AppSpacing.h12,

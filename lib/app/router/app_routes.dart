@@ -14,4 +14,9 @@ abstract final class AppRoutes {
   static const String trips = AppRoutePaths.trips;
   static const String profile = AppRoutePaths.profile;
   static const String profilePassword = AppRoutePaths.profilePassword;
+  static const String profileLanguage = AppRoutePaths.profileLanguage;
+  static const String profileAppearance = AppRoutePaths.profileAppearance;
+  static const String profileLocationStatus =
+      AppRoutePaths.profileLocationStatus;
+  static const String profileAbout = AppRoutePaths.profileAbout;
 }

@@ -5,4 +5,5 @@ abstract final class AppLinks {
   static const String dashboard = 'https://taxi-dashboard.laithroom.com';
   static const String privacyPolicy = '$dashboard/privacy-policy';
   static const String termsAndConditions = '$dashboard/terms-conditions';
+  static const String support = '$dashboard/support';
 }

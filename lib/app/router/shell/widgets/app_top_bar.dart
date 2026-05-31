@@ -1,17 +1,17 @@
 import 'dart:async' show unawaited;
 import 'dart:io';
 
-import 'package:bawabat_al_saeq/app/theme/app_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
+import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/avatar/avatar_controller.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/extensions/snackbar_x.dart';
 import 'package:bawabat_al_saeq/core/session/session_providers.dart';
-import 'package:bawabat_al_saeq/core/widgets/pill_switch.dart';
 import 'package:bawabat_al_saeq/features/availability/presentation/controllers/availability_controller.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/controllers/accept_offer_controller.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/providers/offer_providers.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/switches/pill_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -66,6 +66,7 @@ class AppTopBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final colors = context.colors;
 
     final (:isOnline, :isBusy) = ref.watch(
       availabilityProvider.select(
@@ -86,6 +87,9 @@ class AppTopBar extends ConsumerWidget {
     );
     final initial = displayName.isNotEmpty ? displayName[0] : '—';
     final hasAvatar = avatarPath != null && avatarPath.isNotEmpty;
+    final initialsStyle = AppTypography.labelMd.copyWith(
+      color: colors.textPrimary,
+    );
 
     return Row(
       children: [
@@ -105,7 +109,9 @@ class AppTopBar extends ConsumerWidget {
           child: Text(
             title,
             textAlign: TextAlign.center,
-            style: AppTypography.titleSm,
+            style: AppTypography.titleSm.copyWith(
+              color: colors.textPrimary,
+            ),
           ),
         ),
         AppSpacing.w12,
@@ -116,8 +122,8 @@ class AppTopBar extends ConsumerWidget {
             height: 38.r,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.primary, width: 2),
-              color: AppColors.white,
+              border: Border.all(color: colors.primary, width: 2),
+              color: colors.surface,
             ),
             alignment: Alignment.center,
             child: hasAvatar
@@ -128,11 +134,11 @@ class AppTopBar extends ConsumerWidget {
                       height: 38.r,
                       fit: BoxFit.cover,
                       errorBuilder: (_, _, _) {
-                        return Text(initial, style: AppTypography.labelMd);
+                        return Text(initial, style: initialsStyle);
                       },
                     ),
                   )
-                : Text(initial, style: AppTypography.labelMd),
+                : Text(initial, style: initialsStyle),
           ),
         ),
       ],

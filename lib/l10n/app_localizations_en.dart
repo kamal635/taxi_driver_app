@@ -92,6 +92,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Turn availability on to start receiving nearby ride requests';
 
   @override
+  String get homeEnableAvailabilityAction => 'Turn availability on';
+
+  @override
   String get actionConfirm => 'Confirm';
 
   @override
@@ -199,10 +202,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripsSummaryEarningsLabel => 'Earnings';
 
   @override
+  String get tripsSummaryAverageFareLabel => 'Average fare';
+
+  @override
   String get tripsFilterAll => 'All';
 
   @override
   String get tripsFilterToday => 'Today';
+
+  @override
+  String get tripsFilterLast7Days => 'Last 7 days';
+
+  @override
+  String get tripsFilterThisMonth => 'This month';
 
   @override
   String get tripsFilterWeek => 'Week';
@@ -260,6 +272,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileChangePasswordSubtitle => 'Secure your account';
 
   @override
+  String get profileDarkModeTitle => 'Dark mode';
+
+  @override
+  String get profileDarkModeEnabledSubtitle =>
+      'Enabled now, tap to switch to light mode';
+
+  @override
+  String get profileDarkModeDisabledSubtitle =>
+      'Disabled now, tap to switch to dark mode';
+
+  @override
   String get profileMyVehiclesTitle => 'My vehicles';
 
   @override
@@ -279,7 +302,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signOutConfirmMessage =>
-      'Are you sure you want to sign out from this account?';
+      'You will not receive new requests after signing out. Do you want to continue?';
+
+  @override
+  String get signOutOnlineConfirmMessage =>
+      'You are currently available to receive requests. Your availability will be turned off first, then you will be signed out. Do you want to continue?';
 
   @override
   String get signOutConfirmTitle => 'Sign out?';
@@ -660,4 +687,219 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profileAppUpdateEntrySubtitle =>
       'Check the current version and available updates';
+
+  @override
+  String get connectionOfflineTitle => 'No internet connection';
+
+  @override
+  String get connectionOfflineSubtitle =>
+      'Requests will update when the connection is restored.';
+
+  @override
+  String get connectionRestoredTitle => 'Connection restored';
+
+  @override
+  String get connectionRestoredSubtitle => 'You can now receive updates again.';
+
+  @override
+  String get profileAppearanceTitle => 'Appearance';
+
+  @override
+  String get profileAppearancePageSubtitle => 'Choose how the app should look.';
+
+  @override
+  String get profileAppearanceSystemTitle => 'Use system settings';
+
+  @override
+  String get profileAppearanceSystemSubtitle =>
+      'The app follows your device appearance automatically.';
+
+  @override
+  String get profileAppearanceLightTitle => 'Light mode';
+
+  @override
+  String get profileAppearanceLightSubtitle =>
+      'Always use the light appearance.';
+
+  @override
+  String get profileAppearanceDarkTitle => 'Dark mode';
+
+  @override
+  String get profileAppearanceDarkSubtitle => 'Always use the dark appearance.';
+
+  @override
+  String get profileLanguageTitle => 'Language';
+
+  @override
+  String get profileLanguagePageSubtitle =>
+      'Choose the language you want to use in the app.';
+
+  @override
+  String get profileLanguageArabicSubtitle => 'Arabic';
+
+  @override
+  String get profileLanguageArabicOptionSubtitle =>
+      'Use Arabic and right-to-left layout.';
+
+  @override
+  String get profileLanguageEnglishSubtitle => 'English';
+
+  @override
+  String get profileLanguageEnglishOptionSubtitle =>
+      'Use English and left-to-right layout.';
+
+  @override
+  String get profileLocationStatusTitle => 'Location status';
+
+  @override
+  String get profileLocationStatusSubtitle =>
+      'Check the location settings needed to receive requests.';
+
+  @override
+  String get profileLocationStatusPageSubtitle =>
+      'Location is required to receive nearby requests and track trips while you are available. Background location is optional and only improves tracking when the app is closed.';
+
+  @override
+  String get locationStatusServiceTitle => 'Location services';
+
+  @override
+  String get locationStatusServiceEnabled =>
+      'Location services are enabled on this device.';
+
+  @override
+  String get locationStatusServiceDisabled =>
+      'Location services are disabled. Turn them on so the app can detect your location.';
+
+  @override
+  String get locationStatusPermissionTitle => 'Location permission';
+
+  @override
+  String get locationStatusPermissionAlways =>
+      'Location permission is always allowed.';
+
+  @override
+  String get locationStatusPermissionWhileInUse =>
+      'Location is allowed while using the app, which is enough to turn availability on.';
+
+  @override
+  String get locationStatusPermissionDenied =>
+      'Location permission is not granted.';
+
+  @override
+  String get locationStatusPermissionDeniedForever =>
+      'Location permission is permanently denied. Open app settings to enable it.';
+
+  @override
+  String get locationStatusPermissionUnable =>
+      'Unable to determine the location permission status.';
+
+  @override
+  String get locationStatusBackgroundTitle => 'Background location';
+
+  @override
+  String get locationStatusBackgroundGranted =>
+      'Background location is available and ready.';
+
+  @override
+  String get locationStatusBackgroundMissing =>
+      'Optional: enable background location to improve tracking when the app is closed.';
+
+  @override
+  String get locationStatusReadyTitle => 'Location is ready for requests';
+
+  @override
+  String get locationStatusNeedsAttentionTitle => 'Location needs attention';
+
+  @override
+  String get locationStatusWhyMessage =>
+      'We need your location to find nearby requests and track trips accurately while you are available. Background location is optional.';
+
+  @override
+  String get locationStatusRefreshAction => 'Refresh status';
+
+  @override
+  String get locationStatusRequestPermissionAction =>
+      'Request location permission';
+
+  @override
+  String get locationStatusOpenAppSettingsAction => 'Open app settings';
+
+  @override
+  String get locationStatusOpenLocationSettingsAction =>
+      'Open location settings';
+
+  @override
+  String get locationStatusChecking => 'Checking location status...';
+
+  @override
+  String get locationStatusCheckFailedTitle =>
+      'Could not check location status';
+
+  @override
+  String get locationStatusCheckFailedSubtitle =>
+      'Something went wrong while checking location settings. Try refreshing again.';
+
+  @override
+  String get locationBackgroundPermissionRequired =>
+      'You can enable background location to improve tracking, but it is not required to turn availability on.';
+
+  @override
+  String get profileAboutTitle => 'About app';
+
+  @override
+  String get profileAboutSubtitle => 'App information and important links';
+
+  @override
+  String get aboutSupportTitle => 'Contact support';
+
+  @override
+  String get aboutSupportSubtitle =>
+      'Get help or send your inquiry to the support team';
+
+  @override
+  String get aboutVersionLabel => 'Version';
+
+  @override
+  String get aboutVersionUnavailable => 'Unavailable';
+
+  @override
+  String get profileAboutPageSubtitle =>
+      'View app information, help links, and policies.';
+
+  @override
+  String get aboutLinksSectionTitle => 'Important links';
+
+  @override
+  String get tripsCommissionTitle => 'Office commission calculator';
+
+  @override
+  String get tripsCommissionSubtitle =>
+      'Choose a trip date range and percentage to calculate the amount due.';
+
+  @override
+  String get tripsCommissionFromDateLabel => 'From date';
+
+  @override
+  String get tripsCommissionToDateLabel => 'To date';
+
+  @override
+  String get tripsCommissionDatePlaceholder => 'Select';
+
+  @override
+  String get tripsCommissionClearDatesAction => 'Clear dates';
+
+  @override
+  String get tripsCommissionPercentageLabel => 'Office percentage';
+
+  @override
+  String get tripsCommissionPercentageHint => 'Example: 8';
+
+  @override
+  String get tripsCommissionSelectedTripsLabel => 'Selected trips';
+
+  @override
+  String get tripsCommissionSelectedTotalLabel => 'Selected trips total';
+
+  @override
+  String get tripsCommissionAmountDueLabel => 'Amount due';
 }

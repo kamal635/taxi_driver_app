@@ -14,6 +14,11 @@ final class StartLocationTrackingUseCase {
   final LocationService _locationService;
 
   Future<LocationReadyResult> call() async {
+    // Turning availability on should only require location service + foreground
+    // location permission. Background location is shown as a recommendation in
+    // the location status page, but it should not block the driver from going
+    // online because Android requires enabling "Allow all the time" from
+    // system settings manually.
     final readyResult = await _locationService.ensureReady();
 
     if (!readyResult.isSuccess) {

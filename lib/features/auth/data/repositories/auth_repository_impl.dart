@@ -1,4 +1,4 @@
-import 'package:bawabat_al_saeq/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:bawabat_al_saeq/features/auth/data/datasources/remote/auth_remote_data_source.dart';
 import 'package:bawabat_al_saeq/features/auth/domain/entities/auth_sign_in_result.dart';
 import 'package:bawabat_al_saeq/features/auth/domain/repositories/auth_repository.dart';
 

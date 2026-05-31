@@ -7,11 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Listens for password-change results when the listener is mounted separately.
-///
-/// Most password-change flows can listen inside the page itself. This widget is
-/// kept for route/shell compositions that prefer side-effect listeners as
-/// separate mounted widgets.
 class ChangePasswordStateListener extends ConsumerStatefulWidget {
   const ChangePasswordStateListener({super.key});
 
@@ -43,10 +38,7 @@ class _ChangePasswordStateListenerState
           return;
         }
 
-        final message = failureToUserMessage(
-          error,
-          l10n: context.l10n,
-        );
+        final message = failureToUserMessage(error, l10n: context.l10n);
         context.showAppSnack(message, type: AppSnackType.error);
       },
       data: (result) async {

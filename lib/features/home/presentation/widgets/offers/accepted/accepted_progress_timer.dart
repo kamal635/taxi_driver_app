@@ -1,13 +1,11 @@
-import 'dart:async';
-
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
-import 'package:bawabat_al_saeq/features/home/presentation/utils/offer_time_formatter.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_actions.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_progress_indicator.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/builders/countdown_builder.dart';
 import 'package:flutter/material.dart';
 
 /// Handles the cooldown timer before the driver can complete the trip.
-class AcceptedProgressTimer extends StatefulWidget {
+class AcceptedProgressTimer extends StatelessWidget {
   const AcceptedProgressTimer({
     required this.cooldownUntil,
     required this.isCompletedLoading,
@@ -15,87 +13,42 @@ class AcceptedProgressTimer extends StatefulWidget {
     super.key,
   });
 
+  static const Duration _totalDuration = Duration(minutes: 5);
+
   final DateTime cooldownUntil;
   final VoidCallback? onComplete;
   final bool isCompletedLoading;
 
   @override
-  State<AcceptedProgressTimer> createState() => _AcceptedProgressTimerState();
-}
+  Widget build(BuildContext context) {
+    return CountdownBuilder(
+      targetTime: cooldownUntil,
+      builder: (context, remaining) {
+        final canComplete = remaining == Duration.zero;
+        final progress = _progressFromRemaining(remaining);
 
-class _AcceptedProgressTimerState extends State<AcceptedProgressTimer> {
-  static const Duration _totalDuration = Duration(minutes: 5);
+        return Column(
+          children: [
+            AcceptedProgressIndicator(
+              remaining: remaining,
+              progress: progress,
+            ),
+            AppSpacing.h24,
+            AcceptedActions(
+              isCompletedLoading: isCompletedLoading,
+              canComplete: canComplete,
+              onComplete: onComplete,
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-  Timer? _timer;
-
-  Duration get _remaining => remainingUntil(widget.cooldownUntil);
-
-  bool get _canComplete => _remaining == Duration.zero;
-
-  double get _progress {
+  double _progressFromRemaining(Duration remaining) {
     final totalMilliseconds = _totalDuration.inMilliseconds;
-    final elapsedMilliseconds = totalMilliseconds - _remaining.inMilliseconds;
+    final elapsedMilliseconds = totalMilliseconds - remaining.inMilliseconds;
 
     return (elapsedMilliseconds / totalMilliseconds).clamp(0.0, 1.0);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _startTimerIfNeeded();
-  }
-
-  @override
-  void didUpdateWidget(covariant AcceptedProgressTimer oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.cooldownUntil != widget.cooldownUntil) {
-      _startTimerIfNeeded();
-    }
-  }
-
-  void _startTimerIfNeeded() {
-    _timer?.cancel();
-    _timer = null;
-
-    if (_remaining == Duration.zero) {
-      if (mounted) setState(() {});
-      return;
-    }
-
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
-
-      if (_remaining == Duration.zero) {
-        _timer?.cancel();
-        _timer = null;
-      }
-
-      setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        AcceptedProgressIndicator(
-          remaining: _remaining,
-          progress: _progress,
-        ),
-        AppSpacing.h24,
-        AcceptedActions(
-          isCompletedLoading: widget.isCompletedLoading,
-          canComplete: _canComplete,
-          onComplete: widget.onComplete,
-        ),
-      ],
-    );
   }
 }

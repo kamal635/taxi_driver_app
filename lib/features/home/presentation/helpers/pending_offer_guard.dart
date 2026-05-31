@@ -1,5 +1,6 @@
 import 'package:bawabat_al_saeq/features/home/domain/entities/offer_entity.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/controllers/new_offer_controller.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/services/pending_offer_actionability.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Reads the active pending offer and validates that it is still actionable.
@@ -27,7 +28,7 @@ NewOfferEntity? readActivePendingOffer({
     return null;
   }
 
-  if (!pendingOffer.expiresAt.isAfter(DateTime.now())) {
+  if (isPendingOfferExpired(pendingOffer)) {
     ref.read(newOfferControllerProvider.notifier).clearCurrent();
 
     onError(

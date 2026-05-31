@@ -38,10 +38,7 @@ class _ProfileSignOutListenerState
           return;
         }
 
-        final message = failureToUserMessage(
-          error,
-          l10n: context.l10n,
-        );
+        final message = failureToUserMessage(error, l10n: context.l10n);
         context.showAppSnack(message, type: AppSnackType.error);
         ref.read(signOutControllerProvider.notifier).reset();
       },

@@ -4,7 +4,7 @@ import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_entity.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/widgets/completed_trip_card.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_empty_state.dart';
-import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_loading_state.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/states/app_centered_loading.dart';
 import 'package:flutter/material.dart';
 
 class TripsContentSection extends StatelessWidget {
@@ -20,7 +20,7 @@ class TripsContentSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isInitialLoading) {
-      return const SliverToBoxAdapter(child: TripsLoadingState());
+      return const SliverToBoxAdapter(child: AppCenteredLoading());
     }
 
     if (offers.isEmpty) {

@@ -19,41 +19,49 @@ class AppSignOutService {
     _isSigningOut = true;
 
     try {
-      if (notifyBackend) {
-        try {
-          await _ref
-              .read(availabilityProvider.notifier)
-              .requestSetOnline(value: false);
-        } on Exception {
-          // Best-effort cleanup.
-        }
-      } else {
-        try {
-          await _ref
-              .read(availabilityProvider.notifier)
-              .forceLocalOfflineCleanup();
-        } on Exception {
-          // Best-effort cleanup.
-        }
-      }
-
-      try {
-        _ref.read(newOfferControllerProvider.notifier)
-          ..clearCurrent()
-          ..clearError();
-      } on Exception {
-        // Best-effort cleanup.
-      }
-
-      try {
-        _ref.read(acceptOfferControllerProvider.notifier).clear();
-      } on Exception {
-        // Best-effort cleanup.
-      }
+      await _turnOfflineBeforeSignOut(notifyBackend: notifyBackend);
+      _clearRuntimeOfferState();
 
       await _ref.read(authSessionProvider).clear();
     } finally {
       _isSigningOut = false;
+    }
+  }
+
+  Future<void> _turnOfflineBeforeSignOut({required bool notifyBackend}) async {
+    final availabilityController = _ref.read(availabilityProvider.notifier);
+
+    if (notifyBackend) {
+      try {
+        await availabilityController.requestSetOnline(value: false);
+        return;
+      } on Exception {
+        // If the backend request fails, keep the sign out flow safe by
+        // cleaning the local availability/runtime state before clearing
+        // the session.
+      }
+    }
+
+    try {
+      await availabilityController.forceLocalOfflineCleanup();
+    } on Exception {
+      // Best-effort cleanup.
+    }
+  }
+
+  void _clearRuntimeOfferState() {
+    try {
+      _ref.read(newOfferControllerProvider.notifier)
+        ..clearCurrent()
+        ..clearError();
+    } on Exception {
+      // Best-effort cleanup.
+    }
+
+    try {
+      _ref.read(acceptOfferControllerProvider.notifier).clear();
+    } on Exception {
+      // Best-effort cleanup.
     }
   }
 }

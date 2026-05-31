@@ -29,17 +29,12 @@ final class AuthController extends AsyncNotifier<AuthSignInResult?> {
     }
 
     state = const AsyncLoading<AuthSignInResult?>();
-
-    try {
-      final result = await _signInUseCase(
+    state = await AsyncValue.guard(
+      () => _signInUseCase(
         phone: phone,
         password: password,
         fcmToken: fcmToken,
-      );
-
-      state = AsyncData(result);
-    } on Object catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
-    }
+      ),
+    );
   }
 }

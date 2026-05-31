@@ -11,6 +11,9 @@ enum LocationFailureReason {
   /// The platform could not determine the permission state.
   unableToDetermine,
 
+  /// Foreground location is granted, but background location is still missing.
+  backgroundPermissionRequired,
+
   /// Reserved for future networking-related location failures.
   networkError,
 }

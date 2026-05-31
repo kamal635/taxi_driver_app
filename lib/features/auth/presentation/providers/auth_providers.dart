@@ -1,5 +1,5 @@
 import 'package:bawabat_al_saeq/core/networking/providers/network_client_providers.dart';
-import 'package:bawabat_al_saeq/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:bawabat_al_saeq/features/auth/data/datasources/remote/auth_remote_data_source.dart';
 import 'package:bawabat_al_saeq/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:bawabat_al_saeq/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bawabat_al_saeq/features/auth/domain/usecases/sign_in_use_case.dart';
