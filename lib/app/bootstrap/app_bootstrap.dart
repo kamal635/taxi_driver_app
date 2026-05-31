@@ -1,3 +1,5 @@
+import 'package:bawabat_al_saeq/app/session/app_sign_out_service.dart';
+import 'package:bawabat_al_saeq/core/session/session_expiration_handler.dart';
 import 'package:bawabat_al_saeq/core/session/session_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +18,15 @@ Future<ProviderContainer> bootstrapApplication() async {
 
   _setDefaultSystemUiOverlayStyle();
 
-  final container = ProviderContainer();
+  final container = ProviderContainer(
+    overrides: [
+      sessionExpirationHandlerProvider.overrideWith((ref) {
+        return AppSessionExpirationHandler(
+          ref.read(appSignOutServiceProvider),
+        );
+      }),
+    ],
+  );
   await container.read(authSessionProvider).load();
 
   return container;

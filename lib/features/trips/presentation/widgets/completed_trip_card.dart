@@ -4,7 +4,7 @@ import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_entity.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/widgets/completed_trip_meta.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/widgets/completed_trip_route_section.dart';
-import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_card_surface.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/surfaces/app_card_surface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -18,7 +18,7 @@ class CompletedTripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TripsCardSurface(
+    return AppCardSurface(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

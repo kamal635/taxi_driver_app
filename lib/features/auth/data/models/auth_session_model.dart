@@ -1,5 +1,5 @@
 import 'package:bawabat_al_saeq/core/utils/json_reader.dart';
-import 'package:bawabat_al_saeq/features/auth/domain/entities/auth_sign_in_result.dart';
+import 'package:bawabat_al_saeq/features/auth/domain/entities/auth_session_entity.dart';
 
 /// Data model for the authenticated driver session returned by the backend.
 final class AuthSessionModel {

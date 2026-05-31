@@ -4,7 +4,7 @@ import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
-import 'package:bawabat_al_saeq/features/trips/presentation/widgets/trips_card_surface.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/surfaces/app_card_surface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -36,7 +36,7 @@ class TripsCommissionCalculatorEntryCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(22.r),
-        child: TripsCardSurface(
+        child: AppCardSurface(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -211,7 +211,7 @@ class TripsCommissionCalculatorCard extends StatelessWidget {
     final l10n = context.l10n;
     final hasDateRange = fromDate != null || toDate != null;
 
-    return TripsCardSurface(
+    return AppCardSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

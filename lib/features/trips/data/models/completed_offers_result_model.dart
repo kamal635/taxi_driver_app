@@ -2,6 +2,7 @@ import 'package:bawabat_al_saeq/core/utils/json_reader.dart';
 import 'package:bawabat_al_saeq/features/trips/data/mappers/completed_period_mapper.dart';
 import 'package:bawabat_al_saeq/features/trips/data/models/completed_offer_model.dart';
 import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offers_result_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_period.dart';
 
 /// Data model for the completed trips response.
 final class CompletedOffersResultModel {

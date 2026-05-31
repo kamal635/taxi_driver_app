@@ -1,7 +1,7 @@
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
-import 'package:bawabat_al_saeq/core/widgets/app_button.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/buttons/app_button.dart';
 import 'package:flutter/material.dart';
 
 /// Action row for a pending offer.

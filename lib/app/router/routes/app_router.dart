@@ -5,7 +5,7 @@ import 'package:bawabat_al_saeq/app/router/routes/auth_routes.dart';
 import 'package:bawabat_al_saeq/app/router/routes/shell_routes.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
 import 'package:bawabat_al_saeq/core/session/session_store.dart';
-import 'package:bawabat_al_saeq/core/widgets/app_error_page.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/pages/app_error_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 

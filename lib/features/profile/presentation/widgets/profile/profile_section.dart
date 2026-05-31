@@ -30,10 +30,7 @@ class ProfileSection extends StatelessWidget {
         ),
         AppSpacing.h10,
         AppCardSurface(
-          padding: EdgeInsets.symmetric(
-            horizontal: 4.w,
-            vertical: 4.h,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
           child: Column(children: children),
         ),
       ],

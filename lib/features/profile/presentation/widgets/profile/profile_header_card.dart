@@ -1,6 +1,6 @@
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
-import 'package:bawabat_al_saeq/features/profile/presentation/widgets/profile/avatar_image_editor.dart';
+import 'package:bawabat_al_saeq/features/profile/presentation/widgets/profile/avatar/avatar_image_editor.dart';
 import 'package:bawabat_al_saeq/shared/presentation/widgets/surfaces/app_card_surface.dart';
 import 'package:flutter/material.dart';
 

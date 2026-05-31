@@ -1,12 +1,5 @@
 import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offer_entity.dart';
-
-/// Available filters for completed trips.
-enum CompletedPeriod {
-  all,
-  day,
-  week,
-  month,
-}
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_period.dart';
 
 /// Domain entity for the completed trips screen payload.
 final class CompletedOffersResultEntity {

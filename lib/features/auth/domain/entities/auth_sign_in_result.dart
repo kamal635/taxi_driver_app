@@ -1,19 +1,6 @@
-/// Domain entity representing the authenticated driver session.
-final class AuthSessionEntity {
-  const AuthSessionEntity({
-    required this.accessToken,
-    required this.refreshToken,
-    required this.driverId,
-    required this.driverName,
-    required this.driverPhone,
-  });
+import 'package:bawabat_al_saeq/features/auth/domain/entities/auth_session_entity.dart';
 
-  final String accessToken;
-  final String refreshToken;
-  final String driverId;
-  final String driverName;
-  final String driverPhone;
-}
+export 'package:bawabat_al_saeq/features/auth/domain/entities/auth_session_entity.dart';
 
 /// Base result for sign-in attempts.
 sealed class AuthSignInResult {

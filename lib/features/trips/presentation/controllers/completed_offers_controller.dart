@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offers_result_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/data/datasources/local/trips_commission_settings_storage.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_period.dart';
 import 'package:bawabat_al_saeq/features/trips/domain/usecases/get_completed_offers_use_case.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/providers/trips_providers.dart';
 import 'package:bawabat_al_saeq/features/trips/presentation/state/completed_offers_state.dart';
-import 'package:bawabat_al_saeq/features/trips/presentation/storage/trips_commission_settings_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final completedOffersControllerProvider =

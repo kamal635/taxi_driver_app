@@ -1,7 +1,7 @@
 import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
-import 'package:bawabat_al_saeq/core/widgets/app_text_field.dart';
 import 'package:bawabat_al_saeq/shared/presentation/forms/password_fields/password_visibility_button.dart';
+import 'package:bawabat_al_saeq/shared/presentation/widgets/fields/app_text_field.dart';
 import 'package:flutter/material.dart';
 
 /// Reusable two-field password block used by password setup/update screens.

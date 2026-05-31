@@ -1,7 +1,7 @@
 import 'package:bawabat_al_saeq/core/networking/config/network_constants.dart';
 import 'package:bawabat_al_saeq/core/networking/refresh/forced_logout_policy.dart';
 import 'package:bawabat_al_saeq/core/networking/refresh/session_refresh_service.dart';
-import 'package:bawabat_al_saeq/core/session/app_sign_out_service.dart';
+import 'package:bawabat_al_saeq/core/session/session_expiration_handler.dart';
 import 'package:bawabat_al_saeq/core/session/session_store.dart';
 import 'package:dio/dio.dart';
 
@@ -10,16 +10,16 @@ class SessionRefreshInterceptor extends QueuedInterceptor {
     required Dio dio,
     required AuthSession authSession,
     required SessionRefreshService sessionRefreshService,
-    required AppSignOutService appSignOutService,
+    required SessionExpirationHandler sessionExpirationHandler,
   }) : _dio = dio,
        _authSession = authSession,
        _sessionRefreshService = sessionRefreshService,
-       _appSignOutService = appSignOutService;
+       _sessionExpirationHandler = sessionExpirationHandler;
 
   final Dio _dio;
   final AuthSession _authSession;
   final SessionRefreshService _sessionRefreshService;
-  final AppSignOutService _appSignOutService;
+  final SessionExpirationHandler _sessionExpirationHandler;
 
   @override
   Future<void> onError(
@@ -35,14 +35,14 @@ class SessionRefreshInterceptor extends QueuedInterceptor {
 
     if (request.extra['retried'] == true ||
         ForcedLogoutPolicy.isRefreshRequest(request)) {
-      await _forceLocalSignOut();
+      await _handleExpiredSession();
       handler.next(err);
       return;
     }
 
     final refreshToken = _authSession.refreshToken;
     if (refreshToken == null || refreshToken.isEmpty) {
-      await _forceLocalSignOut();
+      await _handleExpiredSession();
       handler.next(err);
       return;
     }
@@ -50,7 +50,7 @@ class SessionRefreshInterceptor extends QueuedInterceptor {
     try {
       await _sessionRefreshService.refresh();
     } on Exception {
-      await _forceLocalSignOut();
+      await _handleExpiredSession();
       handler.next(err);
       return;
     }
@@ -68,17 +68,17 @@ class SessionRefreshInterceptor extends QueuedInterceptor {
       handler.resolve(response);
     } on DioException catch (retryError) {
       if (ForcedLogoutPolicy.shouldHandle(retryError)) {
-        await _forceLocalSignOut();
+        await _handleExpiredSession();
       }
 
       handler.next(retryError);
     } on Exception {
-      await _forceLocalSignOut();
+      await _handleExpiredSession();
       handler.next(err);
     }
   }
 
-  Future<void> _forceLocalSignOut() {
-    return _appSignOutService.signOut(notifyBackend: false);
+  Future<void> _handleExpiredSession() {
+    return _sessionExpirationHandler.handleExpiredSession();
   }
 }

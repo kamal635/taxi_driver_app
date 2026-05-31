@@ -1,9 +1,7 @@
-import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_offers_result_entity.dart';
+import 'package:bawabat_al_saeq/features/trips/domain/entities/completed_period.dart';
 import 'package:bawabat_al_saeq/l10n/app_localizations.dart';
 
 /// Periods shown in the trips filter UI.
-///
-/// The driver-facing screen includes all unpaid trips plus common date filters.
 const tripsVisiblePeriods = <CompletedPeriod>[
   CompletedPeriod.all,
   CompletedPeriod.day,
