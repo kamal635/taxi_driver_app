@@ -4,6 +4,7 @@ import 'package:bawabat_al_saeq/features/availability/data/datasources/android/d
 import 'package:bawabat_al_saeq/features/availability/presentation/providers/availability_providers.dart';
 import 'package:bawabat_al_saeq/features/home/domain/entities/offer_entity.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/parsers/new_offer_payload_parser.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/providers/offer_providers.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/services/pending_offer_actionability.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/services/pending_offer_expiry_scheduler.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/state/new_offer_state.dart';
@@ -23,9 +24,12 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
   StreamSubscription<DriverBackgroundOfferEvent>? _offerEventsSubscription;
   StreamSubscription<DriverOfferNotificationOpenEvent>?
   _offerNotificationOpenSubscription;
+  var _isDisposed = false;
 
   @override
   FutureOr<NewOfferState> build() {
+    _isDisposed = false;
+
     final bridge = ref.read(driverBackgroundServiceBridgeProvider);
 
     _offerEventsSubscription ??= bridge.offerEvents.listen(
@@ -51,6 +55,13 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
     state = AsyncData(
       _currentState.copyWith(currentOffer: null, errorMessage: null),
     );
+  }
+
+  void clearCurrentIfMatching(String offerId) {
+    final activeOffer = _currentState.currentOffer;
+    if (activeOffer?.offerId != offerId) return;
+
+    clearCurrent();
   }
 
   void clearError() {
@@ -131,10 +142,80 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
       ),
     );
 
+    if (!_hasUsefulNotes(offer.notes)) {
+      unawaited(_refreshPendingOfferSnapshot(offer));
+    }
+
     debugPrint(
       'Native background offer stored successfully -> id=${offer.offerId}',
     );
   }
+
+  Future<void> _refreshPendingOfferSnapshot(NewOfferEntity offer) async {
+    try {
+      final snapshot = await ref.read(
+        getCurrentAndPendingOfferUseCaseProvider,
+      )();
+
+      if (_isDisposed) return;
+
+      final activeOffer = _currentState.currentOffer;
+      if (activeOffer?.offerId != offer.offerId) return;
+
+      final snapshotOffer = snapshot?.pendingOffer;
+      if (snapshotOffer == null || snapshotOffer.offerId != offer.offerId) {
+        clearCurrentIfMatching(offer.offerId);
+        return;
+      }
+
+      if (isPendingOfferExpired(snapshotOffer)) {
+        clearCurrentIfMatching(offer.offerId);
+        return;
+      }
+
+      final mergedOffer = _mergePendingOfferSnapshot(
+        activeOffer: activeOffer!,
+        snapshotOffer: snapshotOffer,
+      );
+
+      _expiryScheduler.schedule(
+        offer: mergedOffer,
+        onExpired: _expireCurrentOfferIfMatching,
+      );
+
+      state = AsyncData(
+        _currentState.copyWith(
+          currentOffer: mergedOffer,
+          errorMessage: null,
+        ),
+      );
+    } on Exception catch (error, stackTrace) {
+      debugPrint(
+        'Failed to refresh pending offer snapshot -> id=${offer.offerId}: '
+        '$error\n$stackTrace',
+      );
+    }
+  }
+
+  NewOfferEntity _mergePendingOfferSnapshot({
+    required NewOfferEntity activeOffer,
+    required NewOfferEntity snapshotOffer,
+  }) {
+    final activeNotes = activeOffer.notes?.trim();
+    final snapshotNotes = snapshotOffer.notes?.trim();
+
+    return NewOfferEntity(
+      type: snapshotOffer.type,
+      offerId: snapshotOffer.offerId,
+      pickup: snapshotOffer.pickup,
+      dropoff: snapshotOffer.dropoff,
+      price: snapshotOffer.price,
+      expiresAt: snapshotOffer.expiresAt,
+      notes: _hasUsefulNotes(snapshotNotes) ? snapshotNotes : activeNotes,
+    );
+  }
+
+  bool _hasUsefulNotes(String? notes) => notes?.trim().isNotEmpty ?? false;
 
   void _handleExpiredIncomingOffer(
     NewOfferEntity offer, {
@@ -169,6 +250,8 @@ final class NewOfferController extends AsyncNotifier<NewOfferState> {
   }
 
   void _disposeSubscriptions() {
+    _isDisposed = true;
+
     unawaited(_offerEventsSubscription?.cancel());
     _offerEventsSubscription = null;
 

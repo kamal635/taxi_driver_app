@@ -6,6 +6,7 @@ import 'package:bawabat_al_saeq/features/home/domain/usecases/accept_offer_use_c
 import 'package:bawabat_al_saeq/features/home/presentation/controllers/new_offer_controller.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/helpers/pending_offer_guard.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/providers/offer_providers.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/services/offer_stale_error_resolver.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/state/accept_offer_state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,10 +55,37 @@ final class AcceptOfferController extends AsyncNotifier<AcceptOfferState> {
         ),
       );
     } on Failure catch (failure, stackTrace) {
+      _clearPendingOfferIfServerRejectedIt(
+        error: failure,
+        offerId: offerId,
+      );
       state = AsyncError(failure, stackTrace);
     } on Exception catch (error, stackTrace) {
+      _clearPendingOfferIfServerRejectedIt(
+        error: error,
+        offerId: offerId,
+      );
+      state = AsyncError(error, stackTrace);
+    } on Object catch (error, stackTrace) {
+      _clearPendingOfferIfServerRejectedIt(
+        error: error,
+        offerId: offerId,
+      );
       state = AsyncError(error, stackTrace);
     }
+  }
+
+  void _clearPendingOfferIfServerRejectedIt({
+    required Object error,
+    required String offerId,
+  }) {
+    if (!OfferStaleErrorResolver.isStaleOfferError(error)) return;
+
+    ref
+        .read(newOfferControllerProvider.notifier)
+        .clearCurrentIfMatching(
+          offerId,
+        );
   }
 
   void clear() {

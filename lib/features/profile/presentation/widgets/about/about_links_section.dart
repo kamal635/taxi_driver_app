@@ -34,14 +34,14 @@ class AboutLinksSection extends StatelessWidget {
             ExternalUrlLauncher.open(AppLinks.termsAndConditions),
           ),
         ),
-        ProfileSectionItem(
-          title: l10n.aboutSupportTitle,
-          subtitle: l10n.aboutSupportSubtitle,
-          icon: Icons.support_agent_rounded,
-          onPressed: () => unawaited(
-            ExternalUrlLauncher.open(AppLinks.support),
-          ),
-        ),
+        // ProfileSectionItem(
+        //   title: l10n.aboutSupportTitle,
+        //   subtitle: l10n.aboutSupportSubtitle,
+        //   icon: Icons.support_agent_rounded,
+        //   onPressed: () => unawaited(
+        //     ExternalUrlLauncher.open(AppLinks.support),
+        //   ),
+        // ),
       ],
     );
   }

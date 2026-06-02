@@ -1,8 +1,8 @@
-import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_actions.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_progress_indicator.dart';
 import 'package:bawabat_al_saeq/shared/presentation/widgets/builders/countdown_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// Handles the cooldown timer before the driver can complete the trip.
 class AcceptedProgressTimer extends StatelessWidget {
@@ -28,12 +28,13 @@ class AcceptedProgressTimer extends StatelessWidget {
         final progress = _progressFromRemaining(remaining);
 
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AcceptedProgressIndicator(
               remaining: remaining,
               progress: progress,
             ),
-            AppSpacing.h24,
+            SizedBox(height: 14.h),
             AcceptedActions(
               isCompletedLoading: isCompletedLoading,
               canComplete: canComplete,
