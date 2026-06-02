@@ -1,8 +1,7 @@
-import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_customer_phone_tile.dart';
 import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/accepted/accepted_progress_timer.dart';
-import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/shared/offer_header.dart';
-import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/shared/offer_route_section.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/shared/offer_main_details.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/shared/offer_section_divider.dart';
 import 'package:flutter/material.dart';
 
 class AcceptedOfferContent extends StatelessWidget {
@@ -30,19 +29,17 @@ class AcceptedOfferContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        OfferHeader(
+        OfferMainDetails(
           statusLabel: statusLabel,
           totalFare: totalFare,
-        ),
-        AppSpacing.h24,
-        OfferRouteSection(
           pickup: pickup,
           dropoff: dropoff,
         ),
-        AppSpacing.h24,
+        const OfferSectionDivider(),
         AcceptedCustomerPhoneTile(customerPhone: customerPhone),
-        AppSpacing.h24,
+        const OfferSectionDivider(),
         AcceptedProgressTimer(
           isCompletedLoading: isCompletedLoading,
           cooldownUntil: cooldownUntil,

@@ -19,5 +19,33 @@ final class OfferJsonKeys {
   static const expiresAt = ['expiresAt', 'expires_at'];
   static const cooldownUntil = ['cooldownUntil', 'cooldown_until'];
   static const customerPhone = ['customerPhone', 'customer_phone', 'phone'];
-  static const notes = ['note', 'notes'];
+  static const notes = [
+    'note',
+    'notes',
+    'customerNote',
+    'customer_note',
+    'customerNotes',
+    'customer_notes',
+    'clientNote',
+    'client_note',
+    'clientNotes',
+    'client_notes',
+    'orderNote',
+    'order_note',
+    'orderNotes',
+    'order_notes',
+    'tripNote',
+    'trip_note',
+    'tripNotes',
+    'trip_notes',
+    'rideNote',
+    'ride_note',
+    'rideNotes',
+    'ride_notes',
+    'specialInstructions',
+    'special_instructions',
+    'remarks',
+    'comment',
+    'description',
+  ];
 }

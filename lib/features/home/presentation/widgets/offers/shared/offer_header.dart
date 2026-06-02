@@ -1,15 +1,11 @@
-import 'package:bawabat_al_saeq/app/theme/app_spacing.dart';
-import 'package:bawabat_al_saeq/app/theme/app_theme_colors.dart';
-import 'package:bawabat_al_saeq/app/theme/app_typography.dart';
-import 'package:bawabat_al_saeq/core/constants/app_icons.dart';
 import 'package:bawabat_al_saeq/core/extensions/l10n_x.dart';
-import 'package:bawabat_al_saeq/core/utils/price_formatter.dart';
-import 'package:bawabat_al_saeq/features/home/presentation/formatters/offer_time_formatter.dart';
-import 'package:bawabat_al_saeq/shared/presentation/widgets/builders/countdown_builder.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/shared/offer_countdown_pill.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/shared/offer_fare_card.dart';
+import 'package:bawabat_al_saeq/features/home/presentation/widgets/offers/shared/offer_status_pill.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// Header area shared by offer cards.
+/// Backward-compatible header built from the shared offer blocks.
 class OfferHeader extends StatelessWidget {
   const OfferHeader({
     required this.statusLabel,
@@ -26,31 +22,30 @@ class OfferHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            OfferStatusChip(label: statusLabel),
-            if (showExpiryChip && expiresAt != null)
-              OfferExpiryChip(expiresAt: expiresAt!),
+            OfferStatusPill(label: statusLabel),
+            if (showExpiryChip && expiresAt != null) ...[
+              const Spacer(),
+              SizedBox(width: 8.w),
+              OfferCountdownPill(
+                expiresAt: expiresAt!,
+                labelPrefix: context.l10n.homeOfferExpiresIn,
+              ),
+            ],
           ],
         ),
-        AppSpacing.h18,
-        Text(l10n.totalFare, style: AppTypography.subtitleSm),
-        AppSpacing.h4,
-        Text(
-          '${formatOrderPrice(totalFare)} ${l10n.currencySyrianPound}',
-          style: AppTypography.titleMd,
-        ),
+        SizedBox(height: 16.h),
+        OfferFareCard(totalFare: totalFare),
       ],
     );
   }
 }
 
+/// Backward-compatible alias for older imports.
 class OfferStatusChip extends StatelessWidget {
   const OfferStatusChip({
     required this.label,
@@ -61,22 +56,11 @@ class OfferStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 14.w),
-      decoration: BoxDecoration(
-        color: colors.infoBg,
-        borderRadius: BorderRadius.circular(999.r),
-      ),
-      child: Text(
-        label,
-        style: AppTypography.labelMd.copyWith(color: colors.info),
-      ),
-    );
+    return OfferStatusPill(label: label);
   }
 }
 
+/// Backward-compatible alias for older imports.
 class OfferExpiryChip extends StatelessWidget {
   const OfferExpiryChip({
     required this.expiresAt,
@@ -87,48 +71,9 @@ class OfferExpiryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CountdownBuilder(
-      targetTime: expiresAt,
-      builder: (context, remaining) {
-        return _OfferExpiryChipContent(
-          label:
-              '${context.l10n.homeOfferExpiresIn} '
-              '${formatOfferCountdown(remaining)}',
-        );
-      },
-    );
-  }
-}
-
-class _OfferExpiryChipContent extends StatelessWidget {
-  const _OfferExpiryChipContent({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
-      decoration: BoxDecoration(
-        color: colors.errorBg.withValues(alpha: 0.4),
-        borderRadius: BorderRadius.circular(999.r),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            AppIcons.timer,
-            size: 18.r,
-            color: colors.error,
-          ),
-          AppSpacing.w4,
-          Text(
-            label,
-            style: AppTypography.labelSm.copyWith(color: colors.error),
-          ),
-        ],
-      ),
+    return OfferCountdownPill(
+      expiresAt: expiresAt,
+      labelPrefix: context.l10n.homeOfferExpiresIn,
     );
   }
 }
